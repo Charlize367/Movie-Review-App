@@ -1,0 +1,500 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+  margin:0;
+  padding:0;
+  
+}
+
+
+.login-body{
+  width:100%;
+  height:80%;
+  
+}
+
+
+input:-internal-autofill-selected {
+    appearance: menulist-button;
+    background-image: none !important;
+    background-color: transparent !important;
+    color: transparent !important;
+}
+
+input:focus {
+  outline: none;
+}
+
+.form-container{
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: space-around;
+  position:relative;
+  max-width:600px;
+  margin-top:4%;
+  margin-left:28%;
+  background-color:#11202b;
+  align-items:center;
+  color:white;
+  padding-top:35px;
+  border-style:outset;
+  border-color:#4a4d4a;
+  padding-bottom:10px;
+  height:80%;
+
+}
+
+.fields{
+  padding:20px;
+  width: 83%;
+  height:25px;
+  border-style: solid;
+
+  border-width:0.1px;
+  border-color: transparent;
+  border-bottom: 2px solid white;
+  margin:30px;
+  background-color: transparent;
+  font-family: "Montserrat", sans-serif;
+  color:white;
+}
+
+.loginBtn{
+  width:80%;
+  background-color:white;
+  border-style: none;
+  border-radius:30px;
+  height:50px;
+  margin:50px;
+  font-family: "Montserrat", sans-serif;
+  color:black;
+  font-size:18px;
+  font-weight:bold;
+}
+.logoutBtn{
+  width:100%;
+  background-color:white;
+  border-style: none;
+  border-radius:30px;
+  height:50px;
+  font-family: "Montserrat", sans-serif;
+  color:darkcyan;
+  font-size:18px;
+  font-weight:bold;
+  margin-left:28%;
+}
+body {
+  padding:40px;
+  background-image: linear-gradient(to right, #477896 , #000E1A);
+  font-family: "Montserrat", sans-serif;
+
+}
+
+ul{
+  list-style-type: none;
+}
+
+.link{
+  display:inline-flex;
+}
+
+
+
+.logoutStyle{
+  color:darkcyan;
+}
+
+h2{
+  color: #f3f3f3;
+  text-align:left;
+  font-size:30px;
+  margin-bottom:20px;
+}
+
+button {
+  border:none;
+  font-size: 30px;
+  background-color: transparent;
+  width:100%;
+  text-align:right;
+  cursor:pointer;
+}
+
+p {
+  color:white;
+}
+
+img{
+  width:250px;
+  height:300px;
+  border-radius:10px;
+}
+
+
+.movie-display {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  align-items: center;
+  padding:0;
+  margin:0;
+}
+
+.search{
+  padding:30px;
+  margin-left:100px;
+}
+
+.search-bar{
+  width:65%;
+  height:80px;
+  border-radius:50px;
+  border-style: none;
+  margin-left:12%;
+  font-family: "Montserrat", sans-serif;
+  padding-left:3%;
+}
+
+section{
+
+}
+
+.container{
+
+}
+
+.movie-card{
+  margin-bottom:40px;
+  padding:8px;
+}
+
+.title{
+  color:white;
+  font-size:50px;
+}
+
+.header{
+  padding:0;
+  margin:0;
+}
+
+.header-nav {
+  display:inline-flex;
+  padding:10;
+  margin-bottom:60px;
+}
+
+.nav-links {
+  margin-left:50px;
+  margin-top:0;
+  padding:20px;
+  display:inline-flex;
+}
+
+a {
+  padding:15px;
+  text-decoration: none;
+  color:white;
+}
+
+.movie_title{
+  font-size:20px;
+  font-weight:bold;
+  width:100%;
+  height:30%;
+  
+}
+
+.poster{
+  width:100%;
+  height:100%;
+  transition: all 0.5s;
+}
+
+
+.indiv-movie-card{
+  position:relative;
+  overflow:hidden;
+}
+
+
+.details{
+  position:absolute;
+  color:white;
+  font-weight:bold;
+  top:-10%;
+  font-size:30px;
+  background: rgb(0, 0, 0);
+  background: rgba(0, 0, 0, 0.5); 
+  width: 100%;
+  height:90%;
+  transition: .5s ease;
+  padding-top: 50%;
+  opacity:0;
+  text-align: center;
+}
+
+.indiv-movie-card:hover .details{
+  opacity:1;
+}
+
+.category-container{
+  display:none;
+  position: absolute;
+  background-color: #f9f9f9;
+  width:400px;
+  height:300px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  color:black;
+
+}
+
+.genre-text{
+  color:black;
+}
+
+
+.category-block{
+  align-items: center;
+  position:relative;
+  margin-top:15px;
+}
+
+.category-block:hover .category-container{
+  display:block;
+  position: absolute;
+  background-color: #f9f9f9;
+  display:grid;
+  grid-template-columns: auto auto auto;
+  width:400px;
+  height:400px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  color:black;
+}
+
+.genre{
+  color:black;
+  cursor: pointer;
+  display:block;
+}
+
+
+.genre:hover{
+  background-color:gray;
+}
+
+.liked-icon{
+  width:40px;
+  height:40px;
+
+}
+
+.addToList-icon{
+  width:44px;
+  height:44px;
+  margin-left:4px;
+}
+
+.rate-icon{
+  width:30px;
+  height:30px;
+}
+
+.function-icons{
+  margin-top:10%;
+  width:100%;
+  display:inline-flex;
+  z-index:3;
+}
+
+.ratings{
+  margin-top:0.5%;
+  margin-left:-1%;
+}
+
+.first-row{
+  width:95%;
+  display:inline-flex;
+  margin-bottom:10px;
+  text-align:center;
+}
+
+.second-row{
+  width:100%;
+  margin-bottom:10px;
+}
+
+.rating{
+  margin-top:5%;
+  display:inline-flex;
+  margin-left:-1%;
+}
+
+
+
+.likeBtn{
+  margin-left:-5%;
+}
+
+.listBtn{
+  margin-right:20%;
+}
+
+
+.primary-details{
+  display:flex;
+}
+
+.movie-subdetail1{
+  display:flex;
+}
+
+.movie-subdetail2{
+  margin-top:2%;
+  display:flex;
+}
+
+
+
+
+
+.movie-detail-title{
+  margin-left:3%;
+}
+.genre-details{
+  margin-left:3%;
+}
+
+.movie-detail-date{
+  margin-left:3%;
+}
+
+.runtime-details{
+  margin-left:3%;
+}
+
+
+.movie-detail-lang{
+  margin-left:3%;
+  background-color:cadetblue;
+  width:4%;
+  padding-left:2%;
+  padding-top:0.8%;
+  border-radius:50px;
+
+}
+
+.rating-details{
+  display:flex;
+  margin-top:-0.5%;
+  margin-left: 10%;
+  background-color:cadetblue;
+  width:9%;
+  padding-left:2%;
+  padding-bottom:0.8%;
+  padding-top:0.5%;
+  border-radius:50px;
+}
+
+.ratings-details{
+  margin-top:8%;
+  margin-left:20%;
+}
+
+.movie-detail-overview{
+  margin-top:3%;
+  margin-left:3%;
+  width:70%;
+}
+
+.cast-details{
+  display:flex;
+  color:white;
+  margin-left:3%;
+  margin-top:3%;
+}
+
+.director-details{
+  margin-left: 3%;
+  margin-top:3%;
+}
+
+.movie-img-container{
+  width:25%;
+  height:25%;
+}
+
+.movie-detail-like{
+  display:flex;
+  margin-left:3%;
+  background-color:#11202b;
+  width:8%;
+  padding:1.5%;
+   padding-bottom:1%;
+  border-radius:50px;
+}
+
+
+
+.like-txt{
+  margin-top: 14%;
+  margin-left: 10%;
+}
+
+.movie-detail-list{
+  display:flex;
+  margin-left:3%;
+  background-color:#11202b;
+  width:10%;
+  padding:0.5%;
+  padding-bottom:0%;
+  border-radius:50px;
+}
+
+.list-txt{
+  margin-top: 20%;
+  margin-right: 15%;
+  margin-left:-10%;
+}
+
+.movie-detail-diary{
+  display:flex;
+  margin-left:3%;
+  background-color:#11202b;
+  width:12%;
+  padding:0.5%;
+   padding-bottom:0%;
+  border-radius:50px;
+}
+
+
+.diary-txt{
+ margin-top: 18%;
+  margin-right: 204%;
+  margin-left:13%;
+}
+
+.movie-actions{
+  display:flex;
+  margin-top:3%;
+}
+
+.dot{
+  font-size:20px;
+  margin-top:-0.5%;
+  margin-left:3%;
+}
+
+.castnames{
+  margin-left:0.5%;
+}
+
+.home-hero-text{
+  color:white;
+  text-align:center;
+  font-size:50px;
+  padding-bottom:5%;
+}
