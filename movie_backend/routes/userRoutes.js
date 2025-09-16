@@ -11,9 +11,9 @@ userRouter.get('/:id', authorize, getUser);
 
 userRouter.get('/:id/likedMovies', getUserLikedMovies);
 
-userRouter.get(':/id/watchlist', getUserWatchList);
+userRouter.get('/:id/watchlist', getUserWatchList);
 
-userRouter.get(':/id/diary', getUserDiary);
+userRouter.get('/:id/diary', getUserDiary);
 
 userRouter.post('/:userId/:movieId/likes', addUserLikedMovies);
 

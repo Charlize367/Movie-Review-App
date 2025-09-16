@@ -201,7 +201,7 @@ export const removeMovieFromLikes = async (req, res) => {
     try {
         const deleteMovie = await User.findByIdAndUpdate(
             req.params.userId,
-            { $pull : {likedMovies : {_id : req.params.likeId } } },
+            { $pull : {likedMovies : req.params.likeId  } },
             { new: true }
         );
 
@@ -224,6 +224,7 @@ export const removeMovieFromLikes = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message : error.message });
+        console.log(error);
     }
 }
 

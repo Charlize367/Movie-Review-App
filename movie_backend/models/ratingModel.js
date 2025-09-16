@@ -9,6 +9,18 @@ const ratingSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
+
+    likes: [
+         {
+                type:mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            }
+        ],
+    comments: [{
+        user: {type: String, required:true},
+        comment: {type:String, required: true}
+    }],
+
     userId: [{
         type:mongoose.Schema.Types.ObjectId,
         ref: "User",

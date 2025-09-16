@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema({
         required:true
     },
 
+    image : {
+        type:Buffer,
+        required:false
+    },
+
     likedMovies: [{
         type:mongoose.Schema.Types.ObjectId,
         ref: "Movie"
@@ -38,9 +43,9 @@ const userSchema = new mongoose.Schema({
     }],
 
     diary : [{
-        type:mongoose.Schema.Types.ObjectId,
-        ref: "Movie"
-    }]
+       type:mongoose.Schema.Types.ObjectId,
+               ref: "Movie"
+    }],
 
    }, {timestamps: true});
    

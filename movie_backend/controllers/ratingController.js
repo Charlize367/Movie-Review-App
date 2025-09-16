@@ -56,7 +56,7 @@ export const getRatingsByMovie = async (req, res) => {
             return res.status(404).json({message : 'Movie not found'});
         }
 
-        const ratings = await Ratings.find({ movie : movieId }).populate('movieId', 'title');
+        const ratings = await Ratings.find({ movieId : movieId }).populate('movieId', 'title');
         res.json(ratings);
     } catch (error) {
     console.log(error);
@@ -69,10 +69,10 @@ export const addRating = async (req, res) => {
     
     
     try {
-        const {rating, review, userId, movieId} = req.body;
+        const {rating, review,  userId, movieId} = req.body;
 
        
-        const newRating = await Ratings.create([{ rating, review, userId, movieId }]);
+        const newRating = await Ratings.create([{ rating, review, userId, movieId}]);
 
        
 
@@ -80,7 +80,7 @@ export const addRating = async (req, res) => {
             success:true,
             message: 'User created successfully',
             data: {
-                rating: newRating[0],
+                rating: newRating,
                 
             }
         })

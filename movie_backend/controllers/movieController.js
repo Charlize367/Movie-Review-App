@@ -39,7 +39,7 @@ export const addMovie = async (req, res) => {
 
         const movieExists = await Movie.findOne({ tmdbId });
 
-        if(movieExists) return res.status(200).json({ message : "Movie is already in collection", exists: true});
+        if(movieExists) return res.status(200).json({ message : "Movie is already in collection", exists: true, data: movieExists});
 
         const newMovie = await Movie.create({ tmdbId, title, posterPath, releaseDate, likedBy, ratings });
         
@@ -48,7 +48,8 @@ export const addMovie = async (req, res) => {
         res.status(201).json({
             success:true,
             message: 'User created successfully',
-            data: savedMovie
+            data: savedMovie,
+            exists:false
         })
     } catch (error) {
         console.log("Failed to add movie");
