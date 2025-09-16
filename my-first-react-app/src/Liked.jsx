@@ -1,8 +1,66 @@
 import React from 'react'
+import { useState, useEffect } from 'react'
+import Nav from './components/Nav.jsx'
+import Search from './components/Search.jsx'
+import MovieCard from './components/MovieCard.jsx'
+import {useParams} from "react-router-dom";
+import axios from "axios"
 
 const Liked = () => {
+  const API_URL = 'http://localhost:3000/api/v1';
+  const userId = localStorage.getItem('user_ID');
+  const [likedMovies, setLikedMovies] = useState([]);
+   const [isLoading, setIsLoading] = useState(false);
+   const [errorMessage, setErrorMessage] = useState("");
+
+  const getUserLikes = async () => {
+       try {
+             const response = await axios.get(`${API_URL}/users/${userId}/likedMovies`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+              });
+
+              console.log(response);
+              setLikedMovies(response.data.likedMovies);
+
+              
+              
+            } catch (error) {
+              console.log(error);
+              
+            }
+          }
+  
+      useEffect(() => {
+      getUserLikes();
+      
+    }, [userId]);
+
+    console.log(likedMovies);
   return (
-    <div>Liked</div>
+    <div className="container">
+      <Nav/>
+
+        <h2>Browse Liked Movies</h2>
+
+      <section className="all-movies">
+        {isLoading ? (
+            <center>
+          <img className="spinner" src="/Spinner.svg"/>
+          </center>
+        ) : errorMessage ? (
+        <p>{errorMessage}</p>
+      ) : (
+          <ul className="movie-display">
+          {likedMovies.map((movie) => (
+            <MovieCard movie={movie}/>
+          ))}
+          </ul>
+  )}
+      </section>
+    </div>
+
   )
 }
 

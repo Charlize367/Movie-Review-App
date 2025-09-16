@@ -71,10 +71,10 @@ const Nav = () => {
                                 </div>
                         </li>
                         <li className="link"><Link to ="/liked">Liked</Link></li>
-                        <li className="link"><Link to ="/watchlist">WatchList</Link></li>
+                        <li className="link"><Link to ="/list">WatchList</Link></li>
                         <li className="link"><Link to ="/diary">Diary</Link></li>
-                        <li className="link"><Link to ="/rated">Rated</Link></li>
-                        <li className="link"><Link to ="/movielist">MovieList</Link></li>
+                        <li className="link"><Link to ="/rated">Ratings</Link></li>
+                        <li className="link"><Link to ="/movielist">Lists</Link></li>
                         <button className="logoutBtn"><li className="logout"><Link className="logoutStyle" onClick={logout}>Logout</Link></li></button>
                          
                          

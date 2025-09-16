@@ -1,8 +1,11 @@
 import React from 'react'
-import { useParams } from 'react-router-dom';
+import { Form, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react'
 import Nav from './components/Nav.jsx'
 import axios from 'axios';
+import emptyStar from "/star1.svg";
+import halfStar from "/halfStar.svg";
+import fullStar from "/star2.svg";
 
 
 const MovieDetails = () => {
@@ -19,18 +22,532 @@ const MovieDetails = () => {
   const [director, setDirector] = useState([]);
   const [backdrop, setBackdrop] = useState([]);
   const param = useParams();
-  const [movie, setMovie] = useState([]);
   const [movies, setMovies] = useState([]);
-  const [movieId, setMovieId] = useState(0);
-  const [users, setUsers] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const username = localStorage.getItem('username');
   const userId = localStorage.getItem('user_ID');
+  const [likedMovies, setLikedMovies] = useState([]);
+  const [likedIcon, setlikedIcon] = useState('');
+  const [likedText, setLikedText] = useState("");
+  const [likeFunction, setLikeFunction] = useState(() => () => {});
+  const [watchList, setWatchList] = useState([]);
+  const [listIcon, setListIcon] = useState('');
+  const [listText, setListText] = useState("");
+  const [listFunction, setListFunction] = useState(() => () => {});
+  const [diary, setDiary] = useState([]);
+  const [diaryIcon, setDiaryIcon] = useState('');
+  const [diaryText, setDiaryText] = useState("");
+  const [diaryFunction, setDiaryFunction] = useState(() => () => {});
+  const [rate, setRate] = useState([]);
+  const [rateIcon, setRateIcon] = useState('');
+  const [rateText, setRateText] = useState("");
+  const [rateFunction, setRateFunction] = useState(() => () => {});
   const [isActive, setIsActive] = useState(false);
+  const [inputData, setInputData] = useState([]);
+  const [ratings, setRatings] = useState(0);
+  const [review, setReview] = useState("");
+  
+   
+
   
 
+  
+  const getMovies = async () => {
+       try {
+             const response = await axios.get(`${API_URL}/movies`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+              });
+
+              console.log(response);
+              setMovies(response.data.data);
+
+              
+            } catch (error) {
+              console.log(error);
+              
+            }
+          }
+  useEffect(() => {
+      getMovies();
+  }, []);
+        
+
+  const getUserLikes = async () => {
+       try {
+             const response = await axios.get(`${API_URL}/users/${userId}/likedMovies`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+              });
+
+              console.log(response);
+              setLikedMovies(response.data.likedMovies);
+
+              
+              
+            } catch (error) {
+              console.log(error);
+              
+            }
+          }
+  
+      useEffect(() => {
+      getUserLikes();
+      
+    }, []);
+
+
+  const getUserWatchList = async () => {
+       try {
+             const response = await axios.get(`${API_URL}/users/${userId}/watchlist`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+              });
+
+              console.log(response);
+              setWatchList(response.data.watchListMovies);
+
+              
+              
+            } catch (error) {
+              console.log(error);
+              
+            }
+          }
+  
+      useEffect(() => {
+      getUserWatchList();
+      
+    }, []);
+
+
+  const getUserDiary = async () => {
+       try {
+             const response = await axios.get(`${API_URL}/users/${userId}/diary`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+              });
+
+              console.log(response);
+              setDiary(response.data.diary);
+
+              
+              
+            } catch (error) {
+              console.log(error);
+              
+            }
+          }
+  
+      useEffect(() => {
+      getUserDiary();
+      
+    }, []);
+
+    
+
+    
+
+   
+
+
+
+  const addMovieIfNotExists = async () => {
+     
+    
+    const inputData = {
+      'tmdbId' : param.id,
+      'title' : movieDetails.title,
+      'posterPath' : movieDetails.poster_path,
+      'releaseDate' : movieDetails.release_date,
+      'likedBy' : [],
+      'ratings' : []
+    }
+
+  
+
+            const response = await axios.post(`${API_URL}/movies`, inputData, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+              });
+
+
+              const movie_ID = response.data.exists === false 
+                ? response.data.data._id
+                : response.data.data._id;
+
+
+                return movie_ID
+          
+          } 
+
+
+    
+
+    
+
+
+    const addToMovieLike = async(e) => {
+      e.preventDefault();
+      try {
+
+          const movieId = await addMovieIfNotExists();
+          const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/likes`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+                });
+                
+                console.log(response);
+                console.log(movieId);
+                getUserLikes();
+                
+        
+      } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+  const removeLike = async(e) => {
+    e.preventDefault();
+    
+     try {
+      const selectedLikedMovie = likedMovies.find(movie => movie.tmdbId === Number(param.id));
+      const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id));
+
+      const likeId = selectedLikedMovie._id;
+      const movieId = selectedMovie._id;
+          const response = await axios.delete(`${API_URL}/users/${userId}/${likeId}/${movieId}/like`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+                });
+                
+                console.log(response);
+                console.log(likeId);
+                console.log(movieId);
+                getUserLikes();
+                
+                
+        
+      } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+    const addToWatchList = async(e) => {
+      e.preventDefault();
+      try {
+         const movieId = await addMovieIfNotExists();
+          const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/watchlist`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+                });
+                
+                console.log(response);
+                console.log(movieId);
+                getUserWatchList();
+                
+        
+      } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+  const removeList = async(e) => {
+    e.preventDefault();
+    
+     try {
+      const selectedListMovie = watchList.find(movie => movie.tmdbId === Number(param.id));
+      const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id));
+
+      const listId = selectedListMovie._id;
+      const movieId = selectedMovie._id;
+          const response = await axios.delete(`${API_URL}/users/${userId}/${listId}/watchlist`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+                });
+                
+                console.log(response);
+                console.log(listId);
+                console.log(movieId);
+                getUserWatchList();
+                
+                
+        
+      } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+  const handleChange = (e) => {
+  setReview(e.target.value);
+};
+
+  const openForm = () => {
+    setIsActive(!isActive);
+    
+  }
+
+
+  
+  
+
+   
+  
+          
+
+
+    const addToDiary = async(e) => {
+     
+      e.preventDefault();
+      
+
+      try {
+         const movieId = await addMovieIfNotExists();
+          const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/diary`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+                });
+                
+                console.log(response);
+                console.log(movieId);
+                getUserDiary();
+
+        
+      } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+  const addToRating = async(e) => {
+     
+      e.preventDefault();
+      
+
+      try {
+        const movieId = await addMovieIfNotExists();
+          const finalData = {
+            rating: ratings,
+            review: review,
+            userId: userId,
+            movieId: movieId
+            
+          };
+
+
+          const response = await axios.post(`${API_URL}/ratings`, finalData, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+                });
+          console.log(response);
+
+          openForm(isActive);
+          e.target.reset();
+          getMovieRatings();
+        
+      } catch (error) {
+      console.log(error);
+    }
+  }
+
+  
+
+  const removeDiary = async(e) => {
+    e.preventDefault();
+    
+     try {
+      const selectedDiary = diary.find(movie => movie.tmdbId === Number(param.id));
+      const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id));
+
+      const diaryId = selectedDiary._id;
+      const movieId = selectedMovie._id;
+          const response = await axios.delete(`${API_URL}/users/${userId}/${diaryId}/diary`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+                });
+                
+                console.log(response);
+                console.log(diaryId);
+                console.log(movieId);
+                getUserDiary();
+                
+                
+        
+      } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getMovieRatings = async () => {
+       try {
+
+        const movieID = await addMovieIfNotExists();
+        console.log(movieID);
+             const response = await axios.get(`${API_URL}/ratings/movieRatings/${movieID}`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+              });
+
+              console.log(response);
+              setRate(response.data);
+              
+              
+  
+              
+            } catch (error) {
+              console.log(error);
+              
+            }
+          }
+  
+      useEffect(() => {
+      getMovieRatings();
+      
+    }, []);
+      
+
+    console.log(rate);
+   
+
+
+
+    
+    
+  
+
+  useEffect(() => {
+
+    const selectedLikedMovie = likedMovies.find(movie => movie.tmdbId === Number(param.id))
+     
+
+    if(selectedLikedMovie) {
+      
+      
+      setlikedIcon('/liked.svg');
+      setLikedText('Liked');
+      setLikeFunction(() => removeLike);
+      
+    }
+    
+    
+     else {
+      setlikedIcon('/like.svg');
+      setLikedText('Like');
+      console.log('like');
+      setLikeFunction(() => addToMovieLike);
+    
+   
+    }
+     }, [likedMovies]);
+
+
+
+
+
+  useEffect(() => {
+
+    const selectedListMovie = watchList.find(movie => movie.tmdbId === Number(param.id))
+     
+
+    if(selectedListMovie) {
+      
+     
+      setListIcon('/listed.svg');
+      setListText('Saved');
+      console.log("listed");
+      setListFunction(() => removeList);
+      
+    }
+
+     else {
+      setListIcon('/add.svg');
+      setListText('List');
+      console.log("not listed");
+      setListFunction(() => addToWatchList);
+    
+   
+    }
+     }, [watchList]);
+
+  
+  useEffect(() => {
+
+    const selectedDiary = diary.find(movie => movie.tmdbId === Number(param.id))
+     
+
+    if(selectedDiary) {
+      
+      
+      setDiaryIcon('/logged.svg');
+      setDiaryText('Logged');
+      setDiaryFunction(() => removeDiary);
+      
+    }
+    
+    
+     else {
+      setDiaryIcon('/add.svg');
+      setDiaryText('Log');
+      setDiaryFunction(() => addToDiary);
+    
+   
+    }
+     }, [diary]);
+
+
+     useEffect(() => {
+
+    const selectedRating = rate.find(movie => movie.tmdbId === Number(param.id))
+     
+
+    console.log(rate);
+
+    if(selectedRating) {
+      
+      
+      setRateIcon('/logged.svg');
+      setRateText('Rated');
+     setRateFunction(() => addToRating);
+      
+    }
+    
+    
+     else {
+      setRateIcon('/add.svg');
+      setRateText('Add Review');
+      setRateFunction(() => addToRating);
+    
+   
+    }
+     }, [rate]);
+  
+    
+      
+    
+      
+    
+
+  
 
   console.log(API_URL);
+  console.log(likeFunction);
   
   console.log(userId);
   const apiOptions = {
@@ -76,10 +593,9 @@ const getMovieDetails = async () => {
 useEffect(() => {
   getMovieDetails();
 }, [param.id])
-      
 
-    
-   
+
+
     
 
 
@@ -166,27 +682,9 @@ useEffect(() => {
       getBackdrop();
     }, []);
 
-    const getMovies = async () => {
-       try {
-             const response = await axios.get(`${API_URL}/movies`, {
-                  headers: {
-                       'Content-Type': 'application/json'
-                  }
-              });
+   
 
-              console.log(response);
-              setMovies(response.data.data);
-
-              
-            } catch (error) {
-              console.log(error);
-              
-            }
-          }
-  
-          useEffect(() => {
-      getMovies();
-    }, []);
+    
 
     
 
@@ -199,88 +697,19 @@ useEffect(() => {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     backgroundBlendMode: 'darken',
     height: 'auto', 
-    width: 'auto'
+    width: 'auto',
+    marginTop: '-3%',
+    paddingTop:'3%',
+    paddingLeft:'3%',
+    marginLeft: '-3%',
+    marginRight: '-3%'
   };
 
-
-
-
-  const addToMovieLike = async (e) => {
-    e.preventDefault();
-
-    
-
-    const inputData = {
-      'tmdbId' : param.id,
-      'title' : movieDetails.title,
-      'posterPath' : movieDetails.poster_path,
-      'releaseDate' : movieDetails.release_date,
-      'likedBy' : [],
-      'ratings' : []
-    }
-
-    try {
-
-            const response = await axios.post(`${API_URL}/movies`, inputData, {
-                  headers: {
-                       'Content-Type': 'application/json'
-                  }
-              });
-
-              console.log(response);
-
-              let movieID = 0;
-              if (response.data.exists == false) {
-              movieID = response.data.data._id;
-              }
-              
-              if (response.data.exists == true) {
-               console.log("movie exists");
-               console.log(movies);
-               console.log(param.id);
-               
-                const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id))
-                movieID = selectedMovie._id;
-                console.log(selectedMovie);
-                
-                
-
-              }
-
-            
-
-               likeMovie(movieID);
-            } catch (error) {
-              console.log(error);
-            }
-          } 
-
-
-    const likeMovie = async(movieId) => {
-      try {
-          const response2 = await axios.post(`${API_URL}/users/${userId}/${movieId}/likes`, {
-                  headers: {
-                       'Content-Type': 'application/json'
-                  }
-                });
-                
-                console.log(response2);
-                console.log(movieId);
-                setIsActive(true);
-        
-      } catch (error) {
-      console.log(error);
-    }
-  }
-
-
-  console.log(movies);
-
+ 
   
-
   return (
-    <body style={divStyle}>
-    <div className="container">
+    <div>
+    <div className="container"  style={divStyle}>
       <Nav />
       <div className="movie-detail-hero" >
         {/*<img className="movie-detail-hero" src={`https://image.tmdb.org/t/p/w500/${movieDetails.poster_path}`} />*/}
@@ -320,12 +749,58 @@ useEffect(() => {
                    <p className="director-details"><b>Directed By:</b> {director.name} </p>
 
               <div className="movie-actions">
-                <div className="movie-detail-like"><button className="likeBtn" onClick={addToMovieLike}><img className="liked-icon" src="/like.svg"/> </button> <p className="like-txt">Like</p></div>
-                <div className="movie-detail-list"><button className="listBtn"><img className="addToList-icon" src="/add.svg"/></button> <p className="list-txt"> List</p> </div>
-                <div className="movie-detail-diary"><button className="diaryBtn"><img className="addToList-icon" src="/add.svg"/></button> <p className="diary-txt"> Diary</p> </div>
+                <div className="movie-detail-like"><button className="likeBtn" onClick={likeFunction}><img className="liked-icon" src={`${likedIcon}`}/> </button> <p className="like-txt">{likedText}</p></div>
+                <div className="movie-detail-list"><button className="listBtn" onClick={listFunction}><img className="addToList-icon" src={`${listIcon}`}/></button> <p className="list-txt"> {listText}</p> </div>
+                <div className="movie-detail-diary"><button className="diaryBtn" onClick={diaryFunction}><img className="addToList-icon2" src={`${diaryIcon}`}/></button> <p className="diary-txt"> {diaryText}</p> </div>
+                <div className="movie-detail-rating"><button className="ratingBtn" onClick={openForm}><img className="addToList-icon2" src={`${rateIcon}`}/></button> <p className="rate-txt"> {rateText}</p> </div>
+                
 
               </div>
             </div>
+
+          <div className="logForm" style={isActive ? {display: "flex"} : {display: "none"}}>
+          <h2>Log Film</h2>
+          <button className="closeBtn" onClick={openForm}>x</button>
+          <form className="log-form" onSubmit={addToRating}>
+          <label className="rating-lbl">Rating:</label>
+           <div style={{ display: "flex", gap: "6px", cursor: "pointer", marginBottom: "10%"}}>
+  {[1, 2, 3, 4, 5].map((star) => (
+    <div key={star} style={{ position: "relative", width: "32px", height: "32px" }}>
+      <img
+        src={
+          ratings >= star
+            ? fullStar
+            : ratings >= star - 0.5
+            ? halfStar
+            : emptyStar
+        }
+        alt={`${star} star`}
+        style={{ width: "100%", height: "100%" }}
+        onClick={() => setRatings(star)}
+      />
+      {/* Optional: half-star click */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "50%",
+          height: "100%",
+          cursor: "pointer",
+        }}
+        onClick={() =>
+          setRatings(star - 0.5)
+        }
+      />
+    </div>
+  ))}
+</div>
+
+          <label className="review-lbl">Review:</label>
+          <textarea className="review_field"  placeholder="Add review..." name="review" value={review} onChange={handleChange} />
+          <input className="logBtn" type="submit" value="Add"/>
+          </form>
+        </div>
 
               
                   
@@ -342,7 +817,22 @@ useEffect(() => {
 
             </div>
 
-          </body>
+            <div className="ratings-div">
+              <ul classname="rating-ul">
+              {rate.map((r) => (
+                <li className="rating-li">
+                <p>{r.rating}</p>
+                <p>{r.review}</p>
+                </li>
+              ))}
+              </ul>
+            </div>
+
+          </div>
+
+          
+
+
             
 
          
