@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { Form, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react'
 import Nav from './components/Nav.jsx'
@@ -6,13 +7,36 @@ import axios from 'axios';
 import emptyStar from "/star1.svg";
 import halfStar from "/halfStar.svg";
 import fullStar from "/star2.svg";
-import RatingCard from './RatingCard.jsx';
+import Box from '@mui/joy/Box';
+import Button from '@mui/joy/Button';
+import FormControl from '@mui/joy/FormControl';
+import FormLabel from '@mui/joy/FormLabel';
+import Textarea from '@mui/joy/Textarea';
+import IconButton from '@mui/joy/IconButton';
+import Menu from '@mui/joy/Menu';
+import MenuItem from '@mui/joy/MenuItem';
+import ListItemDecorator from '@mui/joy/ListItemDecorator';
+import FormatBold from '@mui/icons-material/FormatBold';
+import FormatItalic from '@mui/icons-material/FormatItalic';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import Check from '@mui/icons-material/Check';
+import Card from '@mui/joy/Card';
+import CardContent from '@mui/joy/CardContent';
+import Skeleton from '@mui/joy/Skeleton';
 
 
-const MovieDetails = () => {
+
+const Comments = () => {
   const API_URL = 'http://localhost:3000/api/v1';
   const apiUrl =  'https://api.themoviedb.org/3';
   const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODI1MGEyNjQ5YTAwYTk2OTdlYjIxMGUzMTExZGE1YyIsIm5iZiI6MTcyMjU4NzAzNS43MTYsInN1YiI6IjY2YWM5NzliNTEyMTNhZjA5MWJkNThhMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zrM-3dtjvwa-al-qRd70tlGRD0VkxCFbHgYmZEzY6gA';
+const apiOptions = {
+  method: 'GET',
+  headers : {
+    accept: 'application/json',
+    Authorization: `Bearer ${apiKey}`
+  }
+}
 
   const [movieDetails, setMovieDetails] = useState([]);
   const [vote, setVote] = useState(0);
@@ -44,15 +68,20 @@ const MovieDetails = () => {
   const [rateText, setRateText] = useState("");
   const [rateFunction, setRateFunction] = useState(() => () => {});
   const [isActive, setIsActive] = useState(false);
-  const [inputData, setInputData] = useState([]);
+  const [isActive2, setIsActive2] = useState(false);
   const [ratings, setRatings] = useState(0);
   const [review, setReview] = useState("");
-    const [ratingLikes, setRatingLikes] = useState([]);
+  const [comment, setComment] = useState("");
+  const [comments, setComments] = useState([]);
+  const [italic, setItalic] = React.useState(false);
+  const [fontWeight, setFontWeight] = React.useState('normal');
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [updateCommentID, setUpdateCommentID] = useState(0);
+  const [updateComment, setUpdateComment] = useState("");
+  const [updateData, setUpdateData] = useState([]);
+ 
   
    
-
-  
-
   
   const getMovies = async () => {
        try {
@@ -164,8 +193,6 @@ const MovieDetails = () => {
       'ratings' : []
     }
 
-  
-
             const response = await axios.post(`${API_URL}/movies`, inputData, {
                   headers: {
                        'Content-Type': 'application/json'
@@ -181,11 +208,6 @@ const MovieDetails = () => {
                 return movie_ID
           
           } 
-
-
-    
-
-    
 
 
     const addToMovieLike = async(e) => {
@@ -209,6 +231,8 @@ const MovieDetails = () => {
       } catch (error) {
         console.log(error);
       }
+
+
 
   }
 
@@ -297,6 +321,23 @@ const MovieDetails = () => {
   const openForm = () => {
     setIsActive(!isActive);
     
+  }
+
+  const openUpdateCommentForm = (commentId) => {
+
+    const selectedComment = comments.find(c => c._id === commentId);
+    if (selectedComment) {
+      setUpdateData({
+      comment: selectedComment.comment,
+      });
+    }
+    setIsActive2(!isActive2);
+    setUpdateCommentID(commentId);
+    
+  }
+
+  const handleUpdateCommentChange = async(e) => {
+    setUpdateData({ ...updateData, comment: e.target.value });
   }
 
 
@@ -420,6 +461,11 @@ const MovieDetails = () => {
    
 
 
+
+    
+    
+  
+
   useEffect(() => {
 
     const selectedLikedMovie = likedMovies.find(movie => movie.tmdbId === Number(param.id))
@@ -530,18 +576,8 @@ const MovieDetails = () => {
      }, [rate]);
   
     
-  console.log(API_URL);
-  console.log(likeFunction);
-  
-  console.log(userId);
-  const apiOptions = {
-  method: 'GET',
-  headers : {
-    accept: 'application/json',
-    Authorization: `Bearer ${apiKey}`
-  }
-}
 
+  
 
 const getMovieDetails = async () => {
   try {
@@ -673,11 +709,118 @@ useEffect(() => {
   };
 
   const recentRatings = rate.slice(0, 5);
- 
 
+  const handleCommentChange = (e) => {
+  setComment(e.target.value);
+};
+
+    const getComment = async() => {
+         try{
+       
+
+
+        const response = await axios.get(`${API_URL}/ratings/comments/${param.ratingId}`, {
+          headers : {
+            'Content-Type' : 'application/json'
+          }
+        });
+
+        console.log(response);
+
+      
+        setComments(response.data.comments);
+      } catch (error) {
+        console.log(error);
+      }
+
+    }
+
+    useEffect(() => {
+      getComment();
+  }, []);
+
+  console.log(comments);
+
+  const addComment = async(e) => {
+
+     e.preventDefault();
+
+      try{
+       
+
+        const finalData = {
+          comment: comment
+        };
+
+
+        const response = await axios.post(`${API_URL}/ratings/${userId}/${param.ratingId}/comment`, finalData, {
+          headers : {
+            'Content-Type' : 'application/json'
+          }
+        });
+
+        console.log(response);
+
+      
+        setComment("");
+
+        getComment();
+      } catch (error) {
+        console.log(error);
+      }
+
+  }
+
+  const editComment = async(e) => {
+     e.preventDefault();
+    
+    console.log(rating);
+    try {
+        const response = await axios.put(`${API_URL}/ratings/${updateCommentID}/${param.ratingId}/comment`, updateData, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+              });
+
+              console.log(response);
+
+              
+              setIsActive2(isActive2);
+              e.target.reset();
+
+              getComment();
+
+              } catch (error) {
+              console.log(error);
+              
+            }
+  }
+
+  const deleteComment = async(id) => {
+
+    
+    try {
+        const response = await axios.delete(`${API_URL}/ratings/${id}/${param.ratingId}/comment`, {
+                  headers: {
+                       'Content-Type': 'application/json'
+                  }
+              });
+
+              console.log(response);
+
+              
+            
+
+              getComment();
+
+              } catch (error) {
+              console.log(error);
+              
+            }
+  }
    
   return (
-    <div>
+    <div className="movie-detail-container">
     <div className="container"  style={divStyle}>
       <Nav />
       <div className="movie-detail-hero" >
@@ -776,30 +919,144 @@ useEffect(() => {
          
               </div>
               </div>
+
+
+             
             </div>
 
+        <Box
+        sx={{
+            display: 'flex',
+            justifyContent: 'center', 
+            mt: 4,        
+                        
+        }}
+        > 
+         <FormControl>
+      <p>Add comment</p>
+      <Textarea
+      name="comment" value={comment} onChange={handleCommentChange}
+        placeholder="Type something here…"
+        minRows={3}
+        endDecorator={
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 'var(--Textarea-paddingBlock)',
+              pt: 'var(--Textarea-paddingBlock)',
+              borderTop: '1px solid',
+              borderColor: 'divider',
+              flex: 'auto',
+              fontFamily: 'Montserrat'
+            
+              
+              
+            }}
+          >
+            <IconButton
+              variant="plain"
+              color="neutral"
+              onClick={(event) => setAnchorEl(event.currentTarget)}
+            >
+              <FormatBold />
+              <KeyboardArrowDown fontSize="md" />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={() => setAnchorEl(null)}
+              size="sm"
+              placement="bottom-start"
+              sx={{ '--ListItemDecorator-size': '24px' }}
+            >
+              {['200', 'normal', 'bold'].map((weight) => (
+                <MenuItem
+                  key={weight}
+                  selected={fontWeight === weight}
+                  onClick={() => {
+                    setFontWeight(weight);
+                    setAnchorEl(null);
+                  }}
+                  sx={{ fontWeight: weight }}
+                >
+                  <ListItemDecorator>
+                    {fontWeight === weight && <Check fontSize="sm" />}
+                  </ListItemDecorator>
+                  {weight === '200' ? 'lighter' : weight}
+                </MenuItem>
+              ))}
+            </Menu>
+            <IconButton
+              variant={italic ? 'soft' : 'plain'}
+              color={italic ? 'primary' : 'neutral'}
+              aria-pressed={italic}
+              onClick={() => setItalic((bool) => !bool)}
+            >
+              <FormatItalic />
+            </IconButton>
+            <Button onClick={addComment} sx={{ ml: 'auto' }}>Post</Button>
+          </Box>
+        }
+        sx={[
+          {
+            minWidth: 300,
+            fontWeight,
 
+          }, {width: 500}, 
+          italic ? { fontStyle: 'italic' } : { fontStyle: 'initial' },
+        ]}
+      />
+    </FormControl>
+    </Box>   
 
-            <div className="reviews-list">
-              <h1 className="review-txt-header"> Movie Reviews</h1>
-              <hr className="review-hr" />
-              <ul classname="rating-ul">
-              {rate.map((r) => (
-            <RatingCard rating={r} tmdbId = {param.id}/>
-          ))}
-              </ul>
-             <a href="#">Check all reviews for this movie.</a>
-            </div>
+          <div class="comments-container">
+          <ul id="comments-list" class="comments-list">
+            {comments.map((c) => {
+                
+                const users = c.userId;
 
-          </div>
+                return(
+			<li className="comment">
+                {users.map(u => (
+				<div class="comment-main-level">
+				
+					<div class="comment-avatar"><img src={`http://localhost:3000/${u.image}`} alt=""/></div>
+					
+					<div class="comment-box">
+						<div class="comment-head">
+							<h6 class="comment-name by-author">{u.username}</h6>
+							<button className="edit-comment" onClick={() => {openUpdateCommentForm(c._id, param.ratingId)}}>Edit </button>
+                            <button className="delete-comment" onClick={() => {deleteComment(c._id)}}>Delete </button>
+						</div>
+                        
+						<div class="comment-content">
+							{c.comment}
+						</div>
+					</div>
+				</div>
+				
+				 ))}
+			</li>
+            )})}
+		</ul>
+        </div>
+
+         <div className="logForm" style={isActive2 ? {display: "flex"} : {display: "none"}}>
+          <h2>Edit Comment</h2>
+          <button className="closeBtn" onClick={openUpdateCommentForm}>x</button>
+          <form className="log-form" onSubmit={editComment}>
+          <textarea className="review_field"  placeholder="Add review..." name="review" value={updateData.comment} onChange={handleUpdateCommentChange} />
+          <input className="logBtn" type="submit" value="Edit"/>
+          </form>
+        </div>
+	</div>
 
           
+       
 
 
-            
 
-         
-      
+
   )
       
 }
@@ -808,4 +1065,4 @@ useEffect(() => {
       
 
 
-export default MovieDetails
+export default Comments

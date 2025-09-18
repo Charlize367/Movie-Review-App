@@ -74,7 +74,7 @@ const Nav = () => {
                         <li className="link"><Link to ="/list">WatchList</Link></li>
                         <li className="link"><Link to ="/diary">Diary</Link></li>
                         <li className="link"><Link to ="/rated">Ratings</Link></li>
-                        <li className="link"><Link to ="/movielist">Lists</Link></li>
+                        
                         <button className="logoutBtn"><li className="logout"><Link className="logoutStyle" onClick={logout}>Logout</Link></li></button>
                          
                          

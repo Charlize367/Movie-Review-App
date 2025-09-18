@@ -15,7 +15,7 @@ const Diary = () => {
 
   const getDiary = async () => {
        try {
-             const response = await axios.get(`${API_URL}/users/${userId}/duary`, {
+             const response = await axios.get(`${API_URL}/users/${userId}/diary`, {
                   headers: {
                        'Content-Type': 'application/json'
                   }

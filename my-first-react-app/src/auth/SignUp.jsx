@@ -10,9 +10,11 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  
   const navigate = useNavigate();
   const { signup } = useAuth();
 
+  
     const handleUsernameChange = (event) => {
     setUsername(event.target.value);
   };
@@ -34,16 +36,25 @@ const SignUp = () => {
         console.log(username);
          if(password === confirmPassword) {
             try {
+
+               const response_img = await fetch("/profile.png");
+                const blob = await response_img.blob();
+                const image = new File([blob], "profile.png", {type: "image/png"});
+
                 const postData = {
                     "username" : username,
                     "password" : password,
                     "email" : email,
-                    "role" : "USER"
+                    "role" : "USER",
+                    "image" : image
                 }
+
+               
+
                 const response = await axios.post('http://localhost:3000/api/v1/auth/sign-up', postData, {
                     headers: {
                         
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'multipart/form-data'
                     }
                 });
                 console.log(response);
