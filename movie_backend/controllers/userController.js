@@ -2,6 +2,7 @@ import User from "../models/userModel.js";
 import Movie from "../models/movieModel.js";
 import mongoose from "mongoose";
 
+
 export const getUsers = async (req, res) => {
     try {
         const users = await User.find().populate('likedMovies').populate('watchListMovies').populate('diary');
@@ -71,44 +72,43 @@ export const getUserDiary = async (req, res) => {
 
 
 export const addUserLikedMovies = async (req, res) => {
-    try{
-
+    
+    try {
         const existingLike = await User.findOne({'likedMovies' : req.params.movieId});
 
-        if(existingLike) {
+        if (existingLike) {
             const error = new Error('Movie already liked');
             error.statusCode = 409;
             throw error;
         }
 
         const user = await User.findById(req.params.userId).select('username');
-        const addUserLiked = await User.findOneAndUpdate(
+        const addLike = await User.findOneAndUpdate(
             { username : user.username },
-            { $push : {likedMovies : [req.params.movieId]}},
+            { $push: {likedMovies : [req.params.movieId]}},
             { new: true}
         )
-
-       
 
         const movie = await Movie.findById(req.params.movieId).select('title');
         const addMovieLike = await Movie.findOneAndUpdate(
             { title : movie.title },
             { $push : {likedBy : [req.params.userId]}},
-            { new: true}
+            { new : true }
         )
 
-       res.status(201).json({
+        res.status(201).json({
             success:true,
             message: 'Liked',
             data: {
-                movieLike : addMovieLike,
-                userLike : addUserLiked
-                
+                liked : addMovieLike
             }
         })
     } catch (error) {
+        console.log("Failed to add movie to likes");
         console.log(error);
     }
+
+
 }
 
 export const addMovietoList = async(req, res) => {

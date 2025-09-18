@@ -5,8 +5,6 @@ import jwt from "jsonwebtoken"
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
 
 
-
-
 export const signUp = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -27,7 +25,7 @@ export const signUp = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         
-        const newUsers = await User.create([{username, email, password: hashedPassword, role}], { session });
+        const newUsers = await User.create([{username, email, password: hashedPassword, role, image:req.file.path}], { session });
     
         const token = jwt.sign({userId : newUsers[0]._id }, JWT_SECRET, {expiresIn :JWT_EXPIRES_IN})
         await session.commitTransaction();

@@ -17,9 +17,11 @@ const ratingSchema = new mongoose.Schema({
             }
         ],
     comments: [{
-        user: {type: String, required:true},
-        comment: {type:String, required: true}
-    }],
+        userId: [{ type:mongoose.Schema.Types.ObjectId,
+        ref: "User"}],
+        comment: {type:String, required: true},
+        
+    }, {timestamps: true}],
 
     userId: [{
         type:mongoose.Schema.Types.ObjectId,

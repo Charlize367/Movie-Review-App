@@ -28,8 +28,8 @@ const userSchema = new mongoose.Schema({
     },
 
     image : {
-        type:Buffer,
-        required:false
+        type:String,
+        required:true
     },
 
     likedMovies: [{
