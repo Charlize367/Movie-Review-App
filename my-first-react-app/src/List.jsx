@@ -12,12 +12,14 @@ const List = () => {
   const [watchList, setWatchList] = useState([]);
    const [isLoading, setIsLoading] = useState(false);
    const [errorMessage, setErrorMessage] = useState("");
+  const token = localStorage.getItem('jwtToken');
 
   const getWatchList = async () => {
        try {
              const response = await axios.get(`${API_URL}/users/${userId}/watchlist`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
               });
 

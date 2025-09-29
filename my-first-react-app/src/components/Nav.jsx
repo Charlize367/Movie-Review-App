@@ -20,8 +20,13 @@ const Nav = () => {
     const [genres, setGenres] = useState([]);
     const [genre_ID, setGenreID] = useState(0);
     const { logout } = useAuth();
+    const [isActive, setIsActive] = useState(false);
     
     
+    const openNav = () => {
+    setIsActive(!isActive);
+  };
+
       const displayGenres = async () => {
           try {
             const endpoint = `${apiUrl}/genre/movie/list?language=en`;
@@ -54,6 +59,33 @@ const Nav = () => {
 
 
     return (
+      <div>
+        <div className="header-mobile">
+          <button className="openBtn" onClick={openNav}>☰</button>
+          <h1 className="title">Movie App</h1>
+          <div className="sidebar" style={isActive ? {width: "250px"} : {width: "0px"}}>
+        <button className="closeBtn" onClick={openNav}>x</button>
+        <ul className="link-list">
+          <li className="navlink"><Link to ="/home">Browse</Link></li>
+                        <li style={{paddingTop: '2px'}} className="navlink">   
+                            <div className="category-block">
+                            <Link to = "/categories">Categories</Link>
+                                <div className="category-container">
+                                    {genres.map((genre) => (
+                                    <Link className="genre" to ={`/categories/${genre.id}/${genre.name}`}>{genre.name || 'Not found'} </Link>
+                                        ))}
+                                </div>
+                                </div>
+                        </li>
+                        <li className="navlink"><Link to ="/liked">Liked</Link></li>
+                        <li className="navlink"><Link to ="/list">WatchList</Link></li>
+                        <li className="navlink"><Link to ="/diary">Diary</Link></li>
+                        <li className="navlink"><Link to ="/rated">Ratings</Link></li>
+                        
+                        <button className="logoutBtn"><li className="logout"><Link className="logoutStyle" onClick={logout}>Logout</Link></li></button>
+                        </ul>
+      </div>
+        </div>
             <div className="header">
                 <nav className="header-nav">
                     <h1 className="title">Movie App</h1>
@@ -86,6 +118,7 @@ const Nav = () => {
                     
                 </nav>
                 <Outlet />
+            </div>
             </div>
     );
 };

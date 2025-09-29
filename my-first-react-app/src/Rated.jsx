@@ -6,16 +6,21 @@ import axios from 'axios';
 import emptyStar from "/star1.svg";
 import halfStar from "/halfStar.svg";
 import fullStar from "/star2.svg";
+import dayjs from 'dayjs';
+import relativeTime from "dayjs/plugin/relativeTime"
 
 
 const Rated = () => {
   const API_URL = 'http://localhost:3000/api/v1';
+  const token = localStorage.getItem('jwtToken');
   const [ratings, setRatings] = useState([]);
   const userId = localStorage.getItem('user_ID');
   const [isActive, setIsActive] = useState(false);
   const [rating, setRating] = useState(0);
   const [inputData, setInputData] = useState([]);
   const [updateID, setUpdateID] = useState(0);
+
+  dayjs.extend(relativeTime);
 
 
   const openForm = (id, rate) => {
@@ -54,7 +59,8 @@ const handleChange = (e) => {
        
              const response = await axios.get(`${API_URL}/ratings/userRatings/${userId}`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
               });
 
@@ -92,7 +98,8 @@ const handleChange = (e) => {
     try {
         const response = await axios.put(`${API_URL}/ratings/${updateID}`, finalData, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
               });
 
@@ -116,7 +123,8 @@ const handleChange = (e) => {
     try {
         const response = await axios.delete(`${API_URL}/ratings/${id}`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
               });
 
@@ -141,43 +149,49 @@ const handleChange = (e) => {
       <Nav/>
 
         <h2>My ratings</h2>
-        <div className="reviews-list">
+       <div id="#testimonials">
               
-              <ul classname="rating-ul">
+             <div class="testimonial-box-container">
               {ratings.map((r) => {
                 console.log(r.userId);
                 const movies = r.movieId;
                 
                  
               return(
-                <li className="review-card">
+                
+                  <div class="testimonial-box">
+                  <div class="box-top">
                   {movies.map(m => (
-                  <div className="review-header">
-                    <div className="movie-rated-title">
-                    
+                  <div className="my-rating-top">
+                  <div class="name-user">
                     <p className="movie-rating-title">{m.title}</p>
                 </div>
-                <div className="rating-icon-number">
-                <img className="rate-icon-ratings" src="/star.svg"/><p className="rating-number">{r.rating}</p>
+                <div class="reviews">
+                      <div className="rating-icon-number">
+                <img className="rate-icon-rated" src="/star.svg"/><p className="rating-number">{r.rating}</p>
+                </div>
+
                 </div>
                   </div>
                   ))}
-                <div className="review-description">
+                  </div>
+                <div class="client-comment">
                 <p>{r.review}</p>
                 </div>
+                
 
                 <div className="review-details">
-                  <p>{r.updatedAt}</p>
+                   <p>{dayjs(r.updatedAt).fromNow()}</p>
                   <div className="rating-action">
                 <button className="edit-rating" onClick={() => {openForm(r._id, r.rating)}}><img className="edit-icon" src="/edit-icon.svg"/> </button>
                 <button className="delete-rating" onClick={() => {deleteRating(r._id)}}><img className="delete-icon" src="/delete-icon.svg"/> </button>
                 </div>
                 </div>
                 
-                </li>
-              )})}
-              </ul>
-             
+                
+              
+              </div>
+             )})}
             </div>
 
           <div className="logForm" style={isActive ? {display: "flex"} : {display: "none"}}>
@@ -226,6 +240,7 @@ const handleChange = (e) => {
                     <input className="logBtn" type="submit" value="Edit"/>
                     </form>
                   </div>
+    </div>
     </div>
   )
 }

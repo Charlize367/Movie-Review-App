@@ -5,7 +5,7 @@ import List from './List'
 import Liked from './Liked'
 import Rated from './Rated'
 import Home from './Home.jsx'
-import Watchlist from './Watchlist.jsx'
+import AllRatings from './AllRatings.jsx'
 import Diary from './Diary.jsx'
 import Login from './auth/Login.jsx'
 import SignUp from './auth/SignUp.jsx'
@@ -28,7 +28,7 @@ const App = ()  => {
 
                 <Route exact path="/categories/:id/:name" element={<ProtectedRoute allowedRoles={["USER"]}><Categories /></ProtectedRoute>} />
                 <Route exact path="/liked" element={<ProtectedRoute allowedRoles={["USER"]}><Liked /></ProtectedRoute>} />
-                <Route exact path="/watchlist" element={<ProtectedRoute allowedRoles={["USER"]}><Watchlist /></ProtectedRoute>} />
+                <Route exact path="/all_ratings/:id" element={<ProtectedRoute allowedRoles={["USER"]}><AllRatings /></ProtectedRoute>} />
                 <Route exact path="/list" element={<ProtectedRoute allowedRoles={["USER"]}><List /></ProtectedRoute>} />
                 <Route exact path="/diary" element={<ProtectedRoute allowedRoles={["USER"]}><Diary /></ProtectedRoute>} />
                 <Route exact path="/rated" element={<ProtectedRoute allowedRoles={["USER"]}><Rated /></ProtectedRoute>} />

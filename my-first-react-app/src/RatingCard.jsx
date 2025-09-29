@@ -1,25 +1,27 @@
 import React from 'react'
 
 import { useState, useEffect } from 'react'
-import Nav from './components/Nav.jsx'
 import axios from 'axios';
-import emptyStar from "/star1.svg";
-import halfStar from "/halfStar.svg";
-import fullStar from "/star2.svg";
 import { useNavigate, Link, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
+import relativeTime from "dayjs/plugin/relativeTime"
 
 const RatingCard =  ({rating : 
-    { _id, userId, rating, review, updatedAt}, tmdbId
+    { _id, userId, rating, review, createdAt, updatedAt}, tmdbId
 
     
 }) => {
     const API_URL = 'http://localhost:3000/api/v1';
+    const token = localStorage.getItem('jwtToken');
     const userID = localStorage.getItem('user_ID');
     const navigate = new useNavigate();
     const [ratingLikes, setRatingLikes] = useState([]);
     const [likedIcon, setlikedIcon] = useState("");
     const [likeFunction, setLikeFunction] = useState(() => () => {});
+    const [reviewLikeCount, setReviewLikeCount] = useState(0);
+    const [reviewCommentCount, setReviewCommentCount] = useState(0);
 
+    dayjs.extend(relativeTime);
    
 
     const getRatingLikes = async () => {
@@ -29,7 +31,8 @@ const RatingCard =  ({rating :
        
              const response = await axios.get(`${API_URL}/ratings/likes/${_id}`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
               });
 
@@ -52,6 +55,69 @@ const RatingCard =  ({rating :
       
     }, []);
 
+    const getRatingLikesCount = async () => {
+       try {
+
+     
+       
+             const response = await axios.get(`${API_URL}/ratings/likeCount/${_id}`, {
+                  headers: {
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
+                  }
+              });
+
+              console.log(response);
+              setReviewLikeCount(response.data.likeCount);
+              
+              
+  
+              
+            } catch (error) {
+              console.log(error);
+              
+            }
+          }
+
+          
+  
+      useEffect(() => {
+      getRatingLikesCount();
+      
+    }, []);
+
+    const getRatingCommentsCount = async () => {
+       try {
+
+     
+       
+             const response = await axios.get(`${API_URL}/ratings/commentCount/${_id}`, {
+                  headers: {
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
+                  }
+              });
+
+              console.log(response);
+              setReviewCommentCount(response.data.commentCount);
+              
+              
+  
+              
+            } catch (error) {
+              console.log(error);
+              
+            }
+          }
+
+          
+  
+      useEffect(() => {
+      getRatingCommentsCount();
+      
+    }, []);
+
+
    
 
      const users = userId;
@@ -64,14 +130,16 @@ const likeRating = async(e) => {
       try {
 
       
-        const response = await axios.post(`${API_URL}/ratings/${userID}/${_id}/likes`, {
+        const response = await axios.post(`${API_URL}/ratings/${userID}/${_id}/likes`, {}, {
             headers : {
-              'Content-Type' : 'application/json'
+              'Content-Type' : 'application/json',
+              'Authorization': `Bearer ${token}`
             }
         });
 
         console.log(response);
         getRatingLikes();
+        getRatingLikesCount();
        
 
       } catch (error) {
@@ -88,12 +156,14 @@ const removeLike = async(e) => {
     
           const response = await axios.delete(`${API_URL}/ratings/${userID}/${_id}/likes`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
                 });
                 
                 console.log(response);
                getRatingLikes();
+               getRatingLikesCount();
                 
                 
         
@@ -140,29 +210,68 @@ useEffect(() => {
 
       }
     
-     return(
-                <li className="review-card">
-                  {users.map(u => (
-                  <div className="review-header">
-                    <div className="name-group">
-                    <img className="profile-ratings" src={`http://localhost:3000/${u.image}`} />
-                    <p className="ratings-name">{u.username}</p>
-                </div>
-                <div className="rating-icon-number">
-                <img className="rate-icon-ratings" src="/star.svg"/><p className="rating-number">{rating}</p>
-                </div>
-                  </div>
-                  ))}
-                <div className="review-description">
-                <p>{review}</p>
-                </div>
 
+      console.log(reviewLikeCount);
+     return(
+                
+                  
+                  
+                   
+            
+                    
+                        <div class="testimonial-box">
+                        <div class="box-top">
+                            {users.map(u => (
+                            <div class="profile">
+                                
+                                <div class="profile-img">
+                                    <img className="profile-ratings" src={`http://localhost:3000/${u.image}`} />
+                                </div>
+                                <div class="name-user">
+                                    <strong><p className="ratings-name">{u.username}</p></strong>
+                                </div>
+                                
+                            </div>
+                             ))}
+                            <div class="reviews">
+                            <div className="rating-icon-number">
+                                <img className="rate-icon-ratings" src="/star.svg"/><p className="rating-number">{rating}</p>
+                            </div>
+                        </div>
+                    
+                        </div>
+
+                        
+
+
+                        <div class="client-comment">
+                            <p>{review}</p>
+                        </div>
                 <div className="review-details">
-                  <p>{updatedAt}</p>
-                  <button className="like-review" onClick={likeFunction} ><img src={`${likedIcon}`} className="ratingLikeIcon"/></button>
-                  <button className="comment-review" onClick={goToComments}  ><img src={`/comment.svg`} className="commentRatingIcon"/></button>
+                  <p>{dayjs(createdAt).fromNow()}</p>
+                  
+                  <button className="like-review" onClick={likeFunction} ><img src={`${likedIcon}`} className="ratingLikeIcon"/></button><p>{reviewLikeCount}</p>
+                  <button className="comment-review" onClick={goToComments}  ><img src={`/comment.svg`} className="commentRatingIcon"/></button><p>{reviewCommentCount}</p>
+                
                 </div>
-                </li>
+                </div>
+               
+
+                
+                
+               
+
+
+                
+                
+                
+                  
+                  
+                
+
+                
+                
+                
            
             
             )

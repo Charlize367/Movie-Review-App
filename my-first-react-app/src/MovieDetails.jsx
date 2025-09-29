@@ -13,7 +13,7 @@ const MovieDetails = () => {
   const API_URL = 'http://localhost:3000/api/v1';
   const apiUrl =  'https://api.themoviedb.org/3';
   const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODI1MGEyNjQ5YTAwYTk2OTdlYjIxMGUzMTExZGE1YyIsIm5iZiI6MTcyMjU4NzAzNS43MTYsInN1YiI6IjY2YWM5NzliNTEyMTNhZjA5MWJkNThhMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zrM-3dtjvwa-al-qRd70tlGRD0VkxCFbHgYmZEzY6gA';
-
+  const token = localStorage.getItem('jwtToken');
   const [movieDetails, setMovieDetails] = useState([]);
   const [vote, setVote] = useState(0);
   const [date, setDate] = useState("");
@@ -47,18 +47,25 @@ const MovieDetails = () => {
   const [inputData, setInputData] = useState([]);
   const [ratings, setRatings] = useState(0);
   const [review, setReview] = useState("");
-    const [ratingLikes, setRatingLikes] = useState([]);
+  const [movieLikeCount, setMovieLikeCount] = useState(0);
+  const [movie_ID, setMovie_ID] = useState(0);
+  const [test, setTest] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
+ 
   
    
 
   
+
+              
 
   
   const getMovies = async () => {
        try {
              const response = await axios.get(`${API_URL}/movies`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
               });
 
@@ -74,13 +81,41 @@ const MovieDetails = () => {
   useEffect(() => {
       getMovies();
   }, []);
+
+   const getMovieByTmdbId = async () => {
+
+    
+       try {
+             const response = await axios.get(`${API_URL}/movies/${param.id}/tmdbId`, {
+                  headers: {
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
+                  }
+              });
+
+              console.log(response);
+              setMovie_ID(response.data.data._id);
+
+              
+            } catch (error) {
+              console.log(error);
+              
+            }
+          }
+  useEffect(() => {
+      getMovieByTmdbId();
+  }, []);
+
+  
+  
         
 
   const getUserLikes = async () => {
        try {
              const response = await axios.get(`${API_URL}/users/${userId}/likedMovies`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
               });
 
@@ -100,12 +135,14 @@ const MovieDetails = () => {
       
     }, []);
 
+    
 
   const getUserWatchList = async () => {
        try {
              const response = await axios.get(`${API_URL}/users/${userId}/watchlist`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
               });
 
@@ -130,7 +167,8 @@ const MovieDetails = () => {
        try {
              const response = await axios.get(`${API_URL}/users/${userId}/diary`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                   }
               });
 
@@ -168,7 +206,8 @@ const MovieDetails = () => {
 
             const response = await axios.post(`${API_URL}/movies`, inputData, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
               });
 
@@ -185,7 +224,7 @@ const MovieDetails = () => {
 
     
 
-    
+    console.log(token);
 
 
     const addToMovieLike = async(e) => {
@@ -196,15 +235,17 @@ const MovieDetails = () => {
 
         const movieId = await addMovieIfNotExists();
 
-        const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/likes`, {
+        const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/likes`, {}, {
             headers : {
-              'Content-Type' : 'application/json'
+              'Content-Type' : 'application/json',
+              'Authorization': `Bearer ${token}`
             }
         });
 
         console.log(response);
 
         getUserLikes();
+        getMovieLikes();
 
       } catch (error) {
         console.log(error);
@@ -224,7 +265,8 @@ const MovieDetails = () => {
       const movieId = selectedMovie._id;
           const response = await axios.delete(`${API_URL}/users/${userId}/${likeId}/${movieId}/like`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
                 });
                 
@@ -232,6 +274,7 @@ const MovieDetails = () => {
                 console.log(likeId);
                 console.log(movieId);
                 getUserLikes();
+                getMovieLikes();
                 
                 
         
@@ -245,9 +288,10 @@ const MovieDetails = () => {
       e.preventDefault();
       try {
          const movieId = await addMovieIfNotExists();
-          const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/watchlist`, {
+          const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/watchlist`, {}, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
                 });
                 
@@ -273,7 +317,8 @@ const MovieDetails = () => {
       const movieId = selectedMovie._id;
           const response = await axios.delete(`${API_URL}/users/${userId}/${listId}/watchlist`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
                 });
                 
@@ -308,9 +353,10 @@ const MovieDetails = () => {
 
       try {
          const movieId = await addMovieIfNotExists();
-          const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/diary`, {
+          const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/diary`, {},  {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
                 });
                 
@@ -342,11 +388,17 @@ const MovieDetails = () => {
 
         const response = await axios.post(`${API_URL}/ratings`, finalData, {
           headers : {
-            'Content-Type' : 'application/json'
+            'Content-Type' : 'application/json',
+            'Authorization': `Bearer ${token}`
           }
         });
 
         console.log(response);
+
+                setShowPopup(true);
+
+
+         setTimeout(() => setShowPopup(false), 3000);
 
         openForm(!isActive);
         e.target.reset();
@@ -369,7 +421,8 @@ const MovieDetails = () => {
       const movieId = selectedMovie._id;
           const response = await axios.delete(`${API_URL}/users/${userId}/${diaryId}/diary`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
                 });
                 
@@ -392,7 +445,8 @@ const MovieDetails = () => {
         console.log(movieID);
              const response = await axios.get(`${API_URL}/ratings/movieRatings/${movieID}`, {
                   headers: {
-                       'Content-Type': 'application/json'
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
                   }
               });
 
@@ -578,6 +632,44 @@ useEffect(() => {
   getMovieDetails();
 }, [param.id])
 
+
+const getMovieLikes = async () => {
+       try {
+
+         const movieID = await addMovieIfNotExists();
+             const response = await axios.get(`${API_URL}/movies/${movieID}/likeCount`, {
+                  headers: {
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
+                  }
+              });
+
+              console.log(response);
+              console.log(movieID);
+              setMovieLikeCount(response.data.likeCount);
+
+              
+              
+            } catch (error) {
+              console.log(error);
+              
+            }
+          }
+  
+      useEffect(() => {
+      getMovieLikes();
+      
+    }, []);
+
+
+   
+
+
+
+     
+
+
+
     const release_date = date.substring(0,4);
     const rating = vote.toFixed(1);
     
@@ -663,7 +755,7 @@ useEffect(() => {
     backgroundPosition:'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     backgroundBlendMode: 'darken',
-    height: 'auto', 
+    height: '85vh', 
     width: 'auto',
     marginTop: '-3%',
     paddingTop:'3%',
@@ -672,10 +764,13 @@ useEffect(() => {
     marginRight: '-3%'
   };
 
-  const recentRatings = rate.slice(0, 5);
+  const recentRatings = rate.slice(0, 4);
+
+  console.log(movie_ID);
+  console.log(test);
  
 
-   
+   console.log(movieLikeCount);
   return (
     <div>
     <div className="container"  style={divStyle}>
@@ -685,7 +780,12 @@ useEffect(() => {
       </div>
           <div className="movie-details">
             <div className="primary-details">
+              <div className="img-like-rating-counts">
               <img className="movie-img-container" src={`https://image.tmdb.org/t/p/w500/${movieDetails.poster_path}`} />
+              <div className="movie-like-count"><img src="/liked.svg" className="movieLikeIcon" /> {movieLikeCount}</div>
+              <div className="movie-rating-count"></div>
+              </div>
+              
               
               <div className="movie-main-info">
                 <h2 className="movie-detail-title">{movieDetails.title}</h2>
@@ -778,30 +878,61 @@ useEffect(() => {
               </div>
             </div>
 
-
-
-            <div className="reviews-list">
-              <h1 className="review-txt-header"> Movie Reviews</h1>
-              <hr className="review-hr" />
-              <ul classname="rating-ul">
-              {rate.map((r) => (
-            <RatingCard rating={r} tmdbId = {param.id}/>
-          ))}
-              </ul>
-             <a href="#">Check all reviews for this movie.</a>
+{showPopup && (
+            <div className="add-popup">
+              Rating added successfully.
             </div>
-
-          </div>
-
-          
-
+              )}
 
             
-
-         
+              <div id="#testimonials">
+                <div class="testimonial-heading">
+                    <h2>Ratings For This Film</h2>
+              <div class="testimonial-box-container">
+                
+              {recentRatings.map((r) => { 
+                
+               
+                return(
+                
+            <RatingCard rating={r} tmdbId = {param.id}/>
+            
+           
+          )
       
+           
+        }
+             
+             
+              )}
+            </div>
+        
+          </div>
+         
+          </div>
+          <div>
+             <center>
+              {recentRatings?.length > 0 && (
+                <a 
+                  style={{ display: "flex", justifyContent: "center" }} 
+                  href={`/all_ratings/${movie_ID}/`}
+                >
+                  Check all reviews for this movie.
+                </a>
+              )}
+            </center>
+
+            {recentRatings?.length === 0 && (
+              <p style={{ display: "flex", justifyContent: "center" }}>
+                Be the first to rate this film.
+              </p>
+            )}
+           </div>
+         </div>
+ 
   )
       
+  
 }
 
       
