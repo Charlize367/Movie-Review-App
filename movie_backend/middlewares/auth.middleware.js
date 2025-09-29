@@ -3,6 +3,9 @@ import { JWT_SECRET } from '../config/env.js';
 import User from '../models/userModel.js';
 
 const authorize = async (req, res, next) => {
+
+    
+
     try {
         let token;
         if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -22,6 +25,7 @@ const authorize = async (req, res, next) => {
         next();
     } catch (error) {
         res.status(401).json({ message : 'Unauthorized', error : error.message})
+        console.log("Authorization header:", req.headers.authorization);
     }
 }
 

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { signIn, signOut, signUp } from "../controllers/authController.js";
 import multer from 'multer';
+import authorize from "../middlewares/auth.middleware.js";
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -17,6 +18,6 @@ const authRouter = Router();
 
 authRouter.post('/sign-up', upload.single('image'), signUp);
 authRouter.post('/sign-in', signIn);
-authRouter.post('/sign-out', (req, res) => res.send("signout"));
+authRouter.post('/sign-out', authorize, (req, res) => res.send("signout"));
 
 export default authRouter;

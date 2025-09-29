@@ -5,30 +5,30 @@ import authorize from "../middlewares/auth.middleware.js";
 
 const userRouter = Router();
 
-userRouter.get('/', getUsers);
+userRouter.get('/', authorize, getUsers);
 
 userRouter.get('/:id', authorize, getUser);
 
-userRouter.get('/:id/likedMovies', getUserLikedMovies);
+userRouter.get('/:id/likedMovies', authorize, getUserLikedMovies);
 
-userRouter.get('/:id/watchlist', getUserWatchList);
+userRouter.get('/:id/watchlist', authorize, getUserWatchList);
 
-userRouter.get('/:id/diary', getUserDiary);
+userRouter.get('/:id/diary', authorize, getUserDiary);
 
-userRouter.post('/:userId/:movieId/likes', addUserLikedMovies);
+userRouter.post('/:userId/:movieId/likes', authorize, addUserLikedMovies);
 
-userRouter.post('/:userId/:movieId/watchlist', addMovietoList);
+userRouter.post('/:userId/:movieId/watchlist', authorize, addMovietoList);
 
-userRouter.post('/:userId/:movieId/diary', addMovieToDiary);
+userRouter.post('/:userId/:movieId/diary', authorize, addMovieToDiary);
 
-userRouter.put('/:id', updateUser);
+userRouter.put('/:id', authorize, updateUser);
 
-userRouter.delete('/:id', deleteUser);
+userRouter.delete('/:id', authorize, deleteUser);
 
-userRouter.delete('/:userId/:likeId/:movieId/like', removeMovieFromLikes );
+userRouter.delete('/:userId/:likeId/:movieId/like', authorize, removeMovieFromLikes );
 
-userRouter.delete('/:userId/:watchListId/watchlist', removeMovieFromWatchList )
+userRouter.delete('/:userId/:watchListId/watchlist', authorize, removeMovieFromWatchList )
 
-userRouter.delete('/:userId/:diaryId/diary', removeMovieFromDiary )
+userRouter.delete('/:userId/:diaryId/diary', authorize, removeMovieFromDiary )
 
 export default userRouter;

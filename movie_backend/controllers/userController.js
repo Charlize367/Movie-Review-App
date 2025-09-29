@@ -74,7 +74,7 @@ export const getUserDiary = async (req, res) => {
 export const addUserLikedMovies = async (req, res) => {
     
     try {
-        const existingLike = await User.findOne({'likedMovies' : req.params.movieId});
+        const existingLike = await User.findById(req.params.userId).findOne({'likedMovies' : req.params.movieId});
 
         if (existingLike) {
             const error = new Error('Movie already liked');
@@ -114,7 +114,7 @@ export const addUserLikedMovies = async (req, res) => {
 export const addMovietoList = async(req, res) => {
     try {
 
-        const existingMovie = await User.findOne({'watchListMovies' : req.params.movieId});
+        const existingMovie = await User.findById(req.params.userId).findOne({'watchListMovies' : req.params.movieId});
 
         if(existingMovie) {
             const error = new Error('Movie already in list');
@@ -141,7 +141,7 @@ export const addMovietoList = async(req, res) => {
 export const addMovieToDiary = async(req, res) => {
     try {
 
-        const existingMovie = await User.findOne({'diary' : req.params.movieId});
+        const existingMovie = await User.findById(req.params.userId).findOne({'diary' : req.params.movieId});
 
         if(existingMovie) {
             const error = new Error('Movie already in diary');

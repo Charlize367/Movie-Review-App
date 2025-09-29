@@ -90,10 +90,46 @@ export const getRatingComments = async (req, res) => {
 }
 
 
+export const getRatingLikeNumber = async (req, res) => {
+    try{
+
+        const rating = await Ratings.findById(req.params.id).lean();
+
+        if (!rating) {
+      return res.status(404).json({ message: "Rating not found" });
+    }
+
+        const likeCount = rating.likes.length;
+
+
+        res.status(200).json({ likeCount});
+    } catch (error) {
+     console.log(error);
+    }
+}
+
+export const getRatingCommentNumber = async (req, res) => {
+    try{
+
+        const rating = await Ratings.findById(req.params.id).lean();
+
+        if (!rating) {
+      return res.status(404).json({ message: "Rating not found" });
+    }
+
+        const commentCount = rating.comments.length;
+
+
+        res.status(200).json({ commentCount});
+    } catch (error) {
+     console.log(error);
+    }
+}
+
 export const addLiketoRating = async (req, res) => {
 
     try {
-        const existingLike = await Ratings.findOne({'likes' : req.params.userId});
+        const existingLike = await Ratings.findById(req.params.userId).findOne({'likes' : req.params.userId});
 
         if (existingLike) {
             const error = new Error('Rating already liked');
@@ -132,7 +168,8 @@ export const addCommentToRating = async (req, res) => {
         const rating = await Ratings.findById(req.params.ratingId).select('_id');
         const addComment = await Ratings.findOneAndUpdate(
             { _id : rating._id },
-            { $push: {comments : [{userId: req.params.userId, comment: comment}]}},
+            { $push: {comments : [{userId: req.params.userId, comment: comment, createdAt: new Date(),
+        updatedAt: new Date()}]}},
             { new: true}
         )
 

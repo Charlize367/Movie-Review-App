@@ -67,7 +67,7 @@ export const signIn = async (req, res, next) => {
             throw error;
         }
 
-        const token = jwt.sign({userId: user._id }, JWT_SECRET, {expiresIn : JWT_EXPIRES_IN});
+        const token = jwt.sign({userId: user.id }, JWT_SECRET, {expiresIn : JWT_EXPIRES_IN});
 
         res.status(200).json({
             success:true,
@@ -75,6 +75,7 @@ export const signIn = async (req, res, next) => {
             data : {
                 token,
                 user,
+                
             }
         })
     } catch (error) {

@@ -1,6 +1,7 @@
 
 import Movie from "../models/movieModel.js";
 import mongoose from "mongoose";
+import { ObjectId } from "mongodb";
 
 
 export const getMovies = async (req, res) => {
@@ -24,6 +25,44 @@ export const getMovie = async (req, res) => {
             throw error;
         }
         res.status(200).json({ success: true, data: movie});
+    } catch (error) {
+     console.log(error);
+    }
+}
+
+
+export const getMovieByTmdbId = async (req, res) => {
+     const tmdbId = Number(req.params.tmdbId);
+    try{
+
+
+        const movie = await Movie.findOne ({ tmdbId : tmdbId});
+
+        if(!movie) {
+            const error = new Error('Movie not found');
+            error.statusCode(404);
+            throw error;
+        }
+        res.status(200).json({ success: true, data: movie});
+    } catch (error) {
+     console.log(error);
+     console.log(tmdbId);
+    }
+}
+
+export const getMovieLikeNumber = async (req, res) => {
+    try{
+
+        const movie = await Movie.findById(req.params.id).lean();
+
+        if (!movie) {
+      return res.status(404).json({ message: "Movie not found" });
+    }
+
+        const likeCount = movie.likedBy.length;
+
+
+        res.status(200).json({ likeCount});
     } catch (error) {
      console.log(error);
     }
