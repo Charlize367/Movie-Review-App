@@ -99,15 +99,18 @@ const Home = ()  => {
   }, [search]);
 
   return (
-    <div className="container">
+    <div>
       <Nav />
-      <div className="home-hero">
-        <h1 className="home-hero-text">Your world of movies, all in one place.</h1>
+      <div className="flex justify-center relative mt-24 px-4">
+        <h1 className="text-center max-w-4xl font-bold text-white leading-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl
+  ">Your world of movies, all in one place.</h1>
       </div>
+      <div className="relative w-full max-w-md mx-auto">
       <Search search={search} setSearch={setSearch}/>
-      <h2 >Trending Movies</h2>
+      </div>
+      <h2 className="text-2xl text-white font-bold ml-10">Trending Movies</h2>
 
-      <section className="all-movies">
+      <section>
         {isLoading ? (
           <center>
           <img className="spinner" src="./Spinner.svg"/>
@@ -115,12 +118,17 @@ const Home = ()  => {
         ) : errorMessage ? (
         <p>{errorMessage}</p>
       ) : (
-        
-          <ul className="movie-display">
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2
+    md:grid-cols-3 lg:gap-8 py-6 px-4">
+  
           {movies.map((movie) => (
+             <div class="aspect-[2/3] rounded-lg overflow-hidden rounded bg-gray-300">
             <MovieCard movie={movie}/>
+            </div>
           ))}
-          </ul>
+          
+          
+          </div>
   )}
       </section>
     </div>

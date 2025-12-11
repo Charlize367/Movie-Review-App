@@ -750,18 +750,10 @@ const getMovieLikes = async () => {
     const imageUrl = `https://image.tmdb.org/t/p/original/${backdrop.file_path}`
     const divStyle = {
     backgroundImage: `url(${imageUrl})`,
-    backgroundSize: 'cover', 
-    backgroundRepeat: 'no-repeat', 
-    backgroundPosition:'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    backgroundBlendMode: 'darken',
-    height: '85vh', 
-    width: 'auto',
-    marginTop: '-3%',
-    paddingTop:'3%',
-    paddingLeft:'3%',
-    marginLeft: '-3%',
-    marginRight: '-3%'
+    backgroundSize: 'cover',
+backgroundPosition: 'center',
+
+    
   };
 
   const recentRatings = rate.slice(0, 4);
@@ -772,39 +764,44 @@ const getMovieLikes = async () => {
 
    console.log(movieLikeCount);
   return (
-    <div>
-    <div className="container"  style={divStyle}>
+    <div className="w-full">
+      
+    <div className="w-full  h-[600px] sm:h-[580px] md:h-[580px] lg:h-[580px] xl:h-[640px] bg-cover bg-center flex items-center text-white"  style={divStyle}>
+      <div className="absolute inset-0 bg-black/50 z-0 h-[600px] sm:h-[580px] md:h-[580px] lg:h-[640px] xl:h-[640px]"></div>
+
+      <div className="
+  absolute top-0 left-0 w-full z-10  
+">
       <Nav />
-      <div className="movie-detail-hero" >
-    
-      </div>
-          <div className="movie-details">
-            <div className="primary-details">
+       </div>
+      
+      
+            <div className="relative z-20 flex flex-col sm:flex-row md:flex-row items-center md:items-start sm:items-start pl-8 pt-[700px] sm:pt-29 md:pt-38 lg:pt-38 pb-30 ">
               <div className="img-like-rating-counts">
-              <img className="movie-img-container" src={`https://image.tmdb.org/t/p/w500/${movieDetails.poster_path}`} />
-              <div className="movie-like-count"><img src="/liked.svg" className="movieLikeIcon" /> {movieLikeCount}</div>
+              <img className="flex justify-center max-h-[45vh] lg:max-h-[55vh] md:max-h-[65vh] sm:max-h-[15vh]" src={`https://image.tmdb.org/t/p/w500/${movieDetails.poster_path}`} />
+              <div className="flex justify-center mt-2"><img src="/liked.svg" className="w-6 h-6 mr-2" /> {movieLikeCount}</div>
               <div className="movie-rating-count"></div>
               </div>
               
               
-              <div className="movie-main-info">
-                <h2 className="movie-detail-title">{movieDetails.title}</h2>
+              <div className="md:ml-8 lg:ml-12 xl:ml-16 mt-8 lg:max-w-4xl md:max-w-2xl sm:max-w-sm max-w-sm">
+                <h2 className="font-bold text-4xl mb-3">{movieDetails.title}</h2>
 
-                <div className="movie-subdetail1">
-                    {genre.map((g) => (<p className="genre-details">{g.name}</p> ))} 
-                    <p className="dot">●</p>
-                    <p className="movie-detail-date">{release_date}  </p>
-                    <p className="dot">●</p>
-                    <p className="runtime-details"> {movieDetails.runtime} mins</p>
+                <div className="flex max-w-full flex-wrap">
+                    {genre.map((g) => (<p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" >{g.name}</p> ))} 
+                    <p className="flex flex-wrap m-3">●</p>
+                    <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" >{release_date}  </p>
+                    <p className="flex flex-wrap m-3">●</p>
+                    <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" > {movieDetails.runtime} mins</p>
                  </div>
 
                 
-                <div className="movie-subdetail2">
-                  <p className="movie-detail-lang">{movieDetails.original_language}</p> 
-                  <div className="rating-details"><img className="rate-icon" src="/star.svg"/> <p className="ratings-details">{rating}</p></div>
+                <div className="flex max-w-full flex-wrap">
+                  <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}>{movieDetails.original_language}</p> 
+                  <div className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><img className="w-5 h-5 mr-2" src="/star.svg"/> <p className="ratings-details">{rating}</p></div>
                 </div>
               
-                <p className="movie-detail-overview">{movieDetails.overview}</p>
+                <p className="w-full">{movieDetails.overview}</p>
               
                 <div className="cast-details">
                     <p className="movie-detail-cast"><b>Cast: </b> </p><div className="castnames">{final_cast.map((c, index) => (
@@ -817,20 +814,32 @@ const getMovieLikes = async () => {
                   </div>
                    <p className="director-details"><b>Directed By:</b> {director.name} </p>
 
-              <div className="movie-actions">
-                <div className="movie-detail-like"><button className="likeBtn" onClick={likeFunction}><img className="liked-icon" src={`${likedIcon}`}/> </button> <p className="like-txt">{likedText}</p></div>
-                <div className="movie-detail-list"><button className="listBtn" onClick={listFunction}><img className="addToList-icon" src={`${listIcon}`}/></button> <p className="list-txt"> {listText}</p> </div>
-                <div className="movie-detail-diary"><button className="diaryBtn" onClick={diaryFunction}><img className="addToList-icon2" src={`${diaryIcon}`}/></button> <p className="diary-txt"> {diaryText}</p> </div>
-                <div className="movie-detail-rating"><button className="ratingBtn" onClick={openForm}><img className="addToList-icon2" src={`${rateIcon}`}/></button> <p className="rate-txt"> {rateText}</p> </div>
+              <div className="flex max-w-full flex-wrap mt-2">
+                <div className="flex text-white text-sm font-medium p-3 rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="likeBtn" onClick={likeFunction}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
+                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="listBtn" onClick={listFunction}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
+                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="diaryBtn" onClick={diaryFunction}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
+                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
                 
 
               </div>
             </div>
 
-          <div className="logForm" style={isActive ? {display: "flex"} : {display: "none"}}>
-          <h2>Log Film</h2>
-          <button className="closeBtn" onClick={openForm}>x</button>
-          <form className="log-form" onSubmit={addToRating}>
+          <div className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full" style={isActive ? {display: "flex"} : {display: "none"}}>
+          <div class="relative p-4 w-full max-w-md max-h-full">
+            
+            <div class="relative   rounded-lg shadow-sm p-4 md:p-6" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}>
+          
+          <div class="flex items-center rounded-lg  pb-4 md:pb-5">
+            <button type="button" onClick={openForm} class="text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+                <h3 class="text-lg font-medium text-heading">
+                    Sign in to our platform
+                </h3>
+                
+            </div>
+          <form className="pt-4 md:pt-6" onSubmit={addToRating}>
           <label className="rating-lbl">Rating:</label>
            <div style={{ display: "flex", gap: "6px", cursor: "pointer", marginBottom: "10%"}}>
   {[1, 2, 3, 4, 5].map((star) => (
@@ -873,10 +882,10 @@ const getMovieLikes = async () => {
           <input className="logBtn" type="submit" value="Add"/>
           </form>
         </div>
-         
-              </div>
-              </div>
+          
             </div>
+               </div>
+        </div>
 
 {showPopup && (
             <div className="add-popup">
@@ -908,7 +917,7 @@ const getMovieLikes = async () => {
             </div>
         
           </div>
-         
+         </div>
           </div>
           <div>
              <center>

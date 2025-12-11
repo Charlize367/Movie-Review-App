@@ -20,12 +20,10 @@ const Nav = () => {
     const [genres, setGenres] = useState([]);
     const [genre_ID, setGenreID] = useState(0);
     const { logout } = useAuth();
-    const [isActive, setIsActive] = useState(false);
+    const [open, setOpen] = useState(false);
     
     
-    const openNav = () => {
-    setIsActive(!isActive);
-  };
+  
 
       const displayGenres = async () => {
           try {
@@ -60,65 +58,73 @@ const Nav = () => {
 
     return (
       <div>
-        <div className="header-mobile">
-          <button className="openBtn" onClick={openNav}>☰</button>
-          <h1 className="title">Movie App</h1>
-          <div className="sidebar" style={isActive ? {width: "250px"} : {width: "0px"}}>
-        <button className="closeBtn" onClick={openNav}>x</button>
-        <ul className="link-list">
-          <li className="navlink"><Link to ="/home">Browse</Link></li>
-                        <li style={{paddingTop: '2px'}} className="navlink">   
-                            <div className="category-block">
-                            <Link to = "/categories">Categories</Link>
-                                <div className="category-container">
-                                    {genres.map((genre) => (
-                                    <Link className="genre" to ={`/categories/${genre.id}/${genre.name}`}>{genre.name || 'Not found'} </Link>
-                                        ))}
-                                </div>
-                                </div>
-                        </li>
-                        <li className="navlink"><Link to ="/liked">Liked</Link></li>
-                        <li className="navlink"><Link to ="/list">WatchList</Link></li>
-                        <li className="navlink"><Link to ="/diary">Diary</Link></li>
-                        <li className="navlink"><Link to ="/rated">Ratings</Link></li>
-                        
-                        <button className="logoutBtn"><li className="logout"><Link className="logoutStyle" onClick={logout}>Logout</Link></li></button>
-                        </ul>
-      </div>
-        </div>
-            <div className="header">
-                <nav className="header-nav">
-                    <h1 className="title">Movie App</h1>
-                    <br />
-                    <ul className="nav-links">
-                        <li className="link"><Link to ="/home">Browse</Link></li>
-                        <li className="link">   
-                            <div className="category-block">
-                            <Link to = "/categories">Categories</Link>
-                                <div className="category-container">
-                                    {genres.map((genre) => (
-                                    <Link className="genre" to ={`/categories/${genre.id}/${genre.name}`}>{genre.name || 'Not found'} </Link>
-                                        ))}
-                                </div>
-                                </div>
-                        </li>
-                        <li className="link"><Link to ="/liked">Liked</Link></li>
-                        <li className="link"><Link to ="/list">WatchList</Link></li>
-                        <li className="link"><Link to ="/diary">Diary</Link></li>
-                        <li className="link"><Link to ="/rated">Ratings</Link></li>
-                        
-                        <button className="logoutBtn"><li className="logout"><Link className="logoutStyle" onClick={logout}>Logout</Link></li></button>
-                         
-                         
-                    
-                        
+ 
+<nav class="bg-neutral-primary w-full z-20 top-0 start-0 border-default text-white p-3">
+  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+    <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
+        <p class="self-center text-xl text-heading font-semibold whitespace-nowrap">Movie App</p>
+    </a>
+    <button data-collapse-toggle="navbar-multi-level-dropdown" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-body rounded-base md:hidden hover:bg-neutral-secondary-soft hover:text-heading focus:outline-none focus:ring-2 focus:ring-neutral-tertiary" aria-controls="navbar-multi-level-dropdown" aria-expanded="false">
+        <span class="sr-only">Open main menu</span>
+        <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 7h14M5 12h14M5 17h14"/></svg>
+    </button>
+    <div class="hidden w-full md:block md:w-auto" id="navbar-multi-level-dropdown">
+      <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-default rounded-base bg-neutral-secondary-soft md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-neutral-primary">
+        <li>
+          <a href="#" class="block py-2 px-3 text-white bg-brand rounded md:bg-transparent md:text-fg-brand md:p-0" aria-current="page"><Link to ="/home">Browse</Link></a>
+        </li>
+        <li>
+            <button id="multiLevelDropdownButton" onClick={() => setOpen(!open)} class="flex items-center justify-between w-full py-2 px-3 rounded font-medium text-heading md:w-auto hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0">
+              Categories 
+              <svg class="w-4 h-4 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
+          </button>
 
-            
-                    </ul>
-                    
-                </nav>
-                <Outlet />
-            </div>
+{open && (
+  <div
+    id="multi-dropdown"
+    className="absolute z-10 bg-neutral-primary-medium border border-default-medium rounded-base shadow-lg w-44"
+  >
+    <ul
+      className="p-2 text-sm text-body font-medium"
+      aria-labelledby="multiLevelDropdownButton"
+    >
+      {genres.map((genre) => (
+        <li key={genre.id}>
+          <Link
+            className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
+            to={`/categories/${genre.id}/${genre.name}`}
+          >
+            {genre.name || "Not found"}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+        </li>
+        <li>
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/list">WatchList</Link></a>
+        </li>
+        <li>
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/liked">Liked</Link></a>
+        </li>
+        <li>
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/diary">Diary</Link></a>
+        </li>
+        <li>
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/rated">Ratings</Link></a>
+        </li>
+         <li>
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link className="logoutStyle" onClick={logout}>Logout</Link></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+        
             </div>
     );
 };
