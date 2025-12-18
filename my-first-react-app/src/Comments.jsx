@@ -213,84 +213,76 @@ const token = localStorage.getItem('jwtToken');
   }
    
   return (
-    <div className="container">
+    <div className="w-full bg-gray-900 h-screen">
       <Nav />
      
 
-          <div className="user-comment">
-            <h2>View Comments</h2>
-          
-            <div className="comments-section">
-            
+    <div className="w-full flex justify-center">
 
-            {comments?.length === 0 && (
-              <p style={{ display: "flex", justifyContent: "center" }}>
-                Be the first to comment on this rating.
-              </p>
-            )}
-          
-            {comments.map((c) => {
-                
-                const users = c.userId;
-                console.log(comments);
-
-                return(
-			<div className="comment-post">
-                
-                
-				<div class="comment-main">
-				
-					<div class="comment-img"><img className="comment-icon-img" src={`http://localhost:3000/${c.userId.image}`} alt=""/></div>
-					
-					<div class="comment-details">
-							<p><span class="comment-author">{c.userId.username}</span><span class="comment-time">{dayjs(c.updatedAt).fromNow()}</span></p>
-							
-					
-                        
-						<div class="comment-content">
-							{c.comment}
-						</div>
-
-                        
-
-
-
-                        <div className="comment-edit-delete" style={c.userId._id == userId ? {display: "flex"} : {display: "none"}}>
-                        <button className="edit-comment" onClick={() => {openUpdateCommentForm(c._id, param.ratingId)}}><img className="edit-icon" src="/edit-icon.svg"/> </button>
-                            <button className="delete-comment" onClick={() => {deleteComment(c._id)}}><img className="delete-icon" src="/delete-icon.svg"/> </button>
-					    </div>
-                    </div>
-
-                    
-				
-				
-				
-			</div>
-           
-		</div>
-         )})}
-    
-
-        
-        </div>
-
-        <div className="comment-add">
-         <div className="field-comment">
-            <textarea name="comment" value={comment} onChange={handleCommentChange} rows="4" cols="50"></textarea>
-            <a className="btn btn--blue btn--medium pull-right" onClick={addComment}>Post Your Comment</a>
-         </div>
-      </div>
-
-         <div className="logForm" style={isActive2 ? {display: "flex"} : {display: "none"}}>
-          <h2>Edit Comment</h2>
-          <button className="closeBtn" onClick={openUpdateCommentForm}>x</button>
-          <form className="log-form" onSubmit={editComment}>
-          <textarea className="review_field"  placeholder="Add review..." name="review" value={updateData.comment} onChange={handleUpdateCommentChange} />
-          <input className="logBtn" type="submit" value="Edit"/>
-          </form>
-        </div>
-	</div>
+  {isActive2 && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="bg-gray-900 rounded-2xl p-4 shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
+  <form onSubmit={editComment}>
+   
+  <h2 className="text-lg font-bold text-white mb-3">Edit Comment</h2>
+          <textarea rows="6" value={updateData.comment} onChange={handleUpdateCommentChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3
+                 text-gray-100 placeholder-gray-400
+                 focus:ring-2 focus:ring-indigo-500
+                 shadow-inner mb-4" placeholder="Add review..." name="review"  />
+          <div className="flex justify-end gap-3">
+      <button className="text-gray-400 hover:text-white" onClick={openUpdateCommentForm}>Cancel</button>
+      <button className="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-white">
+        Save
+      </button>
     </div>
+    </form>
+  </div>
+  </div>
+  )}
+
+  <section class="mx-auto bg-gray-900 w-full py-8 lg:py-16 antialiased">
+  <div class="max-w-2xl mx-auto px-4">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Discussion</h2>
+    </div>
+    <form class="mb-6">
+        <div class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+            <label for="comment" class="sr-only">Your comment</label>
+            <textarea id="comment" value={comment} onChange={handleCommentChange} rows="6"
+                class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
+                placeholder="Write a comment..." required></textarea>
+        </div>
+        <button onClick={addComment} type="submit"
+            class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
+            Post comment
+        </button>
+    </form>
+    {comments.map(c => (
+    <article class="p-6 text-base bg-white rounded-lg dark:bg-gray-900">
+        <footer class="flex justify-between items-center mb-2">
+            <div class="flex items-center">
+                <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold"><img
+                        class="mr-2 w-6 h-6 rounded-full"
+                        src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
+                        alt="Michael Gough"/>{c.userId.username}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400"><time pubdate datetime="2022-02-08"
+                        title="February 8th, 2022">{dayjs(c.updatedAt).fromNow()}</time></p>
+            </div>
+            <div class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 dark:text-gray-400 bg-white rounded-lg focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:focus:ring-gray-600">
+             <button className="hover:bg-gray-700" onClick={() => {openUpdateCommentForm(c._id, param.ratingId)}}><img className="w-4 h-4" src="/edit-icon.svg"/> </button>
+            <button className="hover:bg-gray-700 ml-1" onClick={() => {deleteComment(c._id)}}><img className="w-4 h-4" src="/delete-icon.svg"/> </button>
+            </div>
+            
+        </footer>
+        <p class="text-gray-500 dark:text-gray-400">{c.comment}</p>
+        
+    </article>
+    ))}
+  </div>
+</section>
+    </div>
+    </div>
+    
    
           
        

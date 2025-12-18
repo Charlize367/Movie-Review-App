@@ -44,7 +44,7 @@ const Liked = () => {
     <div className="container">
       <Nav/>
 
-        <h2>Browse Liked Movies</h2>
+        <h2 className="text-2xl text-white font-bold ml-10">Browse Liked Movies</h2>
 
       <section className="all-movies">
         {isLoading ? (
@@ -54,11 +54,17 @@ const Liked = () => {
         ) : errorMessage ? (
         <p>{errorMessage}</p>
       ) : (
-          <ul className="movie-display">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2
+    md:grid-cols-3 lg:gap-8 py-6 px-4">
+  
           {likedMovies.map((movie) => (
+             <div className="aspect-[2/3] rounded-lg overflow-hidden rounded bg-gray-300">
             <MovieCard movie={movie}/>
+            </div>
           ))}
-          </ul>
+          
+          
+          </div>
   )}
       </section>
     </div>

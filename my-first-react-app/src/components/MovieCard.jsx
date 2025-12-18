@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate, Link } from 'react-router-dom';
 
 const MovieCard = ({movie : 
-    { id, title, vote_average, poster_path, posterPath  }
+    { id, title, vote_average, poster_path, posterPath, tmdbId }
 
 }) => {
     let ratings = 0;
@@ -26,7 +26,7 @@ const MovieCard = ({movie :
 
     return (
         <div>
-            <Link to = {`/movie_details/${id}`}>
+            <Link to = {`/movie_details/${id ?? tmdbId}`}>
             <article class="group relative overflow-hidden rounded-lg shadow-sm transition hover:shadow-lg aspect-[2/3]">
   <img alt="" src={poster ? `https://image.tmdb.org/t/p/w500/${poster}` : null} class="absolute inset-0 h-full w-full object-cover"/>
 
@@ -56,11 +56,12 @@ const MovieCard = ({movie :
       <a href="#">
         <h3 class="mt-0.5 text-2xl text-white"><p className="font-bold text-2xl">{title}</p></h3>
       </a>
-
+{vote_average &&
       <div className="mt-2 flex items-center gap-1 text-sm text-white/90">
         <img src="/star.svg" className="w-4 h-4" alt="star"/>
         <span>{ratings}</span>
         </div>
+}
     </div>
   </div>
 </article>

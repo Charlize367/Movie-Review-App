@@ -105,7 +105,7 @@ const Home = ()  => {
         <h1 className="text-center max-w-4xl font-bold text-white leading-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl
   ">Your world of movies, all in one place.</h1>
       </div>
-      <div className="relative w-full max-w-md mx-auto">
+      <div className="relative w-full m-5 max-w-2xl mx-auto">
       <Search search={search} setSearch={setSearch}/>
       </div>
       <h2 className="text-2xl text-white font-bold ml-10">Trending Movies</h2>
@@ -118,11 +118,11 @@ const Home = ()  => {
         ) : errorMessage ? (
         <p>{errorMessage}</p>
       ) : (
-        <div class="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2
     md:grid-cols-3 lg:gap-8 py-6 px-4">
   
           {movies.map((movie) => (
-             <div class="aspect-[2/3] rounded-lg overflow-hidden rounded bg-gray-300">
+             <div className="aspect-[2/3] rounded-lg overflow-hidden rounded bg-gray-300">
             <MovieCard movie={movie}/>
             </div>
           ))}

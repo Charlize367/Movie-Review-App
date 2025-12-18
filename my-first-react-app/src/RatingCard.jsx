@@ -218,43 +218,61 @@ useEffect(() => {
                   
                    
             
-                    
-                        <div class="testimonial-box">
-                        <div class="box-top">
-                            {users.map(u => (
-                            <div class="profile">
-                                
-                                <div class="profile-img">
-                                    <img className="profile-ratings" src={`http://localhost:3000/${u.image}`} />
-                                </div>
-                                <div class="name-user">
-                                    <strong><p className="ratings-name">{u.username}</p></strong>
-                                </div>
-                                
-                            </div>
-                             ))}
-                            <div class="reviews">
-                            <div className="rating-icon-number">
-                                <img className="rate-icon-ratings" src="/star.svg"/><p className="rating-number">{rating}</p>
-                            </div>
-                        </div>
-                    
-                        </div>
+                <div >
+                {/* <div class="flex w-4xl p-4 max-w-4xl flex-col bg-transparent  border-b border-slate-200 my-6">
+                  {users.map(u => (
+  <div class="flex items-center gap-4 text-slate-800">
+    
+    <img src={`http://localhost:3000/${u.image}`} alt="Tania Andrew" class="relative inline-block h-[58px] w-[58px] !rounded-full  object-cover object-center" />
+    <div class="flex w-full flex-col">
+      <div class="flex items-center justify-between">
+        <h5 class="text-xl font-semibold text-white">
+          {u.username}
+        </h5>
+        <div class="flex items-center gap-0 5">
+          <img className="w-8 h-8 mr-2" src="/star.svg"/><p className="text-white">{rating}</p>
+        </div>
+      </div>
+      <p class="text-xs uppercase font-bold text-slate-500 mt-0.5">
+        {dayjs(createdAt).fromNow()}
+      </p>
+    </div>
+  </div>
+  ))}
+  <div class="mt-6">
+    <p class="text-base text-white font-light leading-normal">
+     {review}
+    </p>
+  </div>
+  <div className="flex mt-10" >
+  <button className="like-review" onClick={likeFunction} ><img className="w-5 h-5 mr-3" src={`${likedIcon}`} /></button><p>{reviewLikeCount}</p>
+  <button className="comment-review ml-15" onClick={goToComments}  ><img className="w-5 h-5 mr-3" src={`/comment.svg`} /></button><p>{reviewCommentCount}</p>
+</div>
+</div>    */}
+<div class="w-80 max-w-88 space-y-4 rounded-md border border-gray-200 bg-white p-3 text-gray-500 transition-all duration-300 hover:-translate-y-1">
+        <div class="flex items-center justify-between">
+            <div class="flex gap-1">
+                <img className="w-6 h-6 mr-2" src="/star.svg"/><p className="text-black">{rating}</p>
+            </div>
+            <p>{dayjs(createdAt).fromNow()}</p>
+        </div>
+        <p>{review}</p>
+        <div className="flex">
+        {users.map(u => (
+        <div class="flex items-center gap-2 pt-3">
+            <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=200" alt="Richard Nelson" />
+            <p class="font-medium text-gray-800">{u.username}</p>
+          
+        </div>
+        ))}
+        <div className="flex ml-13" >
+  <div className="flex bg-gray-900 p-3 rounded-4xl"><button className="like-review" onClick={likeFunction} ><img className="w-5 h-5 mr-3" src={`${likedIcon}`} /></button><p>{reviewLikeCount}</p></div>
+  <div className="flex bg-gray-900 p-3 rounded-4xl ml-10"><button className="comment-review" onClick={goToComments}  ><img className="w-5 h-5 mr-3" src={`/comment.svg`} /></button><p>{reviewCommentCount}</p></div>
+</div>
+    </div>
+    </div>
 
-                        
-
-
-                        <div class="client-comment">
-                            <p>{review}</p>
-                        </div>
-                <div className="review-details">
-                  <p>{dayjs(createdAt).fromNow()}</p>
-                  
-                  <button className="like-review" onClick={likeFunction} ><img src={`${likedIcon}`} className="ratingLikeIcon"/></button><p>{reviewLikeCount}</p>
-                  <button className="comment-review" onClick={goToComments}  ><img src={`/comment.svg`} className="commentRatingIcon"/></button><p>{reviewCommentCount}</p>
-                
-                </div>
-                </div>
+</div>
                
 
                 

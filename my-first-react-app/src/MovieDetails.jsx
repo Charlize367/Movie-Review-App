@@ -188,18 +188,19 @@ const MovieDetails = () => {
       
     }, []);
 
-    
+    console.log(movieDetails);
 
   const addMovieIfNotExists = async () => {
      
     
     const inputData = {
-      'tmdbId' : param.id,
+      'tmdbId' : Number(param.id),
       'title' : movieDetails.title,
       'posterPath' : movieDetails.poster_path,
       'releaseDate' : movieDetails.release_date,
       'likedBy' : [],
       'ratings' : []
+    
     }
 
   
@@ -235,6 +236,10 @@ const MovieDetails = () => {
 
         const movieId = await addMovieIfNotExists();
 
+        if (!movieId) {
+      console.error("Movie ID missing. Like aborted.");
+      return;
+    }
         const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/likes`, {}, {
             headers : {
               'Content-Type' : 'application/json',
@@ -472,7 +477,7 @@ const MovieDetails = () => {
 
     console.log(rate);
    
-
+console.log(likedMovies);
 
   useEffect(() => {
 
@@ -770,7 +775,7 @@ backgroundPosition: 'center',
       <div className="absolute inset-0 bg-black/50 z-0 h-[600px] sm:h-[580px] md:h-[580px] lg:h-[640px] xl:h-[640px]"></div>
 
       <div className="
-  absolute top-0 left-0 w-full z-10  
+  absolute top-0 left-0 w-full z-60 
 ">
       <Nav />
        </div>
@@ -827,19 +832,18 @@ backgroundPosition: 'center',
           <div className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full" style={isActive ? {display: "flex"} : {display: "none"}}>
           <div class="relative p-4 w-full max-w-md max-h-full">
             
-            <div class="relative   rounded-lg shadow-sm p-4 md:p-6" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}>
-          
+            <div class="w-full mx-auto max-w-md space-y-4 m-30 bg-gray-900 p-6 rounded-lg shadow-xs">
           <div class="flex items-center rounded-lg  pb-4 md:pb-5">
-            <button type="button" onClick={openForm} class="text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
+            
+                <h3 class="text-xl font-semibold text-white text-heading">
+                    Add your review
+                </h3>
+                <button type="button" onClick={openForm} class="text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
                     <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
                     <span class="sr-only">Close modal</span>
                 </button>
-                <h3 class="text-lg font-medium text-heading">
-                    Sign in to our platform
-                </h3>
-                
             </div>
-          <form className="pt-4 md:pt-6" onSubmit={addToRating}>
+          <form className=" md:pt-6" onSubmit={addToRating}>
           <label className="rating-lbl">Rating:</label>
            <div style={{ display: "flex", gap: "6px", cursor: "pointer", marginBottom: "10%"}}>
   {[1, 2, 3, 4, 5].map((star) => (
@@ -878,8 +882,8 @@ backgroundPosition: 'center',
 </div>
 
           <label className="review-lbl">Review:</label>
-          <textarea className="review_field"  placeholder="Add review..." name="review" value={review} onChange={handleChange} />
-          <input className="logBtn" type="submit" value="Add"/>
+          <textarea rows="6" class="p-5 rounded-lg w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Add review..." name="review" value={review} onChange={handleChange} />
+          <input class="block w-full  mt-10 mb-5 rounded-lg border border-blue-600 bg-blue-900 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white" type="submit" value="Add"/>
           </form>
         </div>
           
@@ -894,35 +898,42 @@ backgroundPosition: 'center',
               )}
 
             
-              <div id="#testimonials">
+              
+          </div>
+          <div>
+             
+
+              <div className="flex justify-center text-white mt-15">
                 <div class="testimonial-heading">
-                    <h2>Ratings For This Film</h2>
-              <div class="testimonial-box-container">
+                    <h2 className="font-bold text-white text-4xl flex justify-center mb-5">Ratings For This Film</h2>
+              <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
                 
-              {recentRatings.map((r) => { 
+              {recentRatings?.length > 0 && recentRatings.map(r =>  
                 
                
-                return(
+               
                 
             <RatingCard rating={r} tmdbId = {param.id}/>
             
            
-          )
-      
-           
-        }
-             
-             
-              )}
+          )}
+
             </div>
         
           </div>
          </div>
-          </div>
-          <div>
-             <center>
+            {recentRatings?.length === 0 && (
+              <p className="text-white m-5" style={{ display: "flex", justifyContent: "center" }}>
+                Be the first to rate this film.
+              </p>
+            )}
+
+            
+           </div>
+
+           <center>
               {recentRatings?.length > 0 && (
-                <a 
+                <a className="mt-10 text-white"
                   style={{ display: "flex", justifyContent: "center" }} 
                   href={`/all_ratings/${movie_ID}/`}
                 >
@@ -930,14 +941,9 @@ backgroundPosition: 'center',
                 </a>
               )}
             </center>
-
-            {recentRatings?.length === 0 && (
-              <p style={{ display: "flex", justifyContent: "center" }}>
-                Be the first to rate this film.
-              </p>
-            )}
-           </div>
          </div>
+
+         
  
   )
       

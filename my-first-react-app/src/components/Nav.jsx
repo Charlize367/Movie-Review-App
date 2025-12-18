@@ -59,7 +59,7 @@ const Nav = () => {
     return (
       <div>
  
-<nav class="bg-neutral-primary w-full z-20 top-0 start-0 border-default text-white p-3">
+<nav class="bg-neutral-primary w-full z-99 top-0 start-0 border-default text-white p-3">
   <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
     <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
         <p class="self-center text-xl text-heading font-semibold whitespace-nowrap">Movie App</p>
@@ -82,7 +82,7 @@ const Nav = () => {
 {open && (
   <div
     id="multi-dropdown"
-    className="absolute z-10 bg-neutral-primary-medium border border-default-medium rounded-base shadow-lg w-44"
+    className="absolute z-10 bg-white text-black border border-default-medium rounded-base shadow-lg w-44"
   >
     <ul
       className="p-2 text-sm text-body font-medium"
@@ -115,9 +115,13 @@ const Nav = () => {
         <li>
           <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/rated">Ratings</Link></a>
         </li>
+        <li>
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/account">Account</Link></a>
+        </li>
          <li>
           <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link className="logoutStyle" onClick={logout}>Logout</Link></a>
         </li>
+        
       </ul>
     </div>
   </div>

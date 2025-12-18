@@ -13,6 +13,7 @@ import MovieDetails from './MovieDetails.jsx'
 import ProtectedRoute from './auth/ProtectedRoute.jsx'
 import { AuthProvider } from './auth/AuthContext.jsx'
 import Comments from './Comments.jsx'
+import Account from './Account.jsx'
 
 
 
@@ -35,6 +36,7 @@ const App = ()  => {
                 <Route exact path="/home" element={<ProtectedRoute allowedRoles={["USER"]}><Home /></ProtectedRoute>} />
                 <Route exact path="/movie_details/:id" element={<ProtectedRoute allowedRoles={["USER"]}><MovieDetails /></ProtectedRoute>} />
                 <Route exact path="/comments/:id/:ratingId" element={<ProtectedRoute allowedRoles={["USER"]}><Comments /></ProtectedRoute>} />
+                <Route exact path="/account" element={<ProtectedRoute allowedRoles={["USER"]}><Account /></ProtectedRoute>} />
 
             </Routes>
             </BrowserRouter>

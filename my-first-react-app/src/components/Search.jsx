@@ -2,7 +2,7 @@ import React from "react";
 
 const Search = ({search, setSearch}) => {
     return (
-        <div className="flex justify-center">
+        <div className="flex justify-center max-w-2xl">
             <form>   
                 <label for="search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Search</label>
                 <div class="relative w-full">
