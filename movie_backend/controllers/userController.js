@@ -1,6 +1,7 @@
 import User from "../models/userModel.js";
 import Movie from "../models/movieModel.js";
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 
 export const getUsers = async (req, res) => {
@@ -15,7 +16,7 @@ export const getUsers = async (req, res) => {
 
 export const getUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id).select('-password').populate('likedMovies').populate('watchListMovies').populate('diary');
+        const user = await User.findById(req.params.id).populate('likedMovies').populate('watchListMovies').populate('diary');
 
         if(!user) {
             const error = new Error('User not found');
@@ -74,7 +75,10 @@ export const getUserDiary = async (req, res) => {
 export const addUserLikedMovies = async (req, res) => {
     
     try {
-        const existingLike = await User.findById(req.params.userId).findOne({'likedMovies' : req.params.movieId});
+        const existingLike = await User.findOne({
+  _id: req.params.userId,
+  likedMovies: req.params.movieId
+});
 
         if (existingLike) {
             const error = new Error('Movie already liked');
@@ -114,7 +118,11 @@ export const addUserLikedMovies = async (req, res) => {
 export const addMovietoList = async(req, res) => {
     try {
 
-        const existingMovie = await User.findById(req.params.userId).findOne({'watchListMovies' : req.params.movieId});
+        const existingMovie = await User.findOne({
+        _id: req.params.userId,
+        watchListMovies : req.params.movieId
+        });
+        
 
         if(existingMovie) {
             const error = new Error('Movie already in list');
@@ -141,7 +149,10 @@ export const addMovietoList = async(req, res) => {
 export const addMovieToDiary = async(req, res) => {
     try {
 
-        const existingMovie = await User.findById(req.params.userId).findOne({'diary' : req.params.movieId});
+        const existingMovie = await User.findOne({
+        _id: req.params.userId,
+        diary : req.params.movieId
+        });
 
         if(existingMovie) {
             const error = new Error('Movie already in diary');
@@ -165,23 +176,71 @@ export const addMovieToDiary = async(req, res) => {
 export const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const updatedData = req.body
+        const { username, email, password} = req.body;
+        const updateData = {};
+
+    if (username) updateData.username = username;
+    if (email) updateData.email = email;
+
+    if (password && password.trim() !== "") {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
 
         const updateUser = await User.findByIdAndUpdate(
             id,
-            updatedData,
-            { new : true }
+            updateData,
+            {
+        new: true,
+        runValidators: true,
+      }
         );
 
         if(!updateUser) {
             return res.status(404).json({message : 'User not found'})
         }
 
-        res.json(updateUser)
+        res.json({
+      success: true,
+      message: "User details updated",
+      data: updateUser,
+    });
     } catch (error) {
         console.log(error.message);
     }
 }
+
+export const updateUserImage = async (req, res) => {
+    try {
+        const { id } = req.params;
+       if (!req.file) {
+      return res.status(400).json({ message: "No image uploaded" });
+        }
+
+        const updateUser = await User.findByIdAndUpdate(
+            id,
+            { image: req.file.path },
+            {
+        new: true,
+        runValidators: true,
+      }
+        );
+
+        if(!updateUser) {
+            return res.status(404).json({message : 'User not found'})
+        }
+
+        res.json({
+      success: true,
+      message: "Profile image updated",
+      image: updateUser.image,
+    });
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
 
 
 export const deleteUser = async (req, res) => {
