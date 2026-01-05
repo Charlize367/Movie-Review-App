@@ -7,7 +7,7 @@ import {useParams} from "react-router-dom";
 import axios from "axios"
 
 const Diary = () => {
-  const API_URL = 'http://localhost:3000/api/v1';
+  const API_URL = import.meta.env.VITE_API_URL;
   const userId = localStorage.getItem('user_ID');
   const [diary, setDiary] = useState([]);
    const [isLoading, setIsLoading] = useState(false);
