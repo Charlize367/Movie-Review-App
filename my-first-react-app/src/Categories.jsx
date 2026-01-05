@@ -5,8 +5,8 @@ import Search from './components/Search.jsx'
 import MovieCard from './components/MovieCard.jsx'
 import {useParams} from "react-router-dom";
 
-const apiUrl =  'https://api.themoviedb.org/3';
-const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODI1MGEyNjQ5YTAwYTk2OTdlYjIxMGUzMTExZGE1YyIsIm5iZiI6MTcyMjU4NzAzNS43MTYsInN1YiI6IjY2YWM5NzliNTEyMTNhZjA5MWJkNThhMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zrM-3dtjvwa-al-qRd70tlGRD0VkxCFbHgYmZEzY6gA';
+const apiUrl =  import.meta.env.VITE_TMDB_API_URL;
+const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
 const apiOptions = {
   method: 'GET',
