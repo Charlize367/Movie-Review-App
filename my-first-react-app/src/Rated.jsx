@@ -11,7 +11,7 @@ import relativeTime from "dayjs/plugin/relativeTime"
 
 
 const Rated = () => {
-  const API_URL = 'http://localhost:3000/api/v1';
+  const API_URL = import.meta.env.VITE_API_URL;
   const token = localStorage.getItem('jwtToken');
   const [ratings, setRatings] = useState([]);
   const userId = localStorage.getItem('user_ID');
