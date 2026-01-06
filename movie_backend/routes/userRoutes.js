@@ -1,7 +1,19 @@
 import { Router } from "express";
-import { addMovieToDiary, addMovietoList, addUserLikedMovies, deleteUser, getUser, getUserDiary, getUserLikedMovies, getUsers, getUserWatchList, removeMovieFromDiary, removeMovieFromLikes, removeMovieFromWatchList, updateUser } from "../controllers/userController.js";
+import { addMovieToDiary, addMovietoList, addUserLikedMovies, updateUserImage, deleteUser, getUser, getUserDiary, getUserLikedMovies, getUsers, getUserWatchList, removeMovieFromDiary, removeMovieFromLikes, removeMovieFromWatchList, updateUser } from "../controllers/userController.js";
 import authorize from "../middlewares/auth.middleware.js";
+import multer from 'multer';
 
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, "uploads/");
+    },
+    filename: function(req, file, cb) {
+        cb(null, Date.now() + "-" + file.originalname);
+    },
+});
+
+
+const upload = multer({ storage : storage});
 
 const userRouter = Router();
 
@@ -22,6 +34,8 @@ userRouter.post('/:userId/:movieId/watchlist', authorize, addMovietoList);
 userRouter.post('/:userId/:movieId/diary', authorize, addMovieToDiary);
 
 userRouter.put('/:id', authorize, updateUser);
+
+userRouter.put("/:id/image", upload.single("image"), authorize, updateUserImage);
 
 userRouter.delete('/:id', authorize, deleteUser);
 
