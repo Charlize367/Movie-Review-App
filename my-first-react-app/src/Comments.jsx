@@ -11,17 +11,7 @@ import relativeTime from "dayjs/plugin/relativeTime"
 
 const Comments = () => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const apiUrl =  import.meta.env.VITE_TMDB_API_URL;
-const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-const apiOptions = {
-  method: 'GET',
-  headers : {
-    accept: 'application/json',
-    Authorization: `Bearer ${apiKey}`
-  }
-}
-
-const token = localStorage.getItem('jwtToken');
+  const token = localStorage.getItem('jwtToken');
 
   const [movieDetails, setMovieDetails] = useState([]);
   const [vote, setVote] = useState(0);
@@ -263,7 +253,7 @@ const token = localStorage.getItem('jwtToken');
             <div class="flex items-center">
                 <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold"><img
                         class="mr-2 w-6 h-6 rounded-full"
-                        src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
+                        src={`http://localhost:3000/${c.userId.image}`}
                         alt="Michael Gough"/>{c.userId.username}</p>
                 <p class="text-sm text-gray-600 dark:text-gray-400"><time pubdate datetime="2022-02-08"
                         title="February 8th, 2022">{dayjs(c.updatedAt).fromNow()}</time></p>

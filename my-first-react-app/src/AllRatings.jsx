@@ -9,7 +9,7 @@ import relativeTime from "dayjs/plugin/relativeTime"
 import RatingCard from './RatingCard.jsx';
 
 const AllRatings = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
+ const API_URL = import.meta.env.VITE_API_URL;
     const token = localStorage.getItem('jwtToken');
     const [ratings, setRatings] = useState([]);
     const userId = localStorage.getItem('user_ID');
@@ -65,13 +65,13 @@ const AllRatings = () => {
 
 
   return (
-    <div className="container">
+    <div className="w-full">
       <Nav/>
     <div id="#testimonials">
                 <div className="testimonial-heading">
-                    <h2>All Ratings For This Film</h2>
+                    <h2 className="font-bold text-white text-4xl flex justify-center mb-5">All Ratings For This Film</h2>
                 </div>
-              <div class="testimonial-box-container">
+              <div class="m-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
 
                 {ratings.map((r) => { 
 

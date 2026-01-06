@@ -14,6 +14,8 @@ import ProtectedRoute from './auth/ProtectedRoute.jsx'
 import { AuthProvider } from './auth/AuthContext.jsx'
 import Comments from './Comments.jsx'
 import Account from './Account.jsx'
+import MovieList from './MovieList.jsx'
+import MovieListPage from './MovieListPage.jsx'
 
 
 
@@ -34,6 +36,8 @@ const App = ()  => {
                 <Route exact path="/diary" element={<ProtectedRoute allowedRoles={["USER"]}><Diary /></ProtectedRoute>} />
                 <Route exact path="/rated" element={<ProtectedRoute allowedRoles={["USER"]}><Rated /></ProtectedRoute>} />
                 <Route exact path="/home" element={<ProtectedRoute allowedRoles={["USER"]}><Home /></ProtectedRoute>} />
+                <Route exact path="/movieList" element={<ProtectedRoute allowedRoles={["USER"]}><MovieList /></ProtectedRoute>} />
+                <Route exact path="/movieListPage/:id" element={<ProtectedRoute allowedRoles={["USER"]}><MovieListPage /></ProtectedRoute>} />
                 <Route exact path="/movie_details/:id" element={<ProtectedRoute allowedRoles={["USER"]}><MovieDetails /></ProtectedRoute>} />
                 <Route exact path="/comments/:id/:ratingId" element={<ProtectedRoute allowedRoles={["USER"]}><Comments /></ProtectedRoute>} />
                 <Route exact path="/account" element={<ProtectedRoute allowedRoles={["USER"]}><Account /></ProtectedRoute>} />
