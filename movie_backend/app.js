@@ -10,11 +10,10 @@ import errorMiddleware from './middlewares/error.middleware.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from "path"
-
+import movieListRouter from './routes/movieListRoutes.js';
 
 
 const app = express();
-
 
 
 app.use(cors());
@@ -30,10 +29,9 @@ app.use((err, req, res, next) => {
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
-
-
 app.use('/api/v1/movies', movieRouter);
 app.use('/api/v1/ratings', ratingRouter);
+app.use('/api/v1/movieList', movieListRouter);
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use(errorMiddleware);

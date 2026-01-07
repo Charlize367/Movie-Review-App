@@ -47,7 +47,7 @@ movieListRouter.put("/:id/image", upload.single("image"), authorize, updateListI
 
 movieListRouter.delete('/:id', authorize, deleteMovieList);
 
-movieListRouter.delete('/:listId/:movieId/', authorize, deleteMovieFromMovieList);
+movieListRouter.delete('/:listId/:movieId/deleteMovie', authorize, deleteMovieFromMovieList);
 
 movieListRouter.delete('/:userId/:movieListId/likes', authorize, removeLikeFromList);
 

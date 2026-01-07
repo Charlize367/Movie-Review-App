@@ -54,10 +54,10 @@ export const getMovieListLikes = async (req, res) => {
 }
 
 export const getMovieListComments = async (req, res) => {
-
+    console.log(req.params.id);
     try{
 
-        const movieListComments =  await MovieList.findById(req.params.id).select('comments').populate('comments.userId');
+        const movieListComments =  await MovieList.findById(req.params.id).select('comments').populate('comments.user');
 
         res.status(200).json(movieListComments);
 
@@ -140,11 +140,11 @@ export const addCommentToMovieList = async (req, res) => {
     try {
 
         const {comment} = req.body;
-
+        console.log(req.params.movieId);
         const movieList = await MovieList.findById(req.params.movieListId).select('_id');
         const addComment = await MovieList.findOneAndUpdate(
             { _id : movieList._id },
-            { $push: {comments : [{userId: req.params.userId, comment: comment, createdAt: new Date(),
+            { $push: {comments : [{user: req.params.userId, comment: comment, createdAt: new Date(),
         updatedAt: new Date()}]}},
             { new: true}
         )
