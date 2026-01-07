@@ -25,7 +25,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: self-hosted
+    runs-on: [self-hosted, react-runner]
     steps:
       - name: Pull image from docker hub
         run: docker pull charlize367/movie_frontend:latest
