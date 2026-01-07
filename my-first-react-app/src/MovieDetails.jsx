@@ -6,13 +6,13 @@ import axios from 'axios';
 import emptyStar from "/star1.svg";
 import halfStar from "/halfStar.svg";
 import fullStar from "/star2.svg";
-import RatingCard from './RatingCard.jsx';
+import RatingCard from './components/RatingCard.jsx';
 
 
 const MovieDetails = () => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const apiUrl =  'https://api.themoviedb.org/3';
-  const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODI1MGEyNjQ5YTAwYTk2OTdlYjIxMGUzMTExZGE1YyIsIm5iZiI6MTcyMjU4NzAzNS43MTYsInN1YiI6IjY2YWM5NzliNTEyMTNhZjA5MWJkNThhMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zrM-3dtjvwa-al-qRd70tlGRD0VkxCFbHgYmZEzY6gA';
+ const apiUrl =  import.meta.env.VITE_TMDB_API_URL;
+const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   const token = localStorage.getItem('jwtToken');
   const [movieDetails, setMovieDetails] = useState([]);
   const [vote, setVote] = useState(0);

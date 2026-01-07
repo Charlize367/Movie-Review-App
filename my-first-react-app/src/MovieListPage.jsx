@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react'
 import Nav from './components/Nav.jsx'
 import Search from './components/Search.jsx'
 import MovieCard from './components/MovieCard.jsx'
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import axios from "axios"
+import CommentsSection from './components/CommentsSection.jsx'
+
 
 const MovieListPage = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -20,7 +22,6 @@ const apiOptions = {
 }
   const userId = localStorage.getItem('user_ID');
   const [movieList, setMovieList] = useState([]);
-  const [comments, setComments] = useState([]);
    const [isLoading, setIsLoading] = useState(false);
    const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem('jwtToken');
@@ -28,23 +29,14 @@ const apiOptions = {
   const [isActive, setIsActive] = useState(false);
   const [isActive2, setIsActive2] = useState(false);
   const [isActive3, setIsActive3] = useState(false);
+ 
   const [movieOptions, setMovieOptions] = useState([]);
     const [selectedMovieIds, setSelectedMovieIds] = useState([]);
     const [selectedMovies, setSelectedMovies] = useState([]);
     const [search, setSearch] = useState("");
   const [imageData, setImageData] = useState("");
-
-
-  const openForm = () => {
-    setIsActive(!isActive);
-}
-
-const openForm2 = () => {
-    setIsActive3(!isActive3);
-}
-
-
-
+  const navigate = useNavigate();
+  
 
   const getMovieList = async () => {
        try {
@@ -76,6 +68,17 @@ const openForm2 = () => {
       getMovieList();
       
     }, []);
+
+  const openForm = () => {
+    setIsActive(!isActive);
+}
+
+const openForm2 = () => {
+    setIsActive3(!isActive3);
+}
+
+
+  
 
 
   
@@ -332,6 +335,22 @@ const openImageForm = () => {
         setSelectedMovieIds(updatedSelectedMovieIds);
       }
 
+      const removeMovieFromList = async(movieId) => {
+
+        try {
+          const response = await axios.delete(`${API_URL}/movieList/${movieList._id}/${movieId}/deleteMovie`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+          console.log(response);
+          getMovieList();
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
   const addMovieToList = async(e) => {
         e.preventDefault();
 
@@ -356,12 +375,36 @@ const openImageForm = () => {
             console.error("FULL ERROR:", error);
         }
       }
+
+      const deleteMovieList = async() => {
+      
+         
+          try {
+              const response = await axios.delete(`${API_URL}/movieList/${movieList._id}`, {
+                        headers: {
+                             'Content-Type': 'application/json',
+                             'Authorization': `Bearer ${token}`
+                        }
+                    });
+      
+                    console.log(response);
+      
+                    
+                  
+      
+                    navigate('/movieList');
+      
+                    } catch (error) {
+                    console.log(error);
+                    
+                  }
+        }
    
   
 console.log(isActive);
 console.log(isActive2);
   return (
-    <div className="container">
+    <div className="w-full">
       <Nav/>
 
       <div className="flex space-x-10">
@@ -378,6 +421,9 @@ console.log(isActive2);
       {movieList.userId == userId && (
       <div className="flex items-center  text-white text-sm font-medium p-3 max-w-sm rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button type="button" className="z-100" onClick={openForm2}>Add movies </button> </div>
       )}
+      {movieList.userId == userId && (
+      <div className="flex items-center  text-white text-sm font-medium p-3 max-w-sm rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button type="button" className="z-100" onClick={deleteMovieList}>Delete this list </button> </div>
+      )}
       </div>
       
 
@@ -393,9 +439,12 @@ console.log(isActive2);
     md:grid-cols-3 lg:gap-8 py-6 px-4">
   
           {movieList?.movies?.map((movie) => (
-             <div className="aspect-[2/3] rounded-lg overflow-hidden rounded bg-gray-300">
+            <div>
+             <div className="aspect-[2/3] z-99 position-relative rounded-lg overflow-hidden rounded bg-gray-300">
             <MovieCard movie={movie}/>
             
+            </div>
+            <button type="button" className="text-white" onClick={() => removeMovieFromList(movie._id)}>Remove</button>
             </div>
           ))}
           
@@ -405,23 +454,26 @@ console.log(isActive2);
       </section>
 
 
-      <div className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+      <div >
            <div class="relative p-4 w-full max-h-full">
              
               {isActive && (
-             <div class="w-full mx-auto max-w-2xl space-y-4 m-30 bg-gray-900 p-6 rounded-lg shadow-xs">
-           <div class="flex  items-center rounded-lg  pb-4 md:pb-5">
+             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+           <div class="flex items-center rounded-lg  pb-4 md:pb-5">
              
-                 <h3 class="text-xl font-semibold text-white text-heading">
+                 
+             </div>
+
+           <form onSubmit={editMovieListDetails} className=" md:pt-3" >
+            <div className="flex">
+        <h3 class="text-xl font-semibold text-white text-heading">
                      Create a Movie List
                  </h3>
-                 <button type="button" onClick={openForm} class="text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
+                 <button type="button" onClick={openForm} class="text-body text-white bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
                      <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
                      <span class="sr-only">Close modal</span>
-                 </button>
-             </div>
-           <form onSubmit={editMovieListDetails} className=" md:pt-3" >
-        
+            </button>
+            </div>
 
         <label className="text-sm font-medium text-white mb-5">Title:</label>
            <input value={formData.listTitle} onChange={handleChange} class="p-3 mt-3 rounded-lg w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800 mb-3" placeholder="Add title..." name="listTitle"  />
@@ -438,20 +490,23 @@ console.log(isActive2);
            )}
            
              </div>
-
+          <div class="relative p-4 w-full max-h-full">
              {isActive3 && (
-             <div class="w-full mx-auto max-w-2xl m-30 space-y-4 z-2 bg-gray-900 p-6 rounded-lg shadow-xs">
+             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
            <div class="flex  items-center rounded-lg  pb-4 md:pb-5">
              
-                 <h3 class="text-xl font-semibold text-white text-heading">
+                
+             </div>
+             <form onSubmit={addMovieToList}>
+              <div className="flex">
+               <h3 class="text-xl font-semibold text-white text-heading">
                     Add a movie
                  </h3>
-                 <button type="button" onClick={openForm2} class="text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
+                 <button type="button" onClick={() => {openForm2(); setSelectedMovieIds([]); setSelectedMovies([]); setSearch("")}} class="text-body text-white bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
                      <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
                      <span class="sr-only">Close modal</span>
                  </button>
-             </div>
-             <form onSubmit={addMovieToList}>
+                </div>
            <label className="block text-sm font-medium text-white mt-1" htmlFor="file_input">Add films</label>
            
       <div>
@@ -513,11 +568,12 @@ console.log(isActive2);
          
            )}
                 </div>
+                </div>
                 
 
       {isActive2 && (
-       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div class="bg-gray-900 rounded-2xl p-4 shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
+       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+  <div class=" rounded-2xl p-4 shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
   <form onSubmit={updateCoverPhoto}>
    
   <h2 className="text-lg font-bold text-white mb-3">Edit Cover Photo</h2>
@@ -537,7 +593,7 @@ console.log(isActive2);
   </div>
       )}
       
-
+      <CommentsSection movieListId={movieList._id} />
       
     </div>
 

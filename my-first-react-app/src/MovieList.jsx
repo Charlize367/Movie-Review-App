@@ -3,7 +3,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import Nav from './components/Nav.jsx'
 import axios from 'axios';
-import MovieListCard from './MovieListCard.jsx';
+import MovieListCard from './components/MovieListCard.jsx';
 
 
 
@@ -118,29 +118,7 @@ const [formData, setFormData] = useState({
 
 
   
-  const deleteMovieList = async(id) => {
-
-   
-    try {
-        const response = await axios.delete(`${API_URL}/ratings/${id}`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-              });
-
-              console.log(response);
-
-              
-            
-
-              getMyMovieLists();
-
-              } catch (error) {
-              console.log(error);
-              
-            }
-  }
+  
 
   const displayMovieOptions = async (query = '') => {
   
@@ -323,6 +301,8 @@ console.log(payload);
             console.error("FULL ERROR:", error);
         }
       }
+
+      
    
   return (
     <div className="w-full">

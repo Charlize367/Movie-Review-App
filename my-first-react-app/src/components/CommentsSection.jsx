@@ -2,20 +2,18 @@ import React from 'react'
 
 import { Form, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react'
-import Nav from './components/Nav.jsx'
+import Nav from './Nav.jsx';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime"
 
 
 
-const Comments = () => {
+const CommentsSection = ({ movieListId }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const token = localStorage.getItem('jwtToken');
   const param = useParams();
   const userId = localStorage.getItem('user_ID');
-  const [rate, setRate] = useState([]);
-
   const [isActive, setIsActive] = useState(false);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
@@ -25,6 +23,7 @@ const Comments = () => {
  
    dayjs.extend(relativeTime);
    
+
 
   const openUpdateCommentForm = (commentId) => {
 
@@ -43,27 +42,26 @@ const Comments = () => {
     setUpdateData({ ...updateData, comment: e.target.value });
   }
 
-
-
-  const recentRatings = rate.slice(0, 5);
-
   const handleCommentChange = (e) => {
   setComment(e.target.value);
 };
 
-    const getComment = async() => {
+console.log(movieListId);
+const getComment = async() => {
          try{
        
 
-
-        const response = await axios.get(`${API_URL}/ratings/comments/${param.ratingId}`, {
+console.log('Sending request for movieListId:', movieListId);
+        const response = await axios.get(`${API_URL}/movieList/comments/${movieListId}`, {
           headers : {
             'Content-Type' : 'application/json',
             'Authorization': `Bearer ${token}`
           }
         });
 
+        console.log(response);
         
+
 
       
         setComments(response.data.comments);
@@ -73,13 +71,14 @@ const Comments = () => {
 
     }
 
-    useEffect(() => {
-      getComment();
-  }, []);
 
+  useEffect(() => {
+    if (!movieListId) return;
+    getComment();
+  }, [movieListId]);
 
   
-
+console.log(movieListId);
   console.log(comments);
 
   const addComment = async(e) => {
@@ -94,7 +93,7 @@ const Comments = () => {
         };
 
 
-        const response = await axios.post(`${API_URL}/ratings/${userId}/${param.ratingId}/comment`, finalData, {
+        const response = await axios.post(`${API_URL}/movieList/${userId}/${movieListId}/comment`, finalData, {
           headers : {
             'Content-Type' : 'application/json',
             'Authorization': `Bearer ${token}`
@@ -118,7 +117,7 @@ const Comments = () => {
     
     
     try {
-        const response = await axios.put(`${API_URL}/ratings/${updateCommentID}/${param.ratingId}/comment`, updateData, {
+        const response = await axios.put(`${API_URL}/movieList/${updateCommentID}/${movieListId}/comment`, updateData, {
                   headers: {
                        'Content-Type': 'application/json',
                        'Authorization': `Bearer ${token}`
@@ -128,7 +127,7 @@ const Comments = () => {
               console.log(response);
 
               
-              setisActive(!isActive);
+              setIsActive(!isActive);
               e.target.reset();
 
               getComment();
@@ -142,8 +141,9 @@ const Comments = () => {
   const deleteComment = async(id) => {
 
     
+    
     try {
-        const response = await axios.delete(`${API_URL}/ratings/${id}/${param.ratingId}/comment`, {
+        const response = await axios.delete(`${API_URL}/movieList/${id}/${movieListId}/comment`, {
                   headers: {
                        'Content-Type': 'application/json',
                        'Authorization': `Bearer ${token}`
@@ -162,10 +162,12 @@ const Comments = () => {
               
             }
   }
+
+
    
   return (
     <div className="w-full bg-gray-900 h-screen">
-      <Nav />
+   
      
 
     <div className="w-full flex justify-center">
@@ -214,13 +216,13 @@ const Comments = () => {
             <div class="flex items-center">
                 <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold"><img
                         class="mr-2 w-6 h-6 rounded-full"
-                        src={`http://localhost:3000/${c.userId.image}`}
-                        alt="Michael Gough"/>{c.userId.username}</p>
+                        src={`http://localhost:3000/${c.user.image}`}
+                        alt="Michael Gough"/>{c.user.username}</p>
                 <p class="text-sm text-gray-600 dark:text-gray-400"><time pubdate datetime="2022-02-08"
                         title="February 8th, 2022">{dayjs(c.updatedAt).fromNow()}</time></p>
             </div>
             <div class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 dark:text-gray-400 bg-white rounded-lg focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:focus:ring-gray-600">
-             <button className="hover:bg-gray-700" onClick={() => {openUpdateCommentForm(c._id, param.ratingId)}}><img className="w-4 h-4" src="/edit-icon.svg"/> </button>
+             <button className="hover:bg-gray-700" onClick={() => {openUpdateCommentForm(c._id, movieListId)}}><img className="w-4 h-4" src="/edit-icon.svg"/> </button>
             <button className="hover:bg-gray-700 ml-1" onClick={() => {deleteComment(c._id)}}><img className="w-4 h-4" src="/delete-icon.svg"/> </button>
             </div>
             
@@ -249,4 +251,4 @@ const Comments = () => {
       
 
 
-export default Comments
+export default CommentsSection

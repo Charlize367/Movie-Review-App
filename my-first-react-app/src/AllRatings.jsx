@@ -6,7 +6,7 @@ import Nav from './components/Nav.jsx'
 import axios from 'axios';
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime"
-import RatingCard from './RatingCard.jsx';
+import RatingCard from './components/RatingCard.jsx';
 
 const AllRatings = () => {
  const API_URL = import.meta.env.VITE_API_URL;
