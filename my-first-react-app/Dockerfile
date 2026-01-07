@@ -11,7 +11,7 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ENV VITE_TMDB_API_KEY=$VITE_TMDB_API_KEY
 
 WORKDIR /app
-COPY package.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
 CMD [ "npm", "run", "start"]
@@ -19,7 +19,7 @@ CMD [ "npm", "run", "start"]
 FROM nginx:1.23-alpine
 WORKDIR /usr/share/nginx/html
 RUN rm -rf *
-COPY --from=build /app/build .
+COPY --from=build /app/dist .
 EXPOSE 80
 ENTRYPOINT ["nginx", "-g", "daemon off;"] 
 
