@@ -31,4 +31,10 @@ jobs:
       - name: Delete old container
         run: docker rm -f movie-backend-container 
       - name: Run Docker container
-        run: docker run -d -p 4000:4000 --name movie-backend-container -e MONGO_PASSWORD='${{ secrets.MONGO_PASSWORD}}' charlize367/movie_backend:latest
+        run: docker run -d -p 4000:4000 \
+             --name movie-backend-container \
+            -e MONGO_PASSWORD='${{ secrets.MONGO_PASSWORD}}' \
+            -e DB_URI='${{ secrets.DB_URI}}' \
+            -e PORT='${{ secrets.PORT }}' \
+            -e NODE_ENV='production' \
+            charlize367/movie_backend:latest
