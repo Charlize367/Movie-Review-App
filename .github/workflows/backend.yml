@@ -27,8 +27,8 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Pull image from docker hub
-      - run: docker pull charlize367/movie_frontend:latest
+        run: docker pull charlize367/movie_frontend:latest
       - name: Delete old container
-      - run: docker rm -f movie_frontend-container 
+        run: docker rm -f movie_frontend-container 
       - name: Run Docker container
-      - run: docker run -d -p 4000:4000 --name movie-review-app-container -e MONGO_PASSWORD='${{ secrets.MONGO_PASSWORD}}' charlize367/movie_frontend:latest
+        run: docker run -d -p 4000:4000 --name movie-review-app-container -e MONGO_PASSWORD='${{ secrets.MONGO_PASSWORD}}' charlize367/movie_frontend:latest

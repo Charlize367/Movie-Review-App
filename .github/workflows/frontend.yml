@@ -28,8 +28,8 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Pull image from docker hub
-      - run: docker pull charlize367/movie_backend:latest
+        run: docker pull charlize367/movie_backend:latest
       - name: Delete old container
-      - run: docker rm -f movie_backend-container 
+        run: docker rm -f movie_backend-container 
       - name: Run Docker container
-      - run: docker run -d -p 3000:80 --name movie-review-app-container charlize367/movie_backend:latest
+        run: docker run -d -p 3000:80 --name movie-review-app-container charlize367/movie_backend:latest
