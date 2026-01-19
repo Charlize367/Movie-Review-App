@@ -89,7 +89,7 @@ export const getMovieListCommentNumber = async (req, res) => {
 
         const movieList = await MovieList.findById(req.params.id).lean();
 
-        if (!rating) {
+        if (!movieList) {
       return res.status(404).json({ message: "List not found" });
     }
 

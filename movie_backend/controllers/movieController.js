@@ -40,7 +40,6 @@ export const getMovieByTmdbId = async (req, res) => {
 
         if(!movie) {
             const error = new Error('Movie not found');
-            error.statusCode(404);
             throw error;
         }
         res.status(200).json({ success: true, data: movie});
@@ -87,7 +86,16 @@ export const addMovie = async (req, res) => {
         res.status(201).json({
             success:true,
             message: 'User created successfully',
-            data: savedMovie,
+            data: {
+                _id: savedMovie._id,     
+                tmdbId: savedMovie.tmdbId,
+                title: savedMovie.title,
+                posterPath: savedMovie.posterPath,
+                releaseDate: savedMovie.releaseDate,
+                likedBy: savedMovie.likedBy,
+                ratings: savedMovie.ratings
+            },
+            
             exists:false
         })
     } catch (error) {
