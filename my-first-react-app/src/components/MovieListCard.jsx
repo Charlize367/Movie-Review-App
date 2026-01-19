@@ -144,6 +144,7 @@ const likeMovieList = async(e) => {
         console.log(response);
       
         getMovieListLikeCount();
+        getMovieListLikes();
        
 
       } catch (error) {
@@ -168,6 +169,7 @@ const removeLike = async(e) => {
                 console.log(response);
               
                getMovieListLikeCount();
+               getMovieListLikes();
                 
                 
         
