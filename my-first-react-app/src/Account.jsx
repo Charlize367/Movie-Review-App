@@ -216,7 +216,7 @@ const Account = () => {
             This is some information about the user.
         </p>
     </div>
-    <button onClick={openForm} type="button" class="bg-indigo-600 hover:bg-indigo-500 m-5 p-3 rounded-lg text-white">Edit User Details</button>
+    <button onClick={openForm} type="button" class="bg-gradient-to-r from-blue-700 to-cyan-600 hover:bg-indigo-500 m-5 p-3 rounded-lg text-white">Edit User Details</button>
     </div>
     <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
         <dl class="sm:divide-y sm:divide-gray-200">
@@ -234,7 +234,7 @@ const Account = () => {
                 </dt>
                 <dd class="mt-1 text-sm text-white sm:mt-0 sm:col-span-2">
                    <img class="w-24 h-24 mb-6 rounded-full" src={`${API_BASE_URL}/${user.image}`} alt="Bonnie image"/>
-                   <button onClick={openImageForm} type="button" class="bg-indigo-600 hover:bg-indigo-500 m-5 p-3 rounded-lg text-white">Edit Image</button>
+                   <button onClick={openImageForm} type="button" class="bg-gradient-to-r from-blue-700 to-cyan-600 m-5 p-3 rounded-lg text-white">Edit Image</button>
                 </dd>
                 
             </div>

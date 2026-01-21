@@ -42,8 +42,10 @@ const List = () => {
     <div className="container">
       <Nav/>
 
-        <h2 className="text-2xl text-white font-bold ml-10">Browse WatchList</h2>
-
+        <h2 className="text-3xl text-white font-bold ml-10 mt-5">Browse WatchList</h2>
+        {watchList.length == 0 && (
+            <p className="text-white text-md m-10"> No movies in WatchList.</p>
+          )}
       <section className="all-movies">
         {isLoading ? (
             <center>
@@ -53,7 +55,7 @@ const List = () => {
         <p>{errorMessage}</p>
       ) : (
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2
-    md:grid-cols-3 lg:gap-8 py-6 px-4">
+    md:grid-cols-3 lg:gap-8 py-6 px-4 m-10">
   
           {watchList.map((movie) => (
              <div className="aspect-[2/3] rounded-lg overflow-hidden rounded bg-gray-300">
@@ -64,6 +66,7 @@ const List = () => {
           
           </div>
   )}
+  
       </section>
     </div>
 

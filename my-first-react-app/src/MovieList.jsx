@@ -37,6 +37,17 @@ console.log(movieOptions);
 
   const openForm = (id) => {
     setIsActive(!isActive);
+    setSelectedMovieIds([]);
+    setSelectedMovies([]);
+    setFormData({
+          listTitle: "",
+          listDescription:"",
+          likes: [],
+          comments: [],
+          image: null
+
+      })
+    setSearch("");
 }
 
 const [formData, setFormData] = useState({
@@ -47,7 +58,7 @@ const [formData, setFormData] = useState({
           image: null
 
       });
-      console.log(formData); 
+    
   
     const handleChange = (e) => {
             const { name, value, files, type } = e.target;
@@ -197,6 +208,12 @@ const [formData, setFormData] = useState({
             return;
           }
 
+        const selectedMovieExists = selectedMovies.some(
+          movie => movie.id === data.id
+        );
+
+        if (selectedMovieExists) return;
+
          setSelectedMovies([...selectedMovies, data]);
          return data;
           
@@ -205,6 +222,7 @@ const [formData, setFormData] = useState({
         }
       }
       
+      console.log(selectedMovies);
       
 
       const addMovieIfNotExists = async (tmdbId) => {
@@ -247,10 +265,16 @@ const [formData, setFormData] = useState({
         const movieId = await addMovieIfNotExists(tmdbId);
         
         console.log(movieId);
+
+        const selectedMovieExists = selectedMovieIds.includes(movieId);
+
+        if (selectedMovieExists) return;
+        
         setSelectedMovieIds([...selectedMovieIds, movieId])
         
       }
 
+      console.log(selectedMovieIds);
       const removeMovieOption = async(tmdbId) => {
         const updatedSelectedMovies = selectedMovies.filter(movie => movie.id !== tmdbId);
 
@@ -272,8 +296,8 @@ const [formData, setFormData] = useState({
         payload.append("listDescription", formData.listDescription);
         payload.append("movies", JSON.stringify(selectedMovieIds));
         if (formData.image) {
-  payload.append("image", formData.image);
-}
+          payload.append("image", formData.image);
+        }
 
         try {
 
@@ -283,9 +307,7 @@ const [formData, setFormData] = useState({
 
                 }
             });
-console.log(payload);
-            console.log(response); 
-
+            console.log(response);
             setIsActive(false);
             getMovieLists();
             setFormData({
@@ -310,9 +332,12 @@ console.log(payload);
       <Nav/>
       
       <div className="flex justify-center">
-      <div className="inline-block mb-10">
-         <h2 className="font-bold text-white text-4xl flex justify-center mb-5">Movie Lists</h2> <div className="flex items-center text-white text-sm font-medium p-3 max-w-35 rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="ratingBtn" onClick={openForm}><p className="m-1"> + Add Movie list</p> </button> </div>
+
+      <div className="mb-10 flex flex-col items-center text-center">
+         <h2 className="font-bold text-white text-4xl flex items-center mb-5">Movie Lists</h2> 
+         <div className="flex items-center text-white text-sm font-medium p-3 max-w-35 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="ratingBtn" onClick={openForm}><p className="m-1"> + Add Movie list</p> </button> </div>
         </div>
+
        </div>
      
        

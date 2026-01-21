@@ -149,6 +149,9 @@ const handleChange = (e) => {
       <Nav/>
 
          <h2 className="font-bold text-white text-4xl flex justify-center mb-5">All My Ratings</h2>
+         {watchList.length == 0 && (
+            <p className="text-white text-md m-10"> No ratings found.</p>
+          )}
        <div>
               
              <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
@@ -159,43 +162,12 @@ const handleChange = (e) => {
                  
               return(
                 
-              //     <div class="testimonial-box">
-              //     <div class="box-top">
-              //     {movies.map(m => (
-              //     <div className="my-rating-top">
-              //     <div class="name-user">
-              //       <p className="movie-rating-title">{m.title}</p>
-              //   </div>
-              //   <div class="reviews">
-              //         <div className="rating-icon-number">
-              //   <img className="rate-icon-rated" src="/star.svg"/><p className="rating-number">{r.rating}</p>
-              //   </div>
-
-              //   </div>
-              //     </div>
-              //     ))}
-              //     </div>
-              //   <div class="client-comment">
-              //   <p>{r.review}</p>
-              //   </div>
-                
-
-              //   <div className="review-details">
-              //      <p>{dayjs(r.updatedAt).fromNow()}</p>
-              //     <div className="rating-action">
-              //   <button className="edit-rating" onClick={() => {openForm(r._id, r.rating)}}><img className="edit-icon" src="/edit-icon.svg"/> </button>
-              //   <button className="delete-rating" onClick={() => {deleteRating(r._id)}}><img className="delete-icon" src="/delete-icon.svg"/> </button>
-              //   </div>
-              //   </div>
-                
-                
-              
-              // </div>
              
-              <div class="w-80 max-w-88 space-y-4 rounded-md border border-gray-200 bg-white p-3 text-gray-500 transition-all duration-300 hover:-translate-y-1">
+              <div class="w-80 max-w-88 space-y-4 rounded-md  bg-gradient-to-br from-gray-800 to-blue-900
+ p-3 text-white transition-all duration-300 hover:-translate-y-1">
                      <div class="flex items-center justify-between">
                          <div class="flex gap-1">
-                             <img className="w-6 h-6 mr-2" src="/star.svg"/><p className="text-black">{r.rating}</p>
+                             <img className="w-6 h-6 mr-2" src="/star.svg"/><p className="text-white">{r.rating}</p>
                          </div>
                          <p>{dayjs(r.updatedAt).fromNow()}</p>
                      </div>
@@ -204,13 +176,13 @@ const handleChange = (e) => {
                      {movies.map(m => (
                      <div class="flex items-center gap-2 pt-3">
                          
-                         <p class="font-medium text-gray-800">{m.title}</p>
+                         <p class="font-medium text-white">{m.title}</p>
                        
                      </div>
                      ))}
                      <div className="flex ml-13" >
-               <button className="bg-gray-900 p-1 rounded-lg" onClick={() => {openForm(r._id, r.rating)}}><img className="w-5 h-5" src="/edit-icon.svg"/> </button>
-              <button className="bg-gray-900 p-1 rounded-lg ml-3" onClick={() => {deleteRating(r._id)}}><img className="w-5 h-5" src="/delete-icon.svg"/> </button>
+               <button className=" p-1 rounded-lg" onClick={() => {openForm(r._id, r.rating)}}><img className="w-5 h-5" src="/edit-icon.svg"/> </button>
+              <button className=" p-1 rounded-lg ml-3" onClick={() => {deleteRating(r._id)}}><img className="w-5 h-5" src="/delete-icon.svg"/> </button>
              </div>
              
                  </div>
@@ -273,7 +245,7 @@ const handleChange = (e) => {
                     <input className="logBtn" type="submit" value="Edit"/>
                     <div className="flex justify-end gap-3">
       <button className="text-gray-400 hover:text-white" onClick={openForm}>Cancel</button>
-      <button className="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-white">
+      <button className="bg-gradient-to-r from-blue-700 to-cyan-600 px-4 py-2 rounded-lg text-white">
         Save
       </button>
     </div>

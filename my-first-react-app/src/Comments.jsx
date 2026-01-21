@@ -182,7 +182,7 @@ const Comments = () => {
                  shadow-inner mb-4" placeholder="Add review..." name="review"  />
           <div className="flex justify-end gap-3">
       <button className="text-gray-400 hover:text-white" onClick={openUpdateCommentForm}>Cancel</button>
-      <button className="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-white">
+      <button className="bg-gradient-to-r from-blue-700 to-cyan-600 px-4 py-2 rounded-lg text-white">
         Save
       </button>
     </div>
@@ -220,9 +220,15 @@ const Comments = () => {
                         title="February 8th, 2022">{dayjs(c.updatedAt).fromNow()}</time></p>
             </div>
             <div class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 dark:text-gray-400 bg-white rounded-lg focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:focus:ring-gray-600">
+              {c.userId._id === userId && (
              <button className="hover:bg-gray-700" onClick={() => {openUpdateCommentForm(c._id, param.ratingId)}}><img className="w-4 h-4" src="/edit-icon.svg"/> </button>
+            )}
+            
+            {c.userId._id === userId && (
             <button className="hover:bg-gray-700 ml-1" onClick={() => {deleteComment(c._id)}}><img className="w-4 h-4" src="/delete-icon.svg"/> </button>
+            )}
             </div>
+             
             
         </footer>
         <p class="text-gray-500 dark:text-gray-400">{c.comment}</p>

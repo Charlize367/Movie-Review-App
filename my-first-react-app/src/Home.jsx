@@ -105,7 +105,7 @@ const Home = ()  => {
         <h1 className="text-center max-w-4xl font-bold text-white leading-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl
   ">Your world of movies, all in one place.</h1>
       </div>
-      <div className="relative w-full m-5 max-w-2xl mx-auto">
+      <div className="relative w-full flex justify-center items-center m-5 mx-auto">
       <Search search={search} setSearch={setSearch}/>
       </div>
       <h2 className="text-2xl text-white font-bold ml-10">Trending Movies</h2>

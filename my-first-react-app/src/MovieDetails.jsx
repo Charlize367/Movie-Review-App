@@ -261,6 +261,7 @@ useEffect(() => {
 
         getUserLikes();
         getMovieLikes();
+        
 
       } catch (error) {
         console.log(error);
@@ -644,7 +645,7 @@ const getMovieLikes = async () => {
               });
 
               console.log(response);
-              console.log(movieID);
+             
               setMovieLikeCount(response.data.likeCount);
 
               
@@ -654,17 +655,6 @@ const getMovieLikes = async () => {
               
             }
           }
-  
-     
-
-
-   
-
-
-
-     
-
-
 
     const release_date = date.substring(0,4);
     const rating = vote.toFixed(1);
@@ -785,8 +775,8 @@ backgroundPosition: 'center',
 
                 
                 <div className="flex max-w-full flex-wrap">
-                  <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}>{movieDetails.original_language}</p> 
-                  <div className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><img className="w-5 h-5 mr-2" src="/star.svg"/> <p className="ratings-details">{rating}</p></div>
+                  <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" >{movieDetails.original_language}</p> 
+                  <div className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600"><img className="w-5 h-5 mr-2" src="/star.svg"/> <p className="ratings-details">{rating}</p></div>
                 </div>
               
                 <p className="w-full">{movieDetails.overview}</p>
@@ -803,10 +793,10 @@ backgroundPosition: 'center',
                    <p className="director-details"><b>Directed By:</b> {director.name} </p>
 
               <div className="flex max-w-full flex-wrap mt-2">
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="z-99"  disabled={!movie_ID} onClick={likeFunction}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="listBtn" onClick={listFunction}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="diaryBtn" onClick={diaryFunction}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
+                <div className="flex text-white text-sm font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99"  disabled={!movie_ID} onClick={likeFunction}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
+                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="listBtn" onClick={listFunction}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
+                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="diaryBtn" onClick={diaryFunction}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
+                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
                 
 
               </div>
@@ -916,7 +906,7 @@ backgroundPosition: 'center',
 
            <center>
               {recentRatings?.length > 0 && (
-                <a className="mt-10 text-white"
+                <a className="mt-10 mb-10 bg-gradient-to-r from-blue-700 to-cyan-600 w-sm rounded-4xl p-5 to-blue-700 text-white"
                   style={{ display: "flex", justifyContent: "center" }} 
                   href={`/all_ratings/${movie_ID}/`}
                 >
@@ -930,7 +920,15 @@ backgroundPosition: 'center',
  
   )
       
-}
+  } else {
+    return (
+    <div className="bg-black h-screen flex items-center justify-center">
+      <center>
+          <img className="spinner" src="../Spinner.svg"/>
+          </center>
+    </div>
+    )
+  }
 }
 
       

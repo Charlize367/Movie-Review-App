@@ -43,8 +43,10 @@ const Diary = () => {
     <div className="container">
       <Nav/>
 
-        <h2 className="text-2xl text-white font-bold ml-10">Browse Diary</h2>
-
+        <h2 className="text-3xl text-white font-bold ml-10 mt-5">Browse Diary</h2>
+        {diary.length == 0 && (
+            <p className="text-white text-md m-10"> No movies in Diary.</p>
+          )}
       <section className="all-movies">
         {isLoading ? (
             <center>
@@ -54,7 +56,7 @@ const Diary = () => {
         <p>{errorMessage}</p>
       ) : (
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2
-    md:grid-cols-3 lg:gap-8 py-6 px-4">
+    md:grid-cols-3 lg:gap-8 py-6 px-4 m-10">
           {diary.map((movie) => (
             <div className="aspect-[2/3] rounded-lg overflow-hidden rounded bg-gray-300">
             <MovieCard movie={movie}/>

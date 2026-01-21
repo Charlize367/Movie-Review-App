@@ -226,25 +226,40 @@ useEffect(() => {
             
                 <div >
                 
-<div class="w-80 max-w-88 space-y-4 rounded-md border border-gray-200 bg-white p-3 text-gray-500 transition-all duration-300 hover:-translate-y-1">
-        <div class="flex justify-center ">
-            <div class="flex gap-1">
-                <img className="flex items-center max-w-70 m-3" src={`${API_BASE_URL}/${image}`}/>
-            </div>
-            
-        </div>
-        <p>{listTitle}</p>
-        <div className="flex">
+<div class="group relative w-80 rounded-xl overflow-hidden
+                bg-gradient-to-br from-gray-800 to-blue-900
+                shadow-md shadow-cyan-500/10
+                transition transform hover:-translate-y-1 ">
         
-        <div class="flex items-center gap-2 pt-3">
-            <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=200" alt="Richard Nelson" />
-            <p class="font-medium text-gray-800">{userId.username}</p>
+            <img className="w-full aspect-[16/9] object-cover
+               transition-transform duration-500
+               " src={`${API_BASE_URL}/${image}`}/>
+    <div className="absolute inset-0
+                  bg-gradient-to-t
+                  from-black/80 via-black/40 to-transparent" />
+           
+        <div className="absolute bottom-14 px-4">
+    <p className="text-white text-lg font-semibold leading-tight mb-3">
+      {listTitle}
+    </p>
+  </div>
+        <div className="relative flex items-center justify-between px-4 py-3 bg-black/40backdrop-blur-sm">
+        
+        <div class="flex items-center gap-2 ">
+            <img class="h-8 w-8 rounded-full object-cover" src={`${API_BASE_URL}/${userId.image}`} alt="Richard Nelson" />
+            <p class="text-gray-200 text-sm font-medium">{userId.username}</p>
           
         </div>
        
         <div className="flex ml-13" >
-  <div className="flex bg-gray-900 p-3 rounded-4xl"><button className="like-review" onClick={likeFunction} ><img className="w-5 h-5 mr-3" src={`${likedIcon}`} /></button><p>{likeCount}</p></div>
-  <div className="flex bg-gray-900 p-3 rounded-4xl ml-10"><button className="comment-review" onClick={goToComments}  ><img className="w-5 h-5 mr-3" src={`/comment.svg`} /></button><p>{commentCount}</p></div>
+  <div className="flex items-center gap-3"><button className="flex items-center gap-1 
+                   px-3 py-1.5 rounded-full
+                   text-white text-sm
+                   " onClick={likeFunction} ><img className="w-5 h-5" src={`${likedIcon}`} /></button><p className="text-white ">{likeCount}</p></div>
+  <div className="flex gap-3 items-center"><button className="flex items-center gap-1 
+                   px-3 py-1.5 rounded-full
+                   text-gray-200 text-sm ml-3
+                  " onClick={goToComments}  ><img className="w-5 h-5" src={`/comment.svg`} /></button><p className="text-white">{commentCount}</p></div>
 </div>
     </div>
     </div>

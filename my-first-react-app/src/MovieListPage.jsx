@@ -71,10 +71,17 @@ const apiOptions = {
 
   const openForm = () => {
     setIsActive(!isActive);
+    setFormData({
+          listTitle: movieList?.listTitle,
+          listDescription: movieList?.listDescription,
+    });
 }
 
 const openForm2 = () => {
     setIsActive3(!isActive3);
+    setSelectedMovieIds([]);
+    setSelectedMovies([]);
+    setSearch("");
 }
 
 
@@ -262,11 +269,15 @@ const openImageForm = () => {
       
           const data = await response.json();
       
-         
-      
           if (data.Response == false) {
             return;
           }
+
+          const selectedMovieExists = selectedMovies.some(
+          movie => movie.id === data.id
+        );
+
+        if (selectedMovieExists) return;
 
          setSelectedMovies([...selectedMovies, data]);
          return data;
@@ -318,6 +329,18 @@ const openImageForm = () => {
         const movieId = await addMovieIfNotExists(tmdbId);
         
         console.log(movieId);
+
+        const selectedMovieSelected = selectedMovieIds.includes(movieId);
+
+        const selectedMovieExists = movieList.movies.find(movie => movie._id === movieId);
+
+        if (selectedMovieSelected) return;
+        
+        if (selectedMovieExists) { 
+          window.alert("Movie is already in list.");
+          removeMovieOption(tmdbId);
+        }
+        
         setSelectedMovieIds([...selectedMovieIds, movieId])
         
       }
@@ -355,6 +378,7 @@ const openImageForm = () => {
         e.preventDefault();
 
 
+
         try {
 
             const response = await axios.post(`${API_URL}/movieList/${movieList._id}/addMovie`, { movies : selectedMovieIds }, {
@@ -369,8 +393,8 @@ const openImageForm = () => {
             setIsActive3(false);
             getMovieList();
             
-                setSelectedMovieIds([]);
-                setSelectedMovies([]);
+            setSelectedMovieIds([]);
+            setSelectedMovies([]);
         } catch (error) {
             console.error("FULL ERROR:", error);
         }
@@ -407,23 +431,50 @@ console.log(isActive2);
     <div className="w-full">
       <Nav/>
 
-      <div className="flex space-x-10">
-        <div>
-        <h2 className="text-2xl text-white font-bold ml-10">{movieList.listTitle}</h2>
-        <p className="text-xl text-white font-bold ml-10">{movieList.listDescription}</p>
+      <div className="flex mt-10 space-x-10">
+        <div className="max-w-4xl mx-auto mb-12">
+        <h1 className="text-5xl font-extrabold text-white leading-tight">{movieList.listTitle}</h1>
+         <p className="mt-6 text-gray-300 text-lg leading-relaxed">{movieList.listDescription}</p>
+         {movieList.userId === userId && (
+  <div className="flex flex-wrap gap-3 mt-4">
+    <button
+      onClick={openForm}
+      className="px-4 py-2 rounded-2xl text-white font-medium
+                 bg-gradient-to-r from-blue-700 to-cyan-600
+                 hover:scale-105 transition flex">
+      <img className="mr-2 w-5 h-5" src={`/edit-icon.svg`}/>
+      Edit
+    </button>
+
+    <button
+      onClick={openImageForm}
+      className="px-4 py-2 rounded-2xl text-white font-medium
+                 bg-gradient-to-r from-blue-700 to-cyan-600
+                 hover:scale-105 transition flex">
+      <img className="mr-2 w-5 h-5" src={`/edit-icon.svg`}/>
+      Change Cover
+    </button>
+
+    <button
+      onClick={openForm2}
+      className="px-4 py-2 rounded-2xl text-white font-medium
+                 bg-gradient-to-r from-blue-700 to-cyan-600
+                 hover:scale-105 transition">
+      + Add Movie
+    </button>
+
+    <button
+      onClick={deleteMovieList}
+      className="px-4 py-2 rounded-2xl text-white font-medium
+                 bg-red-800 hover:bg-red-700 transition flex">
+      <img className="mr-2 w-5 h-5" src={`/delete-icon.svg`}/>
+      Delete List
+    </button>
+  </div>
+)}
+
         </div>
-      {movieList.userId == userId && (
-      <div className="flex items-center  text-white text-sm font-medium p-3 max-w-sm rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button type="button" className="z-100" onClick={openForm} >Edit Details</button> </div>
-      )}
-      {movieList.userId == userId && (
-      <div className="flex items-center  text-white text-sm font-medium p-3 max-w-sm rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button type="button" className="z-100" onClick={openImageForm}>Change cover photo </button> </div>
-      )}
-      {movieList.userId == userId && (
-      <div className="flex items-center  text-white text-sm font-medium p-3 max-w-sm rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button type="button" className="z-100" onClick={openForm2}>Add movies </button> </div>
-      )}
-      {movieList.userId == userId && (
-      <div className="flex items-center  text-white text-sm font-medium p-3 max-w-sm rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button type="button" className="z-100" onClick={deleteMovieList}>Delete this list </button> </div>
-      )}
+      
       </div>
       
 
@@ -436,16 +487,22 @@ console.log(isActive2);
         <p>{errorMessage}</p>
       ) : (
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2
-    md:grid-cols-3 lg:gap-8 py-6 px-4">
+    md:grid-cols-3 lg:gap-8 py-6 px-4 m-20">
   
           {movieList?.movies?.map((movie) => (
             <div>
              <div className="aspect-[2/3] z-99 position-relative rounded-lg overflow-hidden rounded bg-gray-300">
             <MovieCard movie={movie}/>
+
             
             </div>
-            <button type="button" className="text-white" onClick={() => removeMovieFromList(movie._id)}>Remove</button>
+            {movieList.userId == userId && (
+            <button type="button" className="text-white rounded-2xl p-3 mt-3 text-white font-medium
+                 bg-gradient-to-r from-blue-700 to-cyan-600
+                 hover:scale-105 transition flex" onClick={() => removeMovieFromList(movie._id)}><img className="w-5 h-5" src={`/delete-icon.svg`}/></button>
+            )}
             </div>
+            
           ))}
           
           
@@ -493,13 +550,13 @@ console.log(isActive2);
           <div class="relative p-4 w-full max-h-full">
              {isActive3 && (
              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
-           <div class="flex  items-center rounded-lg  pb-4 md:pb-5">
+           <div class="flex  items-center  rounded-lg  pb-4 md:pb-5">
              
                 
              </div>
-             <form onSubmit={addMovieToList}>
-              <div className="flex">
-               <h3 class="text-xl font-semibold text-white text-heading">
+             <form onSubmit={addMovieToList} className="w-85" >
+              <div className="flex max-w-md">
+               <h3 class="text-2xl font-semibold text-white text-heading">
                     Add a movie
                  </h3>
                  <button type="button" onClick={() => {openForm2(); setSelectedMovieIds([]); setSelectedMovies([]); setSearch("")}} class="text-body text-white bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
@@ -507,10 +564,10 @@ console.log(isActive2);
                      <span class="sr-only">Close modal</span>
                  </button>
                 </div>
-           <label className="block text-sm font-medium text-white mt-1" htmlFor="file_input">Add films</label>
+           <label className="block text-md font-medium text-white mt-1 mb-1 " htmlFor="file_input">Add films</label>
            
       <div>
-        <div class="relative">
+        <div class="relative w-fulls">
         
         
         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
