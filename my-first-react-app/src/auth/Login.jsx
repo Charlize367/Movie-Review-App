@@ -10,6 +10,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
+  const API_URL = import.meta.env.VITE_API_URL;
 
     const handleUsernameChange = (event) => {
     setUsername(event.target.value);
@@ -28,7 +29,7 @@ const Login = () => {
                     "password" : password,
                     "role" : "USER"
                 }
-                const response = await axios.post('http://localhost:3000/api/v1/auth/sign-in', postData, {
+                const response = await axios.post(`${API_URL}/auth/sign-in`, postData, {
                     headers: {
                         
                         'Content-Type': 'application/json'

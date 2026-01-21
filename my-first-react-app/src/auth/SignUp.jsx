@@ -10,6 +10,7 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL;
   
   const navigate = useNavigate();
   const { signup } = useAuth();
@@ -51,7 +52,7 @@ const SignUp = () => {
 
                
 
-                const response = await axios.post('http://localhost:3000/api/v1/auth/sign-up', postData, {
+                const response = await axios.post(`${API_URL}/auth/sign-up`, postData, {
                     headers: {
                         
                         'Content-Type': 'multipart/form-data'
