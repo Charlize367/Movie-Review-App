@@ -222,8 +222,15 @@ console.log(movieListId);
                         title="February 8th, 2022">{dayjs(c.updatedAt).fromNow()}</time></p>
             </div>
             <div class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 dark:text-gray-400 bg-white rounded-lg focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:focus:ring-gray-600">
+
+              {c.user._id === userId && (
              <button className="hover:bg-gray-700" onClick={() => {openUpdateCommentForm(c._id, movieListId)}}><img className="w-4 h-4" src="/edit-icon.svg"/> </button>
+              )}
+
+              {c.user._id === userId && (
             <button className="hover:bg-gray-700 ml-1" onClick={() => {deleteComment(c._id)}}><img className="w-4 h-4" src="/delete-icon.svg"/> </button>
+              )}
+            
             </div>
             
         </footer>

@@ -12,9 +12,9 @@ import RatingCard from './components/RatingCard.jsx';
 const MovieDetails = () => {
   const API_URL = import.meta.env.VITE_API_URL;
  const apiUrl =  import.meta.env.VITE_TMDB_API_URL;
-const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+  const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   const token = localStorage.getItem('jwtToken');
-  const [movieDetails, setMovieDetails] = useState([]);
+  const [movieDetails, setMovieDetails] = useState(null);
   const [vote, setVote] = useState(0);
   const [date, setDate] = useState("");
   const [credits, setCredits] = useState([]);
@@ -23,8 +23,7 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   const [director, setDirector] = useState([]);
   const [backdrop, setBackdrop] = useState([]);
   const param = useParams();
-  const [movies, setMovies] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [movies, setMovies] = useState([]);  
   const username = localStorage.getItem('username');
   const userId = localStorage.getItem('user_ID');
   const [likedMovies, setLikedMovies] = useState([]);
@@ -44,11 +43,10 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   const [rateText, setRateText] = useState("");
   const [rateFunction, setRateFunction] = useState(() => () => {});
   const [isActive, setIsActive] = useState(false);
-  const [inputData, setInputData] = useState([]);
   const [ratings, setRatings] = useState(0);
   const [review, setReview] = useState("");
   const [movieLikeCount, setMovieLikeCount] = useState(0);
-  const [movie_ID, setMovie_ID] = useState(0);
+  const [movie_ID, setMovie_ID] = useState(null);
   const [test, setTest] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
  
@@ -58,6 +56,85 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   
 
               
+  const getMovieDetails = async () => {
+  try {
+    const endpoint = `${apiUrl}/movie/${param.id}`;
+
+    const response = await fetch (endpoint, apiOptions);
+
+    if (!response.ok) {
+      throw new Error ("Failed to fetch movie details");
+    }
+
+    const data = await response.json();
+
+    console.log(data);
+
+    if (data.Response == false) {
+      setErrorMessage(data.Error || 'Failed to fetch movie details');
+      setMovieDetails([]);
+      return;
+    }
+
+    setMovieDetails(data);
+
+    setVote(data.vote_average);
+    setDate(data.release_date);
+    setGenre(data.genres);
+    
+  } catch (error) {
+    console.error(`Error handling movie details ${error}`);
+  }
+}
+
+
+
+  const addMovieIfNotExists = async () => {
+     if (!movieDetails) {
+    console.warn("Movie details not loaded yet");
+    return null;
+  }
+    const inputData = {
+      'tmdbId' : Number(param.id),
+      'title' : movieDetails.title,
+      'posterPath' : movieDetails.poster_path,
+      'releaseDate' : movieDetails.release_date,
+      'likedBy' : [],
+      'ratings' : []
+    
+    }
+
+  
+
+            const response = await axios.post(`${API_URL}/movies`, inputData, {
+                  headers: {
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
+                  }
+              });
+              console.log(response);
+              
+             
+
+
+              return response.data.data._id;
+          
+          } 
+
+useEffect(() => {
+  if (!movieDetails) {
+    console.log("No movie details found. Cannot create movie ID")
+    return;
+  }
+
+  const ensureMovieExists = async () => {
+    const id = await addMovieIfNotExists();
+    setMovie_ID(id);
+    console.log(id);
+  };
+
+  ensureMovieExists();
+}, [movieDetails]);
 
   
   const getMovies = async () => {
@@ -80,31 +157,9 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
           }
   useEffect(() => {
       getMovies();
-  }, []);
+  }, [param.id]);
 
-   const getMovieByTmdbId = async () => {
-
-    
-       try {
-             const response = await axios.get(`${API_URL}/movies/${param.id}/tmdbId`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-              });
-
-              console.log(response);
-              setMovie_ID(response.data.data._id);
-
-              
-            } catch (error) {
-              console.log(error);
-              
-            }
-          }
-  useEffect(() => {
-      getMovieByTmdbId();
-  }, []);
+   
 
   
   
@@ -130,11 +185,7 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
             }
           }
   
-      useEffect(() => {
-      getUserLikes();
-      
-    }, []);
-
+    
     
 
   const getUserWatchList = async () => {
@@ -157,10 +208,7 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
             }
           }
   
-      useEffect(() => {
-      getUserWatchList();
-      
-    }, []);
+     
 
 
   const getUserDiary = async () => {
@@ -183,64 +231,24 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
             }
           }
   
-      useEffect(() => {
-      getUserDiary();
-      
-    }, []);
-
-    console.log(movieDetails);
-
-  const addMovieIfNotExists = async () => {
-     
-    
-    const inputData = {
-      'tmdbId' : Number(param.id),
-      'title' : movieDetails.title,
-      'posterPath' : movieDetails.poster_path,
-      'releaseDate' : movieDetails.release_date,
-      'likedBy' : [],
-      'ratings' : []
-    
-    }
-
-  
-
-            const response = await axios.post(`${API_URL}/movies`, inputData, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-              });
-
-
-              const movie_ID = response.data.exists === false 
-                ? response.data.data._id
-                : response.data.data._id;
-
-
-                return movie_ID
-          
-          } 
-
-
-    
-
-    console.log(token);
+   
 
 
     const addToMovieLike = async(e) => {
       
       e.preventDefault();
+      if (!movie_ID) {
+      console.error("Movie ID missing. Like aborted. Movie ID: ", movie_ID);
+      return;
+    }
 
       try {
 
-        const movieId = await addMovieIfNotExists();
-
-        if (!movieId) {
-      console.error("Movie ID missing. Like aborted.");
-      return;
-    }
-        const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/likes`, {}, {
+        
+       
+        
+        
+        const response = await axios.post(`${API_URL}/users/${userId}/${movie_ID}/likes`, {}, {
             headers : {
               'Content-Type' : 'application/json',
               'Authorization': `Bearer ${token}`
@@ -251,6 +259,7 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
         getUserLikes();
         getMovieLikes();
+        
 
       } catch (error) {
         console.log(error);
@@ -267,8 +276,8 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
       const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id));
 
       const likeId = selectedLikedMovie._id;
-      const movieId = selectedMovie._id;
-          const response = await axios.delete(`${API_URL}/users/${userId}/${likeId}/${movieId}/like`, {
+      
+          const response = await axios.delete(`${API_URL}/users/${userId}/${likeId}/${movie_ID}/like`, {
                   headers: {
                        'Content-Type': 'application/json',
                        'Authorization': `Bearer ${token}`
@@ -277,7 +286,7 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
                 
                 console.log(response);
                 console.log(likeId);
-                console.log(movieId);
+              
                 getUserLikes();
                 getMovieLikes();
                 
@@ -292,8 +301,8 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
     const addToWatchList = async(e) => {
       e.preventDefault();
       try {
-         const movieId = await addMovieIfNotExists();
-          const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/watchlist`, {}, {
+         if (!movie_ID) return;
+          const response = await axios.post(`${API_URL}/users/${userId}/${movie_ID}/watchlist`, {}, {
                   headers: {
                        'Content-Type': 'application/json',
                        'Authorization': `Bearer ${token}`
@@ -301,7 +310,7 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
                 });
                 
                 console.log(response);
-                console.log(movieId);
+                
                 getUserWatchList();
                 
         
@@ -354,11 +363,11 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
     const addToDiary = async(e) => {
      
       e.preventDefault();
-      
+      if(!movie_ID) return;
 
       try {
-         const movieId = await addMovieIfNotExists();
-          const response = await axios.post(`${API_URL}/users/${userId}/${movieId}/diary`, {},  {
+        
+          const response = await axios.post(`${API_URL}/users/${userId}/${movie_ID}/diary`, {},  {
                   headers: {
                        'Content-Type': 'application/json',
                        'Authorization': `Bearer ${token}`
@@ -366,7 +375,7 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
                 });
                 
                 console.log(response);
-                console.log(movieId);
+                
                 getUserDiary();
 
         
@@ -379,15 +388,16 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   const addToRating = async(e) => {
      
       e.preventDefault();
+      if (!movie_ID) return;
 
       try{
-        const movieId = await addMovieIfNotExists();
+        
 
         const finalData = {
           rating: ratings,
           review: review,
           userId: userId,
-          movieId: movieId
+          movieId: movie_ID
         };
 
 
@@ -446,9 +456,12 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   const getMovieRatings = async () => {
        try {
 
-        const movieID = await addMovieIfNotExists();
-        console.log(movieID);
-             const response = await axios.get(`${API_URL}/ratings/movieRatings/${movieID}`, {
+      
+        if (!movie_ID) return;
+
+        
+        
+             const response = await axios.get(`${API_URL}/ratings/movieRatings/${movie_ID}`, {
                   headers: {
                        'Content-Type': 'application/json',
                        'Authorization': `Bearer ${token}`
@@ -469,11 +482,6 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
           
   
-      useEffect(() => {
-      getMovieRatings();
-      
-    }, []);
-      
 
     console.log(rate);
    
@@ -601,48 +609,33 @@ console.log(likedMovies);
   }
 }
 
-
-const getMovieDetails = async () => {
-  try {
-    const endpoint = `${apiUrl}/movie/${param.id}`;
-
-    const response = await fetch (endpoint, apiOptions);
-
-    if (!response.ok) {
-      throw new Error ("Failed to fetch movie details");
-    }
-
-    const data = await response.json();
-
-    console.log(data);
-
-    if (data.Response == false) {
-      setErrorMessage(data.Error || 'Failed to fetch movie details');
-      setMovieDetails([]);
-      return;
-    }
-
-    setMovieDetails(data);
-
-    setVote(data.vote_average);
-    setDate(data.release_date);
-    setGenre(data.genres);
-    
-  } catch (error) {
-    console.error(`Error handling movie details ${error}`);
-  }
-}
-
 useEffect(() => {
-  getMovieDetails();
-}, [param.id])
+      getMovieDetails();
+      getCredits();
+      getBackdrop();
+  }, [param.id]);
+
+
+  useEffect(() => {
+  if (movie_ID) {
+    getUserLikes();
+    getUserWatchList();
+    getUserDiary();
+    getMovieRatings();
+    getMovieLikes();
+  }
+}, [movie_ID]);
+
+
 
 
 const getMovieLikes = async () => {
        try {
+      
+         if (!movie_ID) return;
 
-         const movieID = await addMovieIfNotExists();
-             const response = await axios.get(`${API_URL}/movies/${movieID}/likeCount`, {
+         
+             const response = await axios.get(`${API_URL}/movies/${movie_ID}/likeCount`, {
                   headers: {
                        'Content-Type': 'application/json',
                        'Authorization': `Bearer ${token}`
@@ -650,7 +643,7 @@ const getMovieLikes = async () => {
               });
 
               console.log(response);
-              console.log(movieID);
+             
               setMovieLikeCount(response.data.likeCount);
 
               
@@ -660,20 +653,6 @@ const getMovieLikes = async () => {
               
             }
           }
-  
-      useEffect(() => {
-      getMovieLikes();
-      
-    }, []);
-
-
-   
-
-
-
-     
-
-
 
     const release_date = date.substring(0,4);
     const rating = vote.toFixed(1);
@@ -711,9 +690,7 @@ const getMovieLikes = async () => {
             }
           }
   
-          useEffect(() => {
-      getCredits();
-    }, [param.id]);
+    
 
 
     const final_cast = cast.slice(0, 4);
@@ -748,9 +725,6 @@ const getMovieLikes = async () => {
             }
           }
   
-          useEffect(() => {
-      getBackdrop();
-    }, []);
 
     const imageUrl = `https://image.tmdb.org/t/p/original/${backdrop.file_path}`
     const divStyle = {
@@ -763,16 +737,13 @@ backgroundPosition: 'center',
 
   const recentRatings = rate.slice(0, 4);
 
-  console.log(movie_ID);
-  console.log(test);
- 
-
-   console.log(movieLikeCount);
+  
+   if (movieDetails) {
   return (
     <div className="w-full">
       
-    <div className="w-full  h-[600px] sm:h-[580px] md:h-[580px] lg:h-[580px] xl:h-[640px] bg-cover bg-center flex items-center text-white"  style={divStyle}>
-      <div className="absolute inset-0 bg-black/50 z-0 h-[600px] sm:h-[580px] md:h-[580px] lg:h-[640px] xl:h-[640px]"></div>
+    <div className="w-full h-auto sm:h-[580px] md:h-[580px] lg:h-[580px] xl:h-[640px] bg-cover bg-center flex items-center text-white"  style={divStyle}>
+      <div className="absolute inset-0 bg-black/50 z-0 h-auto sm:h-[580px] md:h-[580px] lg:h-[640px] xl:h-[640px]"></div>
 
       <div className="
   absolute top-0 left-0 w-full z-60 
@@ -781,9 +752,9 @@ backgroundPosition: 'center',
        </div>
       
       
-            <div className="relative z-20 flex flex-col sm:flex-row md:flex-row items-center md:items-start sm:items-start pl-8 pt-[700px] sm:pt-29 md:pt-38 lg:pt-38 pb-30 ">
-              <div className="img-like-rating-counts">
-              <img className="flex justify-center max-h-[45vh] lg:max-h-[55vh] md:max-h-[65vh] sm:max-h-[15vh]" src={`https://image.tmdb.org/t/p/w500/${movieDetails.poster_path}`} />
+            <div className="relative z-20 flex md:flex-row items-center md:items-start sm:items-start pl-8 pt-[10vh] sm:pt-29 md:pt-38 lg:pt-38 pb-30 ">
+              <div className="hidden lg:block">
+              <img className="max-h-[40vh] lg:max-h-[55vh] md:max-h-[65vh] sm:max-h-[10vh]" src={`https://image.tmdb.org/t/p/w500/${movieDetails.poster_path}`} />
               <div className="flex justify-center mt-2"><img src="/liked.svg" className="w-6 h-6 mr-2" /> {movieLikeCount}</div>
               <div className="movie-rating-count"></div>
               </div>
@@ -802,32 +773,32 @@ backgroundPosition: 'center',
 
                 
                 <div className="flex max-w-full flex-wrap">
-                  <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}>{movieDetails.original_language}</p> 
-                  <div className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><img className="w-5 h-5 mr-2" src="/star.svg"/> <p className="ratings-details">{rating}</p></div>
+                  <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" >{movieDetails.original_language}</p> 
+                  <div className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600"><img className="w-5 h-5 mr-2" src="/star.svg"/> <p className="ratings-details">{rating}</p></div>
                 </div>
               
-                <p className="w-full">{movieDetails.overview}</p>
+                <p className="w-full text-[2vh] lg:text-md">{movieDetails.overview}</p>
               
                 <div className="cast-details">
-                    <p className="movie-detail-cast"><b>Cast: </b> </p><div className="castnames">{final_cast.map((c, index) => (
-                      <span key={c.id}>
+                    <p className="text-[2vh] lg:text-md"><b>Cast: </b> </p><div className="castnames">{final_cast.map((c, index) => (
+                      <span className="text-[2vh] lg:text-md" key={c.id}>
                         {c.name}
                         {index < final_cast.length - 1 && ',\u00A0'}
                       </span>
                     ))}
                     </div>
                   </div>
-                   <p className="director-details"><b>Directed By:</b> {director.name} </p>
+                   <p className="text-[2vh] lg:text-md"><b>Directed By:</b> {director.name} </p>
 
               <div className="flex max-w-full flex-wrap mt-2">
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="likeBtn" onClick={likeFunction}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="listBtn" onClick={listFunction}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="diaryBtn" onClick={diaryFunction}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2" style={{ backgroundImage: 'linear-gradient(to right, #1A2A5C, #1E6093)' }}><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
-                
+                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99"  disabled={!movie_ID} onClick={likeFunction}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
+                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="listBtn" onClick={listFunction}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
+                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="diaryBtn" onClick={diaryFunction}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
+                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
+                </div>
 
               </div>
-            </div>
+         
 
           <div className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full" style={isActive ? {display: "flex"} : {display: "none"}}>
           <div class="relative p-4 w-full max-w-md max-h-full">
@@ -933,7 +904,7 @@ backgroundPosition: 'center',
 
            <center>
               {recentRatings?.length > 0 && (
-                <a className="mt-10 text-white"
+                <a className="mt-10 mb-10 bg-gradient-to-r from-blue-700 to-cyan-600 w-sm rounded-4xl p-5 to-blue-700 text-white"
                   style={{ display: "flex", justifyContent: "center" }} 
                   href={`/all_ratings/${movie_ID}/`}
                 >
@@ -947,7 +918,15 @@ backgroundPosition: 'center',
  
   )
       
-  
+  } else {
+    return (
+    <div className="bg-black h-screen flex items-center justify-center">
+      <center>
+          <img className="spinner" src="../Spinner.svg"/>
+          </center>
+    </div>
+    )
+  }
 }
 
       

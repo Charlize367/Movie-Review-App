@@ -66,29 +66,7 @@ const MovieCard = ({movie :
   </div>
 </article>
 </Link>
-            {/* <Link to = {`/movie_details/${id}`}>
-            <div className="indiv-movie-card">
-           
-                <div className="overlay">
-                     
-            <img className="poster" src={poster ? `https://image.tmdb.org/t/p/w500/${poster}` : null}
-            />
-            <div className="details">
-                <div className="first-row">
-                    <p className="movie_title">{title}</p>
-                </div>
-
-                <div className="second-row">
-                    <div className="rating"><img className="rate-icon" src="/star.svg"/> <p className="ratings">{ratings}</p></div>
-                    
-                </div>
-            </div>
-           
-        </div>
-        
-      
-        </div>
-         </Link> */}
+          
         </div>
         
         
