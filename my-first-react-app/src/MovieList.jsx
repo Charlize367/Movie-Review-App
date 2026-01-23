@@ -343,7 +343,7 @@ const [formData, setFormData] = useState({
        
         
               
-             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+             <div class="grid grid-cols-1 mx-20 lg:mx-auto lg:max-w-5xl gap-6 md:grid-cols-2 lg:grid-cols-3 ">
             
               {movieLists?.length > 0 && movieLists.map(r =>  
                 

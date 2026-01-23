@@ -431,8 +431,8 @@ console.log(isActive2);
     <div className="w-full">
       <Nav/>
 
-      <div className="flex mt-10 space-x-10">
-        <div className="max-w-4xl mx-auto mb-12">
+      <div className="flex mt-10 lg:space-x-10">
+        <div className="max-w-4xl m-10 lg:mx-auto mb-12">
         <h1 className="text-5xl font-extrabold text-white leading-tight">{movieList.listTitle}</h1>
          <p className="mt-6 text-gray-300 text-lg leading-relaxed">{movieList.listDescription}</p>
          {movieList.userId === userId && (
@@ -486,8 +486,8 @@ console.log(isActive2);
         ) : errorMessage ? (
         <p>{errorMessage}</p>
       ) : (
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2
-    md:grid-cols-3 lg:gap-8 py-6 px-4 m-20">
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5 sm:grid-cols-2
+    md:grid-cols-3 lg:gap-8 py-6 px-4 m-15">
   
           {movieList?.movies?.map((movie) => (
             <div>

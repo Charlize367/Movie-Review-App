@@ -12,7 +12,7 @@ import RatingCard from './components/RatingCard.jsx';
 const MovieDetails = () => {
   const API_URL = import.meta.env.VITE_API_URL;
  const apiUrl =  import.meta.env.VITE_TMDB_API_URL;
-const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+  const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   const token = localStorage.getItem('jwtToken');
   const [movieDetails, setMovieDetails] = useState(null);
   const [vote, setVote] = useState(0);
@@ -23,8 +23,7 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   const [director, setDirector] = useState([]);
   const [backdrop, setBackdrop] = useState([]);
   const param = useParams();
-  const [movies, setMovies] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [movies, setMovies] = useState([]);  
   const username = localStorage.getItem('username');
   const userId = localStorage.getItem('user_ID');
   const [likedMovies, setLikedMovies] = useState([]);
@@ -44,7 +43,6 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   const [rateText, setRateText] = useState("");
   const [rateFunction, setRateFunction] = useState(() => () => {});
   const [isActive, setIsActive] = useState(false);
-  const [inputData, setInputData] = useState([]);
   const [ratings, setRatings] = useState(0);
   const [review, setReview] = useState("");
   const [movieLikeCount, setMovieLikeCount] = useState(0);
@@ -744,8 +742,8 @@ backgroundPosition: 'center',
   return (
     <div className="w-full">
       
-    <div className="w-full  h-[600px] sm:h-[580px] md:h-[580px] lg:h-[580px] xl:h-[640px] bg-cover bg-center flex items-center text-white"  style={divStyle}>
-      <div className="absolute inset-0 bg-black/50 z-0 h-[600px] sm:h-[580px] md:h-[580px] lg:h-[640px] xl:h-[640px]"></div>
+    <div className="w-full h-auto sm:h-[580px] md:h-[580px] lg:h-[580px] xl:h-[640px] bg-cover bg-center flex items-center text-white"  style={divStyle}>
+      <div className="absolute inset-0 bg-black/50 z-0 h-auto sm:h-[580px] md:h-[580px] lg:h-[640px] xl:h-[640px]"></div>
 
       <div className="
   absolute top-0 left-0 w-full z-60 
@@ -754,9 +752,9 @@ backgroundPosition: 'center',
        </div>
       
       
-            <div className="relative z-20 flex flex-col sm:flex-row md:flex-row items-center md:items-start sm:items-start pl-8 pt-[700px] sm:pt-29 md:pt-38 lg:pt-38 pb-30 ">
-              <div className="img-like-rating-counts">
-              <img className="flex justify-center max-h-[45vh] lg:max-h-[55vh] md:max-h-[65vh] sm:max-h-[15vh]" src={`https://image.tmdb.org/t/p/w500/${movieDetails.poster_path}`} />
+            <div className="relative z-20 flex md:flex-row items-center md:items-start sm:items-start pl-8 pt-[10vh] sm:pt-29 md:pt-38 lg:pt-38 pb-30 ">
+              <div className="hidden lg:block">
+              <img className="max-h-[40vh] lg:max-h-[55vh] md:max-h-[65vh] sm:max-h-[10vh]" src={`https://image.tmdb.org/t/p/w500/${movieDetails.poster_path}`} />
               <div className="flex justify-center mt-2"><img src="/liked.svg" className="w-6 h-6 mr-2" /> {movieLikeCount}</div>
               <div className="movie-rating-count"></div>
               </div>
@@ -779,28 +777,28 @@ backgroundPosition: 'center',
                   <div className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600"><img className="w-5 h-5 mr-2" src="/star.svg"/> <p className="ratings-details">{rating}</p></div>
                 </div>
               
-                <p className="w-full">{movieDetails.overview}</p>
+                <p className="w-full text-[2vh] lg:text-md">{movieDetails.overview}</p>
               
                 <div className="cast-details">
-                    <p className="movie-detail-cast"><b>Cast: </b> </p><div className="castnames">{final_cast.map((c, index) => (
-                      <span key={c.id}>
+                    <p className="text-[2vh] lg:text-md"><b>Cast: </b> </p><div className="castnames">{final_cast.map((c, index) => (
+                      <span className="text-[2vh] lg:text-md" key={c.id}>
                         {c.name}
                         {index < final_cast.length - 1 && ',\u00A0'}
                       </span>
                     ))}
                     </div>
                   </div>
-                   <p className="director-details"><b>Directed By:</b> {director.name} </p>
+                   <p className="text-[2vh] lg:text-md"><b>Directed By:</b> {director.name} </p>
 
               <div className="flex max-w-full flex-wrap mt-2">
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99"  disabled={!movie_ID} onClick={likeFunction}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="listBtn" onClick={listFunction}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="diaryBtn" onClick={diaryFunction}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
-                <div className="flex text-white text-sm font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
-                
+                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99"  disabled={!movie_ID} onClick={likeFunction}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
+                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="listBtn" onClick={listFunction}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
+                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="diaryBtn" onClick={diaryFunction}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
+                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
+                </div>
 
               </div>
-            </div>
+         
 
           <div className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full" style={isActive ? {display: "flex"} : {display: "none"}}>
           <div class="relative p-4 w-full max-w-md max-h-full">

@@ -54,7 +54,7 @@ const List = () => {
         ) : errorMessage ? (
         <p>{errorMessage}</p>
       ) : (
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5 sm:grid-cols-2
     md:grid-cols-3 lg:gap-8 py-6 px-4 m-10">
   
           {watchList.map((movie) => (
