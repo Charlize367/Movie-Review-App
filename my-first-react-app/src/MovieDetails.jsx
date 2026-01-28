@@ -445,6 +445,7 @@ useEffect(() => {
   const removeDiary = async(e) => {
     e.preventDefault();
     
+    setIsWatched(false);
      try {
       const selectedDiary = diary.find(movie => movie.tmdbId === Number(param.id));
      
@@ -467,7 +468,7 @@ useEffect(() => {
         
       } catch (error) {
       console.log(error);
-      setIsWatched(false);
+      setIsWatched(true);
 
     
     }
