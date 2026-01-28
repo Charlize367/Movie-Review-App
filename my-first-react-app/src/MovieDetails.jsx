@@ -356,10 +356,9 @@ useEffect(() => {
     
      try {
       const selectedListMovie = watchList.find(movie => movie.tmdbId === Number(param.id));
-      const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id));
-
+      
       const listId = selectedListMovie._id;
-      const movieId = selectedMovie._id;
+   
           const response = await axios.delete(`${API_URL}/users/${userId}/${listId}/watchlist`, {
                   headers: {
                        'Content-Type': 'application/json',
@@ -369,7 +368,7 @@ useEffect(() => {
                 
                 console.log(response);
                 console.log(listId);
-                console.log(movieId);
+                
                 getUserWatchList();
                 
                 
@@ -479,10 +478,10 @@ useEffect(() => {
     
      try {
       const selectedDiary = diary.find(movie => movie.tmdbId === Number(param.id));
-      const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id));
+     
 
       const diaryId = selectedDiary._id;
-      const movieId = selectedMovie._id;
+      
           const response = await axios.delete(`${API_URL}/users/${userId}/${diaryId}/diary`, {
                   headers: {
                        'Content-Type': 'application/json',
@@ -492,7 +491,7 @@ useEffect(() => {
                 
                 console.log(response);
                 console.log(diaryId);
-                console.log(movieId);
+               
                 getUserDiary();
                 
                 
