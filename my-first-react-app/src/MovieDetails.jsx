@@ -738,7 +738,7 @@ backgroundPosition: 'center',
   const recentRatings = rate.slice(0, 4);
 
   
-   if (movieDetails) {
+   if (movieDetails && likedMovies && watchList && diary ) {
   return (
     <div className="w-full">
       
