@@ -7,6 +7,7 @@ import emptyStar from "/star1.svg";
 import halfStar from "/halfStar.svg";
 import fullStar from "/star2.svg";
 import RatingCard from './components/RatingCard.jsx';
+import ActionSkeleton from './components/ActionSkeleton.jsx';
 
 
 const MovieDetails = () => {
@@ -237,6 +238,12 @@ useEffect(() => {
     const addToMovieLike = async(e) => {
       
       e.preventDefault();
+
+
+      setlikedIcon('/liked.svg');
+      setLikedText('Liked');
+      setLikeFunction(() => removeLike);
+
       if (!movie_ID) {
       console.error("Movie ID missing. Like aborted. Movie ID: ", movie_ID);
       return;
@@ -262,6 +269,9 @@ useEffect(() => {
         
 
       } catch (error) {
+        setlikedIcon('/like.svg');
+        setLikedText('Like');
+        setLikeFunction(() => addToMovieLike);
         console.log(error);
       }
 
@@ -270,7 +280,10 @@ useEffect(() => {
 
   const removeLike = async(e) => {
     e.preventDefault();
-    
+
+    setlikedIcon('/like.svg');
+    setLikedText('Like');
+    setLikeFunction(() => addToMovieLike);
      try {
       const selectedLikedMovie = likedMovies.find(movie => movie.tmdbId === Number(param.id));
       const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id));
@@ -294,12 +307,21 @@ useEffect(() => {
         
       } catch (error) {
       console.log(error);
+      setlikedIcon('/liked.svg');
+      setLikedText('Liked');
+      setLikeFunction(() => removeLike);
     }
   }
 
 
     const addToWatchList = async(e) => {
       e.preventDefault();
+
+      setListIcon('/listed.svg');
+      setListText('Saved');
+      setListFunction(() => removeList);
+
+
       try {
          if (!movie_ID) return;
           const response = await axios.post(`${API_URL}/users/${userId}/${movie_ID}/watchlist`, {}, {
@@ -316,12 +338,21 @@ useEffect(() => {
         
       } catch (error) {
       console.log(error);
+      setListIcon('/add.svg');
+      setListText('List');
+      console.log("not listed");
+      setListFunction(() => addToWatchList);
     }
   }
 
 
   const removeList = async(e) => {
     e.preventDefault();
+
+    setListIcon('/add.svg');
+    setListText('List');
+    console.log("not listed");
+    setListFunction(() => addToWatchList);
     
      try {
       const selectedListMovie = watchList.find(movie => movie.tmdbId === Number(param.id));
@@ -345,6 +376,10 @@ useEffect(() => {
         
       } catch (error) {
       console.log(error);
+      setListIcon('/listed.svg');
+      setListText('Saved');
+      console.log("listed");
+      setListFunction(() => removeList);
     }
   }
 
@@ -363,6 +398,12 @@ useEffect(() => {
     const addToDiary = async(e) => {
      
       e.preventDefault();
+
+      setDiaryIcon('/watched.svg');
+      setDiaryText('Watched');
+      setDiaryFunction(() => removeDiary);
+
+
       if(!movie_ID) return;
 
       try {
@@ -381,6 +422,10 @@ useEffect(() => {
         
       } catch (error) {
       console.log(error);
+
+      setDiaryIcon('/watch.svg');
+      setDiaryText('Mark');
+      setDiaryFunction(() => addToDiary);
     }
   }
 
@@ -427,6 +472,10 @@ useEffect(() => {
 
   const removeDiary = async(e) => {
     e.preventDefault();
+
+    setDiaryIcon('/watch.svg');
+    setDiaryText('Mark');
+    setDiaryFunction(() => addToDiary);
     
      try {
       const selectedDiary = diary.find(movie => movie.tmdbId === Number(param.id));
@@ -450,6 +499,10 @@ useEffect(() => {
         
       } catch (error) {
       console.log(error);
+
+      setDiaryIcon('/watched.svg');
+      setDiaryText('Watched');
+      setDiaryFunction(() => removeDiary);
     }
   }
 
@@ -482,11 +535,6 @@ useEffect(() => {
 
           
   
-
-    console.log(rate);
-   
-console.log(likedMovies);
-
   useEffect(() => {
 
     const selectedLikedMovie = likedMovies.find(movie => movie.tmdbId === Number(param.id))
@@ -738,7 +786,7 @@ backgroundPosition: 'center',
   const recentRatings = rate.slice(0, 4);
 
   
-   if (movieDetails && likedMovies && watchList && diary ) {
+   if (movieDetails) {
   return (
     <div className="w-full">
       
@@ -790,13 +838,22 @@ backgroundPosition: 'center',
                   </div>
                    <p className="text-[2vh] lg:text-md"><b>Directed By:</b> {director.name} </p>
 
+
+              {!movie_ID ? (
+  <div className="flex gap-2 mt-2">
+    <ActionSkeleton />
+    <ActionSkeleton />
+    <ActionSkeleton />
+    <ActionSkeleton />
+  </div>
+) : (
               <div className="flex max-w-full flex-wrap mt-2">
                 <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99"  disabled={!movie_ID} onClick={likeFunction}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
                 <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="listBtn" onClick={listFunction}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
                 <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="diaryBtn" onClick={diaryFunction}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
                 <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
                 </div>
-
+)}
               </div>
          
 
