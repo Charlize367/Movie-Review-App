@@ -583,7 +583,7 @@ console.log(isActive2);
     <div id="dropdown" class="z-10 h-25 w-full overflow-y-auto dark:placeholder-gray-400 dark:bg-gray-800 text-white mb-2 rounded-base shadow-lg w-44">
             <ul class="p-2 flex flex-col text-sm text-body font-medium" aria-labelledby="dropdown-button">
                 {movieOptions.map(m => 
-                <button type="button" className="hover:bg-gray-400" onClick={() => selectMovieOption(m.id)} disabled={selectedMovieIds.includes(m.id)}>
+                <button type="button" className="hover:bg-gray-400" onClick={() => selectMovieOption(m.id)} disabled={selectedMovies.some(movie => movie.id === m.id)}>
                 <li className="flex items-center mb-3">
                     <img className="w-15 h-15 rounded-lg" src={m.poster_path ? `https://image.tmdb.org/t/p/w500/${m.poster_path}` : null} />
                     <p class="block p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md">{m.title}</p>
