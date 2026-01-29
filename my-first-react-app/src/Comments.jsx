@@ -11,6 +11,7 @@ import relativeTime from "dayjs/plugin/relativeTime"
 
 const Comments = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('jwtToken');
   const param = useParams();
   const userId = localStorage.getItem('user_ID');
@@ -210,7 +211,7 @@ const Comments = () => {
             <div class="flex items-center">
                 <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold"><img
                         class="mr-2 w-6 h-6 rounded-full"
-                        src={`http://localhost:3000/${c.userId.image}`}
+                        src={`${API_BASE_URL} /${c.userId.image}`}
                         alt="Michael Gough"/>{c.userId.username}</p>
                 <p class="text-sm text-gray-600 dark:text-gray-400"><time pubdate datetime="2022-02-08"
                         title="February 8th, 2022">{dayjs(c.updatedAt).fromNow()}</time></p>
