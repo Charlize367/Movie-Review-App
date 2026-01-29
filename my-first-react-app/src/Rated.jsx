@@ -112,6 +112,7 @@ const handleChange = (e) => {
               e.target.reset();
 
               getMovieRatings();
+              setIsActive(false);
 
               } catch (error) {
               console.log(error);
@@ -189,9 +190,9 @@ const handleChange = (e) => {
                        
                      </div>
                      ))}
-                     <div className="flex ml-13" >
-               <button className=" p-1 rounded-lg" onClick={() => {openForm(r._id, r.rating)}}><img className="w-10 h-10" src="/edit-icon.svg"/> </button>
-              <button className=" p-1 rounded-lg ml-3" onClick={() => {deleteRating(r._id)}}><img className="w-10 h-10" src="/delete-icon.svg"/> </button>
+                     <div className="flex ml-5 mt-3" >
+               <button className=" p-1 rounded-lg" onClick={() => {openForm(r._id, r.rating)}}><img className="w-4 h-5" src="/edit-icon.svg"/> </button>
+              <button className=" p-1 rounded-lg ml-3" onClick={() => {deleteRating(r._id)}}><img className="w-4 h-5" src="/delete-icon.svg"/> </button>
              </div>
              
                  </div>

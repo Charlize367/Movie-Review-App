@@ -11,7 +11,7 @@ import CommentsSection from './components/CommentsSection.jsx'
 const MovieListPage = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const apiUrl =  import.meta.env.VITE_TMDB_API_URL;
-const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODI1MGEyNjQ5YTAwYTk2OTdlYjIxMGUzMTExZGE1YyIsIm5iZiI6MTcyMjU4NzAzNS43MTYsInN1YiI6IjY2YWM5NzliNTEyMTNhZjA5MWJkNThhMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zrM-3dtjvwa-al-qRd70tlGRD0VkxCFbHgYmZEzY6gA';
+const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
 const apiOptions = {
   method: 'GET',
@@ -22,7 +22,7 @@ const apiOptions = {
 }
   const userId = localStorage.getItem('user_ID');
   const [movieList, setMovieList] = useState([]);
-   const [isLoading, setIsLoading] = useState(false);
+   const [isLoading, setIsLoading] = useState(true);
    const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem('jwtToken');
   const param = useParams();
@@ -52,6 +52,8 @@ const apiOptions = {
 
               console.log(response);
               setMovieList(response.data.data);
+              setIsLoading(false);
+             
               
               
   
@@ -481,7 +483,7 @@ console.log(isActive2);
       <section className="all-movies">
         {isLoading ? (
             <center>
-          <img className="spinner" src="/Spinner.svg"/>
+          <img className="spinner" src="../Spinner.svg"/>
           </center>
         ) : errorMessage ? (
         <p>{errorMessage}</p>

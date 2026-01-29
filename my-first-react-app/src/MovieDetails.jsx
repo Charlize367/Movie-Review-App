@@ -700,11 +700,11 @@ backgroundPosition: 'center',
               <ActionSkeleton />
             </div>
           ) : (
-              <div className="flex max-w-full flex-wrap mt-2">
-                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99"  disabled={!movie_ID} onClick={toggleLike}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
-                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="listBtn" onClick={toggleList}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
-                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="diaryBtn" onClick={toggleDiary}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
-                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
+              <div className="flex max-w-full flex-col lg:flex-row mt-2 lg:ml-auto lg:items-center lg:gap-3">
+                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99"  disabled={!movie_ID} onClick={toggleLike}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
+                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl lg:ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="listBtn" onClick={toggleList}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
+                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl lg:ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="diaryBtn" onClick={toggleDiary}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
+                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl lg:ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
                 </div>
 )}
               </div>
