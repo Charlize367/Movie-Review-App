@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 
 import { useState, useEffect } from 'react'
 import axios from 'axios';
@@ -15,17 +15,12 @@ const MovieListCard =  ({movieList :
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('jwtToken');
     const userID = localStorage.getItem('user_ID');
-    const navigate = new useNavigate();
     const [likeCount, setLikeCount] = useState(0);
     const [commentCount, setCommentCount] = useState(0);
     const [likes, setLikes] = useState([]);
-    const [comments, setComments] = useState([]);
-    const [likedIcon, setlikedIcon] = useState("");
-    const [likeFunction, setLikeFunction] = useState(() => () => {});
+    const [isLiked, setIsLiked] = useState(false);
+    const likeRef = useRef(isLiked);
     
-    
-
-console.log(image);
    
 
    const getMovieListLikes = async () => {
@@ -122,99 +117,59 @@ console.log(image);
     }, []);
 
 
-   
+     const toggleLike = async(e) => {
+      e.preventDefault()
 
-     const users = userId;
-
-
-const likeMovieList = async(e) => {
-      
-      e.preventDefault();
+      likeRef.current = !likeRef.current;
+      setIsLiked(likeRef.current);
+      setLikeCount(prev => likeRef.current ? prev + 1 : prev - 1);
 
       try {
+        if(likeRef.current) {
 
-      
-        const response = await axios.post(`${API_URL}/movieList/${userID}/${_id}/likes`, {}, {
+          await axios.post(`${API_URL}/movieList/${userID}/${_id}/likes`, {}, {
             headers : {
               'Content-Type' : 'application/json',
               'Authorization': `Bearer ${token}`
             }
         });
 
-        console.log(response);
-      
-        getMovieListLikeCount();
-        getMovieListLikes();
-       
+        } else {
 
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-const removeLike = async(e) => {
-    e.preventDefault();
-    
-     try {
-      
-
-    
-          const response = await axios.delete(`${API_URL}/movieList/${userID}/${_id}/likes`, {
+          await axios.delete(`${API_URL}/movieList/${userID}/${_id}/likes`, {
                   headers: {
                        'Content-Type': 'application/json',
                        'Authorization': `Bearer ${token}`
                   }
                 });
                 
-                console.log(response);
-              
-               getMovieListLikeCount();
-               getMovieListLikes();
-                
-                
-        
+        }
+
+      getMovieListLikeCount();
+      getMovieListLikes();
+
+
       } catch (error) {
-      console.log(error);
-    }
-  }
-
-      
-     
-
-
-
-
-useEffect(() => {
-    const selectedLike = likes.find(rl => rl.toString() === userID)
-     
-
-    if(selectedLike) {
-      
-      
-      setlikedIcon('/liked.svg');
-      setLikeFunction(() => removeLike);
-      
-    }
-    
-    
-     else {
-      setlikedIcon('/like.svg');
-      console.log("test not liked");
-      setLikeFunction(() => likeMovieList);
-    
-   
-    }
-     }, [likes]);
-    
-    
-     
-
-     const goToComments = () => {
-
-        // navigate(`/comments/${tmdbId}/${_id}`);
-     
-
+        console.log(error);
+        likeRef.current = !likeRef.current;
+        setIsLiked(likeRef.current);
+        setLikeCount(prev => likeRef.current ? prev + 1 : prev - 1);
       }
+      
+    }
+
+
+
+
+
+  const likedIcon = isLiked ? '/liked.svg' : '/like.svg';
+  
+
+
+  useEffect(() => {
+  
+  setIsLiked(likes.includes(userID));
+}, [likes, userID]);
     
 
      
@@ -255,11 +210,11 @@ useEffect(() => {
   <div className="flex items-center gap-3"><button className="flex items-center gap-1 
                    px-3 py-1.5 rounded-full
                    text-white text-sm
-                   " onClick={likeFunction} ><img className="w-5 h-5" src={`${likedIcon}`} /></button><p className="text-white ">{likeCount}</p></div>
+                   " onClick={toggleLike} ><img className="w-5 h-5" src={`${likedIcon}`} /></button><p className="text-white ">{likeCount}</p></div>
   <div className="flex gap-3 items-center"><button className="flex items-center gap-1 
                    px-3 py-1.5 rounded-full
                    text-gray-200 text-sm ml-3
-                  " onClick={goToComments}  ><img className="w-5 h-5" src={`/comment.svg`} /></button><p className="text-white">{commentCount}</p></div>
+                  "  ><img className="w-5 h-5" src={`/comment.svg`} /></button><p className="text-white">{commentCount}</p></div>
 </div>
     </div>
     </div>

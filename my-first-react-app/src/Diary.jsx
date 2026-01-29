@@ -10,8 +10,8 @@ const Diary = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const userId = localStorage.getItem('user_ID');
   const [diary, setDiary] = useState([]);
-   const [isLoading, setIsLoading] = useState(false);
-   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem('jwtToken');
 
 
@@ -26,6 +26,7 @@ const Diary = () => {
 
               console.log(response);
               setDiary(response.data.diary);
+              setIsLoading(false);
 
               
               
@@ -40,7 +41,7 @@ const Diary = () => {
       
     }, [userId]);
   return (
-    <div className="container">
+    <div className="w-full">
       <Nav/>
 
         <h2 className="text-3xl text-white font-bold ml-10 mt-5">Browse Diary</h2>

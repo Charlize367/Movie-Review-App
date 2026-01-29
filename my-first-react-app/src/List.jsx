@@ -10,8 +10,8 @@ const List = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const userId = localStorage.getItem('user_ID');
   const [watchList, setWatchList] = useState([]);
-   const [isLoading, setIsLoading] = useState(false);
-   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem('jwtToken');
 
   const getWatchList = async () => {
@@ -25,6 +25,7 @@ const List = () => {
 
               console.log(response);
               setWatchList(response.data.watchListMovies);
+              setIsLoading(false);
 
               
               
@@ -39,14 +40,14 @@ const List = () => {
       
     }, [userId]);
   return (
-    <div className="container">
+    <div className="w-full">
       <Nav/>
 
         <h2 className="text-3xl text-white font-bold ml-10 mt-5">Browse WatchList</h2>
         {watchList.length == 0 && (
             <p className="text-white text-md m-10"> No movies in WatchList.</p>
           )}
-      <section className="all-movies">
+      <section className="w-full">
         {isLoading ? (
             <center>
           <img className="spinner" src="/Spinner.svg"/>

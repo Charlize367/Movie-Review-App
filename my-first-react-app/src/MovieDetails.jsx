@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Form, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react'
 import Nav from './components/Nav.jsx'
@@ -42,6 +42,10 @@ const MovieDetails = () => {
   const [movieLikeCount, setMovieLikeCount] = useState(0);
   const [movie_ID, setMovie_ID] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [credits, setCredits] = useState([]);
+  const likeRef = useRef(isLiked);
+  const listRef = useRef(isListed);
+  const diaryRef = useRef(isWatched);
  
  
   
@@ -225,144 +229,139 @@ useEffect(() => {
               
             }
           }
-  
-   
 
+    
+    const toggleLike = async(e) => {
+      e.preventDefault()
 
-    const addToMovieLike = async(e) => {
-      
-      e.preventDefault();
-
-
-      setIsLiked(true);
-      setMovieLikeCount(prev => prev + 1);
-
-      if (!movie_ID) {
-      console.error("Movie ID missing. Like aborted. Movie ID: ", movie_ID);
-      return;
-    }
+      likeRef.current = !likeRef.current;
+      setIsLiked(likeRef.current);
+      setMovieLikeCount(prev => likeRef.current ? prev + 1 : prev - 1);
 
       try {
+        if(likeRef.current) {
 
-        
-       
-        
-        
-        const response = await axios.post(`${API_URL}/users/${userId}/${movie_ID}/likes`, {}, {
+          await axios.post(`${API_URL}/users/${userId}/${movie_ID}/likes`, {}, {
             headers : {
               'Content-Type' : 'application/json',
               'Authorization': `Bearer ${token}`
             }
         });
 
-        console.log(response);
+        } else {
 
-        getUserLikes();
-        getMovieLikes();
+          const selectedLikedMovie = likedMovies.find(movie => movie.tmdbId === Number(param.id));
+      
+
+      const likeId = selectedLikedMovie._id;
+          await axios.delete(`${API_URL}/users/${userId}/${likeId}/${movie_ID}/like`, {
+                  headers: {
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
+                  }
+                });
+        }
+
+      getUserLikes();
+      getMovieLikes();
+
+
+      } catch (error) {
+        console.log(error);
+        likeRef.current = !likeRef.current;
+        setIsLiked(likeRef.current);
+        setMovieLikeCount(prev => likeRef.current ? prev + 1 : prev - 1);
+      }
+      
+    }
+   
+
+    const toggleList = async (e) => {
+
+      e.preventDefault()
+
+      listRef.current = !listRef.current;
+      setIsListed(listRef.currentue);
+      
+
+      try {
+        if(listRef.current) {
+
+          await axios.post(`${API_URL}/users/${userId}/${movie_ID}/watchlist`, {}, {
+                  headers: {
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
+                  }
+          });
+
+        } else {
+
+        const selectedListMovie = watchList.find(movie => movie.tmdbId === Number(param.id));
+      
+      const listId = selectedListMovie._id;
+   
+         await axios.delete(`${API_URL}/users/${userId}/${listId}/watchlist`, {
+                  headers: {
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
+                  }
+          });
+        }
+
+      getUserWatchList();
+
+      } catch (error) {
+        console.log(error);
+        listRef.current = !listRef.current;
+        setIsListed(listRef.current);
+      }
+    }
+
+
+    const toggleDiary = async (e) => {
+      e.preventDefault()
+
+      diaryRef.current = !diaryRef.current;
+      setIsWatched(diaryRef.current);
+      
+
+      try {
+        if(diaryRef.current) {
+
+          await axios.post(`${API_URL}/users/${userId}/${movie_ID}/diary`, {},  {
+                  headers: {
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
+                  }
+        });
+
+        } else {
+
+        const selectedDiary = diary.find(movie => movie.tmdbId === Number(param.id));
+     
+
+      const diaryId = selectedDiary._id;
+      
+        await axios.delete(`${API_URL}/users/${userId}/${diaryId}/diary`, {
+                  headers: {
+                       'Content-Type': 'application/json',
+                       'Authorization': `Bearer ${token}`
+                  }
+                });
+
+     
+        }
+         getUserDiary();
         
 
       } catch (error) {
         console.log(error);
-        setIsLiked(false);
-        setMovieLikeCount(prev => prev - 1);
+        diaryRef.current = !diaryRef.current;
+        setIsWatched(diaryRef.current);
       }
-
-  }
-
-
-  const removeLike = async(e) => {
-    e.preventDefault();
-
-    setMovieLikeCount(prev => prev - 1);
-    setIsLiked(false);
-     try {
-      const selectedLikedMovie = likedMovies.find(movie => movie.tmdbId === Number(param.id));
-      const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id));
-
-      const likeId = selectedLikedMovie._id;
-      
-          const response = await axios.delete(`${API_URL}/users/${userId}/${likeId}/${movie_ID}/like`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
-                
-                console.log(response);
-                console.log(likeId);
-              
-                getUserLikes();
-                getMovieLikes();
-                
-                
-        
-      } catch (error) {
-      console.log(error);
-      setIsLiked(true);
-      setMovieLikeCount(prev => prev + 1);
     }
-  }
 
-
-    const addToWatchList = async(e) => {
-      e.preventDefault();
-
-      setIsListed(true);
-     
-      try {
-         if (!movie_ID) return;
-          const response = await axios.post(`${API_URL}/users/${userId}/${movie_ID}/watchlist`, {}, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
-                
-                console.log(response);
-                
-                getUserWatchList();
-                
-        
-      } catch (error) {
-      console.log(error);
-      setIsListed(false);
-     
-    }
-  }
-
-
-  const removeList = async(e) => {
-    e.preventDefault();
-
-    setIsListed(false);
     
-     try {
-      const selectedListMovie = watchList.find(movie => movie.tmdbId === Number(param.id));
-      
-      const listId = selectedListMovie._id;
-   
-          const response = await axios.delete(`${API_URL}/users/${userId}/${listId}/watchlist`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
-                
-                console.log(response);
-                console.log(listId);
-                
-                getUserWatchList();
-                
-                
-        
-      } catch (error) {
-      console.log(error);
-      setIsListed(true);
-      
-    }
-  }
-
-
   const handleChange = (e) => {
   setReview(e.target.value);
 };
@@ -373,34 +372,9 @@ useEffect(() => {
   }
 
 
-
-    const addToDiary = async(e) => {
-     
-      e.preventDefault();
-
-      setIsWatched(true);
-
-      if(!movie_ID) return;
-
-      try {
-        
-          const response = await axios.post(`${API_URL}/users/${userId}/${movie_ID}/diary`, {},  {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
-                
-                console.log(response);
-                
-                getUserDiary();
-
-        
-      } catch (error) {
-      console.log(error);
-    }
-  }
-
+  
+    
+    
 
   const addToRating = async(e) => {
      
@@ -441,39 +415,6 @@ useEffect(() => {
     }
 
 
-
-  const removeDiary = async(e) => {
-    e.preventDefault();
-    
-    setIsWatched(false);
-     try {
-      const selectedDiary = diary.find(movie => movie.tmdbId === Number(param.id));
-     
-
-      const diaryId = selectedDiary._id;
-      
-          const response = await axios.delete(`${API_URL}/users/${userId}/${diaryId}/diary`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
-                
-                console.log(response);
-                console.log(diaryId);
-               
-                getUserDiary();
-                
-                
-        
-      } catch (error) {
-      console.log(error);
-      setIsWatched(true);
-
-    
-    }
-  }
-
   const getMovieRatings = async () => {
        try {
 
@@ -502,17 +443,17 @@ useEffect(() => {
           }
 
 
-    const likedIcon = isLiked ? '/liked.svg' : '/like.svg';
+  const likedIcon = isLiked ? '/liked.svg' : '/like.svg';
   const likedText = isLiked ? 'Liked' : 'Like';
-  const likeFunction = isLiked ? removeLike : addToMovieLike;
+  
   
   const listIcon = isListed ? '/listed.svg' : '/add.svg';
   const listText = isListed ? 'Saved' : 'List';
-  const listFunction = isListed ? removeList : addToWatchList;
+  
   
   const diaryIcon = isWatched ? '/watched.svg' : '/watch.svg';
   const diaryText = isWatched ? 'Watched' : 'Mark';
-  const diaryFunction = isWatched ? removeDiary : addToDiary;
+  
         
 
 
@@ -544,13 +485,13 @@ useEffect(() => {
   
     
   
-  const apiOptions = {
-  method: 'GET',
-  headers : {
-    accept: 'application/json',
-    Authorization: `Bearer ${apiKey}`
+    const apiOptions = {
+    method: 'GET',
+    headers : {
+      accept: 'application/json',
+      Authorization: `Bearer ${apiKey}`
+    }
   }
-}
 
 useEffect(() => {
       getMovieDetails();
@@ -760,9 +701,9 @@ backgroundPosition: 'center',
             </div>
           ) : (
               <div className="flex max-w-full flex-wrap mt-2">
-                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99"  disabled={!movie_ID} onClick={likeFunction}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
-                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="listBtn" onClick={listFunction}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
-                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="diaryBtn" onClick={diaryFunction}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
+                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99"  disabled={!movie_ID} onClick={toggleLike}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
+                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="listBtn" onClick={toggleList}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
+                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="diaryBtn" onClick={toggleDiary}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
                 <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
                 </div>
 )}

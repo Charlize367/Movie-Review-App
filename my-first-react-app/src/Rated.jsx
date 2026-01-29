@@ -19,6 +19,7 @@ const Rated = () => {
   const [rating, setRating] = useState(0);
   const [inputData, setInputData] = useState([]);
   const [updateID, setUpdateID] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   dayjs.extend(relativeTime);
 
@@ -66,6 +67,7 @@ const handleChange = (e) => {
 
               console.log(response);
               setRatings(response.data);
+              setIsLoading(false);
               
               
   
@@ -149,12 +151,19 @@ const handleChange = (e) => {
       <Nav/>
 
          <h2 className="font-bold text-white text-4xl flex justify-center mb-5">All My Ratings</h2>
-         {watchList.length == 0 && (
+      
+         {ratings.length == 0 && (
             <p className="text-white text-md m-10"> No ratings found.</p>
           )}
        <div>
-              
+        
+        {isLoading ? (
+          <center>
+          <img className="spinner" src="./Spinner.svg"/>
+          </center>
+        ) : (
              <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+              
               {ratings.map((r) => {
                 console.log(r.userId);
                 const movies = r.movieId;
@@ -181,18 +190,20 @@ const handleChange = (e) => {
                      </div>
                      ))}
                      <div className="flex ml-13" >
-               <button className=" p-1 rounded-lg" onClick={() => {openForm(r._id, r.rating)}}><img className="w-5 h-5" src="/edit-icon.svg"/> </button>
-              <button className=" p-1 rounded-lg ml-3" onClick={() => {deleteRating(r._id)}}><img className="w-5 h-5" src="/delete-icon.svg"/> </button>
+               <button className=" p-1 rounded-lg" onClick={() => {openForm(r._id, r.rating)}}><img className="w-10 h-10" src="/edit-icon.svg"/> </button>
+              <button className=" p-1 rounded-lg ml-3" onClick={() => {deleteRating(r._id)}}><img className="w-10 h-10" src="/delete-icon.svg"/> </button>
              </div>
              
                  </div>
                  
                  </div>
              )})}
+        
              
              
-         
+        
             </div>
+        )}
             
  {isActive && (
   <div className="fixed inset-0 z-50 flex text-white items-center justify-center p-4">

@@ -10,7 +10,7 @@ const Liked = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const userId = localStorage.getItem('user_ID');
   const [likedMovies, setLikedMovies] = useState([]);
-   const [isLoading, setIsLoading] = useState(false);
+   const [isLoading, setIsLoading] = useState(true);
    const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem('jwtToken');
 
@@ -25,7 +25,7 @@ const Liked = () => {
 
               console.log(response);
               setLikedMovies(response.data.likedMovies);
-
+              setIsLoading(false);
               
               
             } catch (error) {
@@ -41,7 +41,7 @@ const Liked = () => {
 
     console.log(likedMovies);
   return (
-    <div className="container">
+    <div className="w-full">
       <Nav/>
 
         <h2 className="text-3xl text-white font-bold ml-10 mt-5">Browse Liked Movies</h2>

@@ -15,12 +15,10 @@ const Comments = () => {
   const param = useParams();
   const userId = localStorage.getItem('user_ID');
   const [rate, setRate] = useState([]);
-
   const [isActive, setIsActive] = useState(false);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const [updateCommentID, setUpdateCommentID] = useState(0);
-  const [updateComment, setUpdateComment] = useState("");
   const [updateData, setUpdateData] = useState([]);
  
    dayjs.extend(relativeTime);
@@ -44,8 +42,6 @@ const Comments = () => {
   }
 
 
-
-  const recentRatings = rate.slice(0, 5);
 
   const handleCommentChange = (e) => {
   setComment(e.target.value);
@@ -128,7 +124,7 @@ const Comments = () => {
               console.log(response);
 
               
-              setisActive(!isActive);
+              setIsActive(!isActive);
               e.target.reset();
 
               getComment();

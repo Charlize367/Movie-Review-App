@@ -10,7 +10,8 @@ import MovieListCard from './components/MovieListCard.jsx';
 const MovieList = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const apiUrl =  import.meta.env.VITE_TMDB_API_URL;
-const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODI1MGEyNjQ5YTAwYTk2OTdlYjIxMGUzMTExZGE1YyIsIm5iZiI6MTcyMjU4NzAzNS43MTYsInN1YiI6IjY2YWM5NzliNTEyMTNhZjA5MWJkNThhMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zrM-3dtjvwa-al-qRd70tlGRD0VkxCFbHgYmZEzY6gA';
+  const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+  
 
 const apiOptions = {
   method: 'GET',
@@ -23,16 +24,12 @@ const apiOptions = {
   const userId = localStorage.getItem('user_ID');
   const [isActive, setIsActive] = useState(false);
   const [movieLists, setMovieLists] = useState([]);
-  const [myMovieLists, setMyMovieLists] = useState([]);
   const [movieOptions, setMovieOptions] = useState([]);
   const [selectedMovieIds, setSelectedMovieIds] = useState([]);
   const [selectedMovies, setSelectedMovies] = useState([]);
   const [search, setSearch] = useState("");
-  
-  
+  const [isLoading, setIsLoading] = useState(true);
 
-console.log(selectedMovies);
-console.log(movieOptions);
 
 
   const openForm = (id) => {
@@ -66,36 +63,6 @@ const [formData, setFormData] = useState({
             });
     }
 
-
-
-  const getMyMovieLists = async () => {
-       try {
-
-       
-             const response = await axios.get(`${API_URL}/movieLists/${userId}`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-              });
-
-              console.log(response);
-              setMyMovieLists(response.data);
-              
-              
-  
-              
-            } catch (error) {
-              console.log(error);
-              
-            }
-          }
-  
-      useEffect(() => {
-      getMyMovieLists();
-      
-    }, []);
-
     const getMovieLists = async () => {
        try {
 
@@ -109,6 +76,7 @@ const [formData, setFormData] = useState({
 
               console.log(response);
               setMovieLists(response.data.data);
+              setIsLoading(false);
               
               
   
@@ -341,7 +309,11 @@ const [formData, setFormData] = useState({
        </div>
      
        
-        
+        {isLoading ? (
+          <center>
+          <img className="spinner" src="./Spinner.svg"/>
+          </center>
+        ) : (
               
              <div class="grid grid-cols-1 mx-20 lg:mx-auto lg:max-w-5xl gap-6 md:grid-cols-2 lg:grid-cols-3 ">
             
@@ -357,6 +329,7 @@ const [formData, setFormData] = useState({
 
          
             </div>
+        )}
             
  
  <div className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full" style={isActive ? {display: "flex"} : {display: "none"}}>
