@@ -95,7 +95,7 @@ const SignUp = () => {
                 </div>
                 <div>
                     <label for="password" class="block text-white mb-2.5 text-sm font-medium text-heading">Your password</label>
-                    <input type="password" id="password" value={password} onChange={handlePasswordChange} class="bg-transparent text-white border border-[0.5px] rounded-lg border-gray-100 border-default-small text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" placeholder="Password" required />
+                    <input type="password" id="password" value={password} onChange={handlePasswordChange} class="bg-transparent mb-5 text-white border border-[0.5px] rounded-lg border-gray-100 border-default-small text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" placeholder="Password" required />
                 </div>
                 <div>
                     <label for="confirmPassword" class="block text-white mb-2.5 text-sm font-medium text-heading">Confirm password</label>
