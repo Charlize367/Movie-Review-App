@@ -17,19 +17,19 @@ const upload = multer({ storage : storage});
 
 const movieListRouter = Router();
 
-movieListRouter.get('/', authorize, getMovieList);
+movieListRouter.get('/',  getMovieList);
 
-movieListRouter.get('/:id', authorize, getMovieListById);
+movieListRouter.get('/:id',  getMovieListById);
 
-movieListRouter.get('/:userId', authorize, getMovieListByUser);
+movieListRouter.get('/:userId',  getMovieListByUser);
 
-movieListRouter.get('/likes/:id', authorize, authorize, getMovieListLikes);
+movieListRouter.get('/likes/:id',  authorize, getMovieListLikes);
 
-movieListRouter.get('/comments/:id', authorize, getMovieListComments);
+movieListRouter.get('/comments/:id',  getMovieListComments);
 
-movieListRouter.get('/likeCount/:id', authorize, getMovieListLikeNumber);
+movieListRouter.get('/likeCount/:id', getMovieListLikeNumber);
 
-movieListRouter.get('/commentCount/:id', authorize, getMovieListCommentNumber);
+movieListRouter.get('/commentCount/:id',  getMovieListCommentNumber);
 
 movieListRouter.post('/:id', upload.single("image"), authorize, createMovieList);
 

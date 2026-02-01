@@ -16,15 +16,15 @@ const upload = multer({ storage : storage});
 
 const movieRouter = Router();
 
-movieRouter.get('/', authorize, getMovies);
+movieRouter.get('/', getMovies);
 
-movieRouter.get('/:id', authorize, getMovie);
+movieRouter.get('/:id', getMovie);
 
 movieRouter.get('/:tmdbId/tmdbId', authorize, getMovieByTmdbId);
 
 movieRouter.get('/:id/likeCount', authorize, getMovieLikeNumber);
 
-movieRouter.post('/', authorize, upload.single('poster'), addMovie);
+movieRouter.post('/',  upload.single('poster'), addMovie);
 
 movieRouter.put('/:id', authorize, updateMovie);
 
