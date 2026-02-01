@@ -1,6 +1,6 @@
 import React from "react"
 import { useState, useEffect } from 'react'
-import { Outlet, NavLink, Link } from "react-router-dom";
+import { Outlet, NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from '../auth/AuthContext';
 
 const apiUrl =  'https://api.themoviedb.org/3';
@@ -22,6 +22,10 @@ const Nav = () => {
     const { logout } = useAuth();
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
+    const [open3, setOpen3] = useState(false);
+    const username = localStorage.getItem('username');
+    const token = localStorage.getItem('jwtToken');
+    const navigate = useNavigate();
     
     
     
@@ -76,8 +80,8 @@ const Nav = () => {
         <li>
           <a href="#" class="block py-2 px-3 text-white bg-brand rounded md:bg-transparent md:text-fg-brand md:p-0" aria-current="page"><Link to ="/home">Browse</Link></a>
         </li>
-        <li>
-            <button id="multiLevelDropdownButton" onClick={() => setOpen2(!open2)} class="flex items-center justify-between w-full py-2 px-3 rounded font-medium text-heading md:w-auto hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0">
+        <li className="cursor-pointer">
+            <button id="multiLevelDropdownButton" onClick={() => setOpen2(!open2)} class="flex cursor-pointer items-center justify-between w-full py-2 px-3 rounded font-medium text-heading md:w-auto hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0">
               Categories 
               <svg class="w-4 h-4 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
           </button>
@@ -85,7 +89,7 @@ const Nav = () => {
 {open2 && (
   <div
     id="multi-dropdown"
-    className="absolute z-10 bg-white text-black border border-default-medium rounded-base shadow-lg w-44"
+    className="absolute z-10 cursor-pointer bg-white text-black border border-default-medium rounded-base shadow-lg w-44"
   >
     <ul
       className="p-2 text-sm text-body font-medium"
@@ -106,27 +110,68 @@ const Nav = () => {
 )}
 
         </li>
-        <li>
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/list">WatchList</Link></a>
-        </li>
-        <li>
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/liked">Liked</Link></a>
-        </li>
-        <li>
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/diary">Diary</Link></a>
-        </li>
-        <li>
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/rated">Ratings</Link></a>
-        </li>
+
+       
          <li>
           <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/movieList">Lists</Link></a>
         </li>
+
+        {!token && (
         <li>
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/login">Sign In</Link></a>
+        </li>
+        )}
+
+        {!token && (
+        <li>
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/signup">Create Account</Link></a>
+        </li>
+        )}
+       
+       
+
+        {token && (
+        <li className="cursor-pointer">
+            <button id="multiLevelDropdownButton" onClick={() => setOpen3(!open3)} class="flex cursor-pointer items-center justify-between w-full py-2 px-3 rounded font-medium text-heading md:w-auto hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0">
+              User 
+              <svg class="w-4 h-4 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
+          </button>
+
+{open3 && (
+  <div
+    id="multi-dropdown"
+    className="absolute z-10 bg-white text-black border border-default-medium rounded-base shadow-lg w-35"
+  >
+    <ul
+      className="p-2 text-sm text-body font-medium"
+      aria-labelledby="multiLevelDropdownButton"
+    >
+       <li className="py-1">
+          <a href="#" class="block py-2 px-5 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/list">WatchList</Link></a>
+        </li>
+        <li className="py-1">
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/liked">Liked</Link></a>
+        </li>
+        <li className="py-1">
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/diary">Diary</Link></a>
+        </li>
+        <li className="py-1">
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/rated">Ratings</Link></a>
+        </li>
+         <li className="py-1">
           <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/account">Account</Link></a>
         </li>
-         <li>
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link className="logoutStyle" onClick={logout}>Logout</Link></a>
+         <li className="py-1">
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><button onClick={() => logout(navigate)}>Logout</button></a>
         </li>
+    </ul>
+  </div>
+)}
+
+        </li>
+        )}
+       
+        
         
       </ul>
     </div>

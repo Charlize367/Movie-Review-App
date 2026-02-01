@@ -44,7 +44,7 @@ const Liked = () => {
     <div className="w-full">
       <Nav/>
 
-        <h2 className="text-3xl text-white font-bold ml-10 mt-5">Browse Liked Movies</h2>
+        <h2 className="text-3xl text-white font-bold ml-15 mt-5">Browse Liked Movies</h2>
         {likedMovies.length == 0 && (
             <p className="text-white text-md m-10"> No liked movies.</p>
           )}

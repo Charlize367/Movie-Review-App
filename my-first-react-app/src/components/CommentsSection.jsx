@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Form, useParams } from 'react-router-dom';
+import { Form, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react'
 import Nav from './Nav.jsx';
 import axios from 'axios';
@@ -11,6 +11,7 @@ import relativeTime from "dayjs/plugin/relativeTime"
 
 const CommentsSection = ({ movieListId }) => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('jwtToken');
   const param = useParams();
   const userId = localStorage.getItem('user_ID');
@@ -20,6 +21,18 @@ const CommentsSection = ({ movieListId }) => {
   const [updateCommentID, setUpdateCommentID] = useState(0);
   const [updateComment, setUpdateComment] = useState("");
   const [updateData, setUpdateData] = useState([]);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      if (location.state?.popup) {
+        setPopupMessage(location.state.popup);
+        setShowPopup(true);
+    
+        setTimeout(() => setShowPopup(false), 3000);
+      }
+    }, []);
  
    dayjs.extend(relativeTime);
    
@@ -65,6 +78,7 @@ console.log('Sending request for movieListId:', movieListId);
 
       
         setComments(response.data.comments);
+        setLoading(false);
       } catch (error) {
         console.log(error);
       }
@@ -163,7 +177,15 @@ console.log(movieListId);
             }
   }
 
+  const goToLogin = () => {
+    navigate("/login", {
+      state: {
+        from: location.pathname + location.search
+      }
+    })
+  }
 
+console.log(userId);
    
   return (
     <div className="w-full bg-gray-900 h-screen">
@@ -183,8 +205,8 @@ console.log(movieListId);
                  focus:ring-2 focus:ring-indigo-500
                  shadow-inner mb-4" placeholder="Add review..." name="review"  />
           <div className="flex justify-end gap-3">
-      <button className="text-gray-400 hover:text-white" onClick={openUpdateCommentForm}>Cancel</button>
-      <button className="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-white">
+      <button className="text-gray-400 cursor-pointer hover:text-white" onClick={openUpdateCommentForm}>Cancel</button>
+      <button className="bg-gradient-to-r from-blue-700 to-cyan-600 cursor-pointer hover:bg-indigo-500 px-4 py-2 rounded-lg text-white">
         Save
       </button>
     </div>
@@ -198,6 +220,7 @@ console.log(movieListId);
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Discussion</h2>
     </div>
+    {token && (
     <form class="mb-6">
         <div class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <label for="comment" class="sr-only">Your comment</label>
@@ -206,17 +229,44 @@ console.log(movieListId);
                 placeholder="Write a comment..." required></textarea>
         </div>
         <button onClick={addComment} type="submit"
-            class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
+            class="inline-flex cursor-pointer items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-gradient-to-r from-blue-700 to-cyan-600 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
             Post comment
         </button>
     </form>
+    )}
+
+    {loading && (
+      <div className="flex justify-center my-6">
+        <img src="/Spinner.svg" alt="Loading..." className="w-12 h-12" />
+      </div>
+    )}
+
+    {token && !loading  && comments.length === 0 && (
+  <span className="text-white flex m-10 justify-center">
+    No comments found. 
+  </span>
+)}
+
+    {!loading && !token && comments.length === 0 && (
+  <span className="text-white">
+    No comments found. Please{" "}
+    <a
+      onClick={goToLogin}
+      className="text-cyan-400 cursor-pointer hover:underline"
+    >
+      sign in
+    </a>{" "}
+    to comment.
+  </span>
+)}
+
     {comments.map(c => (
     <article class="p-6 text-base bg-white rounded-lg dark:bg-gray-900">
         <footer class="flex justify-between items-center mb-2">
             <div class="flex items-center">
                 <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold"><img
                         class="mr-2 w-6 h-6 rounded-full"
-                        src={`http://localhost:3000/${c.user.image}`}
+                        src={`${API_BASE_URL}/${c.user.image}`}
                         alt="Michael Gough"/>{c.user.username}</p>
                 <p class="text-sm text-gray-600 dark:text-gray-400"><time pubdate datetime="2022-02-08"
                         title="February 8th, 2022">{dayjs(c.updatedAt).fromNow()}</time></p>
@@ -224,11 +274,11 @@ console.log(movieListId);
             <div class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 dark:text-gray-400 bg-white rounded-lg focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:focus:ring-gray-600">
 
               {c.user._id === userId && (
-             <button className="hover:bg-gray-700" onClick={() => {openUpdateCommentForm(c._id, movieListId)}}><img className="w-4 h-4" src="/edit-icon.svg"/> </button>
+             <button className="cursor-pointer hover:bg-gray-700" onClick={() => {openUpdateCommentForm(c._id, movieListId)}}><img className="w-4 h-4" src="/edit-icon.svg"/> </button>
               )}
 
               {c.user._id === userId && (
-            <button className="hover:bg-gray-700 ml-1" onClick={() => {deleteComment(c._id)}}><img className="w-4 h-4" src="/delete-icon.svg"/> </button>
+            <button className="cursor-pointer hover:bg-gray-700 ml-1" onClick={() => {deleteComment(c._id)}}><img className="w-4 h-4" src="/delete-icon.svg"/> </button>
               )}
             
             </div>

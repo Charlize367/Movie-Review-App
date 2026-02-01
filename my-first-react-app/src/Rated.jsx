@@ -20,6 +20,8 @@ const Rated = () => {
   const [inputData, setInputData] = useState([]);
   const [updateID, setUpdateID] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
 
   dayjs.extend(relativeTime);
 
@@ -113,6 +115,11 @@ const handleChange = (e) => {
 
               getMovieRatings();
               setIsActive(false);
+              setShowPopup(true);
+                setPopupMessage("Rating edited succssfully.")
+
+
+         setTimeout(() => setShowPopup(false), 3000);
 
               } catch (error) {
               console.log(error);
@@ -137,6 +144,11 @@ const handleChange = (e) => {
             
 
               getMovieRatings();
+              setShowPopup(true);
+                setPopupMessage("Rating deleted succssfully.")
+
+
+         setTimeout(() => setShowPopup(false), 3000);
 
               } catch (error) {
               console.log(error);
@@ -191,8 +203,8 @@ const handleChange = (e) => {
                      </div>
                      ))}
                      <div className="flex ml-5 mt-3" >
-               <button className=" p-1 rounded-lg" onClick={() => {openForm(r._id, r.rating)}}><img className="w-4 h-5" src="/edit-icon.svg"/> </button>
-              <button className=" p-1 rounded-lg ml-3" onClick={() => {deleteRating(r._id)}}><img className="w-4 h-5" src="/delete-icon.svg"/> </button>
+               <button className="cursor-pointer p-1 rounded-lg" onClick={() => {openForm(r._id, r.rating)}}><img className="w-7 h-7" src="/edit-icon.svg"/> </button>
+              <button className=" cursor-pointer p-1 rounded-lg ml-3" onClick={() => {deleteRating(r._id)}}><img className="w-7 h-7" src="/delete-icon.svg"/> </button>
              </div>
              
                  </div>
@@ -205,6 +217,18 @@ const handleChange = (e) => {
         
             </div>
         )}
+        {showPopup && (
+            <div
+        className={`
+          fixed top-6 right-6 z-50 max-w-xs z-99 w-full p-4 rounded-xl shadow-lg
+          bg-gray-900 text-white text-sm font-medium transition-transform duration-300
+          ${showPopup ? "translate-x-0 opacity-100" : "translate-x-32 opacity-0"}
+        `}
+      >
+        {popupMessage}
+      </div>
+              )}
+
             
  {isActive && (
   <div className="fixed inset-0 z-50 flex text-white items-center justify-center p-4">

@@ -207,10 +207,10 @@ const MovieListCard =  ({movieList :
         </div>
        
         <div className="flex ml-13" >
-  <div className="flex items-center gap-3"><button className="flex items-center gap-1 
+  <div className="flex items-center gap-3"><button className={`flex items-center gap-1 
                    px-3 py-1.5 rounded-full
                    text-white text-sm
-                   " onClick={toggleLike} ><img className="w-5 h-5" src={`${likedIcon}`} /></button><p className="text-white ">{likeCount}</p></div>
+                    ${token ? "cursor-pointer" : ""}`} onClick={toggleLike} ><img className="w-5 h-5" src={`${likedIcon}`} /></button><p className="text-white ">{likeCount}</p></div>
   <div className="flex gap-3 items-center"><button className="flex items-center gap-1 
                    px-3 py-1.5 rounded-full
                    text-gray-200 text-sm ml-3

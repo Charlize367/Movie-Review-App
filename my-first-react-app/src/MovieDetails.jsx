@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { Form, useParams } from 'react-router-dom';
+import { Form, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react'
 import Nav from './components/Nav.jsx'
 import axios from 'axios';
@@ -8,6 +8,7 @@ import halfStar from "/halfStar.svg";
 import fullStar from "/star2.svg";
 import RatingCard from './components/RatingCard.jsx';
 import ActionSkeleton from './components/ActionSkeleton.jsx';
+
 
 
 
@@ -42,13 +43,24 @@ const MovieDetails = () => {
   const [movieLikeCount, setMovieLikeCount] = useState(0);
   const [movie_ID, setMovie_ID] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
   const [credits, setCredits] = useState([]);
   const likeRef = useRef(isLiked);
   const listRef = useRef(isListed);
   const diaryRef = useRef(isWatched);
- 
- 
+  const navigate = useNavigate();
+  const location = useLocation();
   
+ 
+ 
+  useEffect(() => {
+    if (location.state?.popup) {
+      setPopupMessage(location.state.popup);
+      setShowPopup(true);
+  
+      setTimeout(() => setShowPopup(false), 3000);
+    }
+  }, []);
    
 
   
@@ -107,7 +119,7 @@ const MovieDetails = () => {
             const response = await axios.post(`${API_URL}/movies`, inputData, {
                   headers: {
                        'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
+                      
                   }
               });
               console.log(response);
@@ -136,11 +148,13 @@ useEffect(() => {
 
   
   const getMovies = async () => {
+
+    
        try {
              const response = await axios.get(`${API_URL}/movies`, {
                   headers: {
                        'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
+                       
                   }
               });
 
@@ -239,6 +253,7 @@ useEffect(() => {
       setMovieLikeCount(prev => likeRef.current ? prev + 1 : prev - 1);
 
       try {
+        
         if(likeRef.current) {
 
           await axios.post(`${API_URL}/users/${userId}/${movie_ID}/likes`, {}, {
@@ -247,6 +262,8 @@ useEffect(() => {
               'Authorization': `Bearer ${token}`
             }
         });
+
+        
 
         } else {
 
@@ -260,10 +277,13 @@ useEffect(() => {
                        'Authorization': `Bearer ${token}`
                   }
                 });
+
+               
         }
 
       getUserLikes();
       getMovieLikes();
+      
 
 
       } catch (error) {
@@ -281,10 +301,12 @@ useEffect(() => {
       e.preventDefault()
 
       listRef.current = !listRef.current;
-      setIsListed(listRef.currentue);
+      setIsListed(listRef.current);
       
 
       try {
+
+        let message = "";
         if(listRef.current) {
 
           await axios.post(`${API_URL}/users/${userId}/${movie_ID}/watchlist`, {}, {
@@ -293,6 +315,9 @@ useEffect(() => {
                        'Authorization': `Bearer ${token}`
                   }
           });
+
+          
+        message =  "🎬 Movie added to your watchlist"
 
         } else {
 
@@ -306,9 +331,16 @@ useEffect(() => {
                        'Authorization': `Bearer ${token}`
                   }
           });
+
+          message =  "🎬 Movie removed from your watchlist"
         }
 
       getUserWatchList();
+      setShowPopup(true);
+      setPopupMessage(message);
+
+      setTimeout(() => setShowPopup(false), 3000);
+      
 
       } catch (error) {
         console.log(error);
@@ -326,6 +358,7 @@ useEffect(() => {
       
 
       try {
+        let message = "";
         if(diaryRef.current) {
 
           await axios.post(`${API_URL}/users/${userId}/${movie_ID}/diary`, {},  {
@@ -334,6 +367,8 @@ useEffect(() => {
                        'Authorization': `Bearer ${token}`
                   }
         });
+        message =  "🎬 Movie added to your diary"
+       
 
         } else {
 
@@ -348,10 +383,16 @@ useEffect(() => {
                        'Authorization': `Bearer ${token}`
                   }
                 });
+          message =  "🎬 Movie removed from your diary"
 
      
         }
          getUserDiary();
+       setShowPopup(true);
+      setPopupMessage(message);
+
+      setTimeout(() => setShowPopup(false), 3000);
+         
         
 
       } catch (error) {
@@ -402,6 +443,7 @@ useEffect(() => {
         console.log(response);
 
                 setShowPopup(true);
+                setPopupMessage("Rating added succssfully.")
 
 
          setTimeout(() => setShowPopup(false), 3000);
@@ -426,7 +468,7 @@ useEffect(() => {
              const response = await axios.get(`${API_URL}/ratings/movieRatings/${movie_ID}`, {
                   headers: {
                        'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
+                       
                   }
               });
 
@@ -636,8 +678,17 @@ backgroundPosition: 'center',
     
   };
 
+  const goToLogin = () => {
+    navigate("/login", {
+      state: {
+        from: location.pathname + location.search
+      }
+    })
+  }
+
   const recentRatings = rate.slice(0, 4);
 
+  console.log(token);
   
    if (movieDetails) {
   return (
@@ -692,21 +743,28 @@ backgroundPosition: 'center',
                    <p className="text-[2vh] lg:text-md"><b>Directed By:</b> {director.name} </p>
 
 
-              {!movie_ID ? (
+        
+              { !token ? (
+                 <div className="flex max-w-full flex-col lg:flex-row mt-2 lg:ml-auto lg:items-center lg:gap-3">
+                <button className="z-99 cursor-pointer" onClick={goToLogin} ><div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" >  <p className="m-1">Sign in to like, log, or review</p></div></button>
+            </div>
+            
+          ) : !movie_ID  ? (
             <div className="flex gap-2 mt-2">
               <ActionSkeleton />
               <ActionSkeleton />
               <ActionSkeleton />
               <ActionSkeleton />
             </div>
+
           ) : (
               <div className="flex max-w-full flex-col lg:flex-row mt-2 lg:ml-auto lg:items-center lg:gap-3">
-                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99"  disabled={!movie_ID} onClick={toggleLike}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
-                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl lg:ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="listBtn" onClick={toggleList}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
-                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl lg:ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="diaryBtn" onClick={toggleDiary}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
-                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl lg:ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
+                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99 cursor-pointer"  disabled={!movie_ID} onClick={toggleLike}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
+                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl lg:ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="cursor-pointer" onClick={toggleList}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
+                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl lg:ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="cursor-pointer" onClick={toggleDiary}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
+                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl lg:ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="cursor-pointer" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
                 </div>
-)}
+          )}
               </div>
          
 
@@ -719,7 +777,7 @@ backgroundPosition: 'center',
                 <h3 class="text-xl font-semibold text-white text-heading">
                     Add your review
                 </h3>
-                <button type="button" onClick={openForm} class="text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
+                <button type="button" onClick={openForm} class="text-body cursor-pointer bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
                     <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
                     <span class="sr-only">Close modal</span>
                 </button>
@@ -764,7 +822,7 @@ backgroundPosition: 'center',
 
           <label className="review-lbl">Review:</label>
           <textarea rows="6" class="p-5 rounded-lg w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Add review..." name="review" value={review} onChange={handleChange} />
-          <input class="block w-full  mt-10 mb-5 rounded-lg border border-blue-600 bg-blue-900 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white" type="submit" value="Add"/>
+          <input class="block w-full cursor-pointer mt-10 mb-5 rounded-lg  bg-gradient-to-r from-blue-700 to-cyan-600 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-gradient-to-r from-blue-400 to-cyan-300 " type="submit" value="Add"/>
           </form>
         </div>
           
@@ -773,9 +831,15 @@ backgroundPosition: 'center',
         </div>
 
 {showPopup && (
-            <div className="add-popup">
-              Rating added successfully.
-            </div>
+            <div
+        className={`
+          fixed top-6 right-6 z-50 max-w-xs z-99 w-full p-4 rounded-xl shadow-lg
+          bg-gray-900 text-white text-sm font-medium transition-transform duration-300
+          ${showPopup ? "translate-x-0 opacity-100" : "translate-x-32 opacity-0"}
+        `}
+      >
+        {popupMessage}
+      </div>
               )}
 
             

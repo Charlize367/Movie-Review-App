@@ -20,6 +20,8 @@ const Account = () => {
   const [user, setUser] = useState([]);
   const [updateData, setUpdateData] = useState([]);
   const [imageData, setImageData] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState("");
 
   const openForm = () => {
    
@@ -107,6 +109,11 @@ const Account = () => {
                 e.target.reset();
   
                 getUser();
+                setShowPopup(true);
+                setPopupMessage("Account details updated succssfully.")
+
+
+         setTimeout(() => setShowPopup(false), 3000);
   
                 } catch (error) {
                 console.log(error);
@@ -135,6 +142,11 @@ const Account = () => {
                 e.target.reset();
   
                 getUser();
+                setShowPopup(true);
+                setPopupMessage("Profile image edited succssfully.")
+
+
+         setTimeout(() => setShowPopup(false), 3000);
   
                 } catch (error) {
                 console.log(error);
@@ -157,7 +169,7 @@ const Account = () => {
   <div class="bg-gray-900 rounded-2xl p-4 shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
   <form onSubmit={updateAccountDetails}>
    
-  <h2 className="text-lg font-bold text-white mb-3">Edit Comment</h2>
+  <h2 className="text-lg font-bold text-white mb-3">Edit User Details</h2>
   <label className="text-white">Username:</label>
           <input type="text" name="username" value={updateData.username} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3
                  text-gray-100 placeholder-gray-400
@@ -174,8 +186,8 @@ const Account = () => {
                  focus:ring-2 focus:ring-indigo-500
                  shadow-inner mb-4" />
           <div className="flex justify-end gap-3">
-      <button className="text-gray-400 hover:text-white" onClick={openForm}>Cancel</button>
-      <button className="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-white">
+      <button className="cursor-pointer text-gray-400 hover:text-white" onClick={openForm}>Cancel</button>
+      <button className="bg-gradient-to-r cursor-pointer from-blue-700 to-cyan-600 px-4 py-2 rounded-lg text-white">
         Save
       </button>
     </div>
@@ -183,6 +195,18 @@ const Account = () => {
   </div>
   </div>
   )}
+
+   {showPopup && (
+            <div
+        className={`
+          fixed top-6 right-6 z-50 max-w-xs z-99 w-full p-4 rounded-xl shadow-lg
+          bg-gray-900 text-white text-sm font-medium transition-transform duration-300
+          ${showPopup ? "translate-x-0 opacity-100" : "translate-x-32 opacity-0"}
+        `}
+      >
+        {popupMessage}
+      </div>
+              )}
 
   {isActive2 && (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -216,7 +240,7 @@ const Account = () => {
             This is some information about the user.
         </p>
     </div>
-    <button onClick={openForm} type="button" class="bg-gradient-to-r from-blue-700 to-cyan-600 hover:bg-indigo-500 m-5 p-3 rounded-lg text-white">Edit User Details</button>
+    <button onClick={openForm} type="button" class="cursor-pointer bg-gradient-to-r from-blue-700 to-cyan-600 hover:bg-indigo-500 m-5 p-3 rounded-lg text-white">Edit User Details</button>
     </div>
     <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
         <dl class="sm:divide-y sm:divide-gray-200">
@@ -234,7 +258,7 @@ const Account = () => {
                 </dt>
                 <dd class="mt-1 text-sm text-white sm:mt-0 sm:col-span-2">
                    <img class="w-24 h-24 mb-6 rounded-full" src={`${API_BASE_URL}/${user.image}`} alt="Bonnie image"/>
-                   <button onClick={openImageForm} type="button" class="bg-gradient-to-r from-blue-700 to-cyan-600 m-5 p-3 rounded-lg text-white">Edit Image</button>
+                   <button onClick={openImageForm} type="button" class="cursor-pointer bg-gradient-to-r from-blue-700 to-cyan-600 m-5 p-3 rounded-lg text-white">Edit Image</button>
                 </dd>
                 
             </div>
