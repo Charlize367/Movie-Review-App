@@ -51,6 +51,7 @@ const MovieDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [likes, setLikes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   
  
  
@@ -479,6 +480,8 @@ useEffect(() => {
 
               console.log(response);
               setRate(response.data);
+              setIsLoading(false);
+              
               
               
   
@@ -863,20 +866,25 @@ backgroundPosition: 'center',
 
 
   <div className="max-w-4xl mx-auto flex flex-col gap-6">
-    {recentRatings?.length > 0 ? (
-      recentRatings.map(r => (
-        <RatingCard
-          key={r._id}
-          rating={r}
-          tmdbId={param.id}
-        />
-      ))
-    ) : (
-      <p className="text-center text-gray-400 mb-8">
-        No reviews yet. Be the first to rate this film.
-      </p>
-    )}
-  </div>
+  {isLoading ? (
+    <div className="flex justify-center py-10">
+      <img src="/Spinner.svg" />
+    </div>
+  ) : rate?.length > 0 ? (
+    recentRatings.map(r => (
+      <RatingCard
+        key={r._id}
+        rating={r}
+        tmdbId={param.id}
+      />
+    ))
+  ) : (
+    <p className="text-center text-gray-400 mb-8">
+      No reviews yet. Be the first to rate this film.
+    </p>
+  )}
+</div>
+
   </div>
             
            </div>

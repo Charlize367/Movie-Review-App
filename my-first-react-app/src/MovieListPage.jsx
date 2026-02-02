@@ -537,13 +537,13 @@ console.log(isActive2);
     <div className="flex justify-end gap-2">
       <button
         onClick={removeMovieFromList}
-        className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
+        className="bg-red-600 px-4 py-2 cursor-pointer rounded-lg hover:bg-red-700 transition"
       >
         Confirm
       </button>
       <button
         onClick={() => setShowConfirm(false)}
-        className="bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-600 transition"
+        className="bg-gray-700 px-4 py-2 cursor-pointer rounded-lg hover:bg-gray-600 transition"
       >
         Cancel
       </button>
@@ -553,17 +553,17 @@ console.log(isActive2);
 
       {showConfirm2 && (
         <div className="fixed top-6 right-6 z-50 w-80 p-4 rounded-xl shadow-lg bg-gray-900 text-white flex flex-col gap-3">
-    <p className="font-medium">Are you sure you want to delete this movie?</p>
+    <p className="font-medium">Are you sure you want to delete this movie list?</p>
     <div className="flex justify-end gap-2">
       <button
         onClick={deleteMovieList}
-        className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
+        className="bg-red-600 px-4 py-2 cursor-pointer rounded-lg hover:bg-red-700 transition"
       >
         Confirm
       </button>
       <button
         onClick={() => setShowConfirm2(false)}
-        className="bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-600 transition"
+        className="bg-gray-700 px-4 py-2 cursor-pointer rounded-lg hover:bg-gray-600 transition"
       >
         Cancel
       </button>

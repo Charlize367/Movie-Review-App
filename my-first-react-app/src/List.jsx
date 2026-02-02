@@ -47,9 +47,7 @@ const List = () => {
 
         
 
-        {watchList.length == 0 && (
-            <p className="text-white text-md m-10"> No movies in WatchList.</p>
-        )}
+     
 
         
       <section className="w-full">
@@ -59,8 +57,10 @@ const List = () => {
           </center>
         ) : errorMessage ? (
         <p>{errorMessage}</p>
+      ) : watchList.length == 0 ? (
+        <p className="text-white text-md m-15"> No movies in WatchList.</p>
       ) : (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5 sm:grid-cols-2
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-6 sm:grid-cols-2
     md:grid-cols-3 lg:gap-8 py-6 px-4 m-10">
   
           {watchList.map((movie) => (

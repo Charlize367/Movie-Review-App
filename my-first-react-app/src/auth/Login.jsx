@@ -24,7 +24,7 @@ const Login = () => {
   };
 
   const handleGoToSignup = () => {
-  navigate("/signup", {
+  navigate("/sign-up", {
     state: {
       from: location.state?.from
     }
@@ -81,7 +81,7 @@ const Login = () => {
         </div>
         
         <button type="submit" class="block w-full  mt-10 mb-5 rounded-lg bg-gradient-to-r from-blue-700 to-cyan-600 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white">Login</button>
-        <Link className="text-white" onClick={handleGoToSignup}>Don't have an account? Sign up here.</Link>
+        <button className="text-white" onClick={handleGoToSignup}>Don't have an account? Sign up here.</button>
     </form>
 </div>
 

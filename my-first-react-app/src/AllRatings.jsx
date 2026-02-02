@@ -19,6 +19,7 @@ const AllRatings = () => {
     const [likedIcon, setlikedIcon] = useState("");
      const [likeFunction, setLikeFunction] = useState(() => () => {});
     const [ratingLikes, setRatingLikes] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     
 
      dayjs.extend(relativeTime);
@@ -40,6 +41,7 @@ const AllRatings = () => {
 
               console.log(response);
               setRatings(response.data);
+              setIsLoading(false);
               
               
   
@@ -72,20 +74,25 @@ const AllRatings = () => {
                     <h2 className="font-bold text-white text-4xl flex justify-center mb-5">All Ratings For This Film</h2>
                 </div>
               <div className="max-w-4xl mx-auto flex flex-col gap-6">
-
-                {ratings.map((r) => { 
+            {isLoading ? (
+    <div className="flex justify-center py-10">
+      <img src="/Spinner.svg" />
+    </div>
+    ) : ratings?.length > 0 ? (
+                ratings.map((r) => { 
 
 
                 return(
                  <RatingCard rating={r} tmdbId = {param.id}/>
-                
-
-                 
-  ) 
+                ) 
   
-}
+                })
 
-                )}
+                ) : (
+    <p className="text-center text-gray-400 mb-8">
+      No reviews yet. Be the first to rate this film.
+    </p>
+  )}
 
                 </div>
                 </div>

@@ -69,7 +69,7 @@ const Categories = ()  => {
     <div className="w-full">
       <Nav/>
 
-       <h2 className="text-2xl text-white font-bold ml-10">Browse {param.name} Movies</h2>
+       <h2 className="text-4xl text-white font-bold m-15">Browse {param.name} Movies</h2>
 
       <section className="all-movies">
         {isLoading ? (
@@ -80,7 +80,7 @@ const Categories = ()  => {
         <p>{errorMessage}</p>
       ) : (
           <div className="grid grid-cols-2 gap-4 m-5 lg:grid-cols-5 sm:grid-cols-2
-    md:grid-cols-3 lg:gap-8 py-6 px-4">
+    md:grid-cols-3 lg:gap-8 py-6 px-4 m-10">
   
           {movies.map((movie) => (
              <div className="aspect-[2/3] rounded-lg overflow-hidden rounded bg-gray-300">

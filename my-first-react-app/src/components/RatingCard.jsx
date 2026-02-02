@@ -193,7 +193,7 @@ const RatingCard =  ({rating :
   return (
   <div className="w-full max-w-3xl mx-auto border-b border-white/10 py-6">
 
-    {/* HEADER */}
+
     <div className="flex items-center justify-between mb-3">
       {users.map(u => (
         <div key={u._id} className="flex items-center gap-3">
@@ -228,11 +228,11 @@ const RatingCard =  ({rating :
  
     <div className="flex items-center gap-6 text-gray-400 text-sm">
       
-      {/* LIKE */}
+  
       <button
         onClick={token ? toggleLike : goToLogin}
         disabled={!token}
-        className="flex items-center gap-2 hover:text-white transition"
+        className="flex items-center gap-2 cursor-pointer hover:text-white transition"
       >
         <img src={likedIcon} className="w-4 h-4" />
         <span>{reviewLikeCount}</span>
@@ -241,7 +241,7 @@ const RatingCard =  ({rating :
     
       <button
         onClick={goToComments}
-        className="flex items-center gap-2 hover:text-white transition"
+        className="flex items-center gap-2 cursor-pointer hover:text-white transition"
       >
         <img src="/comment.svg" className="w-4 h-4" />
         <span>{reviewCommentCount}</span>

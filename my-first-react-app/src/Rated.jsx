@@ -217,7 +217,7 @@ const handleChange = (e) => {
         <div className="flex flex-col gap-3 justify-start">
           <button
             onClick={() => openForm(r._id, r.rating)}
-            className="p-2 rounded-lg hover:bg-white/10 transition"
+            className="p-2 rounded-lg cursor-pointer hover:bg-white/10 transition"
             title="Edit review"
           >
             <img src="/edit-icon.svg" className="w-5 h-5" />
@@ -225,7 +225,7 @@ const handleChange = (e) => {
 
           <button
             onClick={() => deleteRating(r._id)}
-            className="p-2 rounded-lg hover:bg-red-500/20 transition"
+            className="p-2 rounded-lg cursor-pointer hover:bg-red-500/20 transition"
             title="Delete review"
           >
             <img src="/delete-icon.svg" className="w-5 h-5" />

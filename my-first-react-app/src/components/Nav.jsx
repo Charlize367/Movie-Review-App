@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useRef } from "react"
 import { useState, useEffect } from 'react'
 import { Outlet, NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '../auth/AuthContext';
@@ -29,6 +29,31 @@ const Nav = () => {
     const location = useLocation();
     const [showPopup, setShowPopup] = useState(false);
     const [popupMessage, setPopupMessage] = useState("");
+    const dropdownRef = useRef(null);
+    const dropdownRef2 = useRef(null);
+    const dropdownRef3 = useRef(null);
+
+    useEffect(() => {
+  if (!open && !open2 && !open3) return;
+
+  const handleClickOutside = (e) => {
+    if (
+      !dropdownRef.current?.contains(e.target) &&
+      !dropdownRef2.current?.contains(e.target) &&
+      !dropdownRef3.current?.contains(e.target)
+    ) {
+      setOpen(false);
+      setOpen2(false);
+      setOpen3(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, [open, open2, open3]);
+
+    
+
     
     const goToLogin = () => {
     navigate("/login", {
@@ -95,7 +120,7 @@ const Nav = () => {
         <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 7h14M5 12h14M5 17h14"/></svg>
     </button>
    
-    <div className={`w-full md:block md:w-auto ${open ? "block" : "hidden"}`} id="navbar-multi-level-dropdown">
+    <div ref={dropdownRef} className={`w-full md:block md:w-auto ${open ? "block" : "hidden"}`} id="navbar-multi-level-dropdown">
       <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-default rounded-base bg-neutral-secondary-soft md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-neutral-primary">
         <li>
           <a href="#" class="block py-2 px-3 text-white bg-brand rounded md:bg-transparent md:text-fg-brand md:p-0" aria-current="page"><Link to ="/home">Browse</Link></a>
@@ -107,7 +132,7 @@ const Nav = () => {
           </button>
 
 {open2 && (
-  <div
+  <div ref={dropdownRef2}
     id="multi-dropdown"
     className="absolute z-10 cursor-pointer bg-white text-black border border-default-medium rounded-base shadow-lg w-44"
   >
@@ -116,9 +141,9 @@ const Nav = () => {
       aria-labelledby="multiLevelDropdownButton"
     >
       {genres.map((genre) => (
-        <li key={genre.id}>
+        <li className="cursor-pointer" key={genre.id}>
           <Link
-            className="inline-flex hover:bg-gray-200 items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
+            className="inline-flex cursor-pointer hover:bg-gray-200 items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
             to={`/categories/${genre.id}/${genre.name}`}
           >
             {genre.name || "Not found"}
@@ -158,7 +183,7 @@ const Nav = () => {
           </button>
 
 {open3 && (
-  <div
+  <div ref={dropdownRef3}
     id="multi-dropdown"
     className="absolute z-10 bg-white text-black border border-default-medium rounded-base shadow-lg w-35"
   >
