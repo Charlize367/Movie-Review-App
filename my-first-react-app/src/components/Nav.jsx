@@ -1,10 +1,10 @@
 import React from "react"
 import { useState, useEffect } from 'react'
-import { Outlet, NavLink, Link, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '../auth/AuthContext';
 
 const apiUrl =  'https://api.themoviedb.org/3';
-const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODI1MGEyNjQ5YTAwYTk2OTdlYjIxMGUzMTExZGE1YyIsIm5iZiI6MTcyMjU4NzAzNS43MTYsInN1YiI6IjY2YWM5NzliNTEyMTNhZjA5MWJkNThhMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zrM-3dtjvwa-al-qRd70tlGRD0VkxCFbHgYmZEzY6gA';
+const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
 const apiOptions = {
   method: 'GET',
@@ -26,8 +26,28 @@ const Nav = () => {
     const username = localStorage.getItem('username');
     const token = localStorage.getItem('jwtToken');
     const navigate = useNavigate();
+    const location = useLocation();
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState("");
     
-    
+    const goToLogin = () => {
+    navigate("/login", {
+      state: {
+        from: window.location.pathname + window.location.search
+      }
+    })
+  }
+
+  const goToLogout = () => {
+  setPopupMessage("👋 Logged out successfully");
+  setShowPopup(true);
+
+  logout(); 
+
+  setTimeout(() => {
+    setShowPopup(false);
+  }, 3000);
+};
     
   
 
@@ -80,7 +100,7 @@ const Nav = () => {
         <li>
           <a href="#" class="block py-2 px-3 text-white bg-brand rounded md:bg-transparent md:text-fg-brand md:p-0" aria-current="page"><Link to ="/home">Browse</Link></a>
         </li>
-        <li className="cursor-pointer">
+        <li className="cursor-pointer ">
             <button id="multiLevelDropdownButton" onClick={() => setOpen2(!open2)} class="flex cursor-pointer items-center justify-between w-full py-2 px-3 rounded font-medium text-heading md:w-auto hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0">
               Categories 
               <svg class="w-4 h-4 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
@@ -98,7 +118,7 @@ const Nav = () => {
       {genres.map((genre) => (
         <li key={genre.id}>
           <Link
-            className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
+            className="inline-flex hover:bg-gray-200 items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
             to={`/categories/${genre.id}/${genre.name}`}
           >
             {genre.name || "Not found"}
@@ -118,13 +138,13 @@ const Nav = () => {
 
         {!token && (
         <li>
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/login">Sign In</Link></a>
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><button onClick={goToLogin}>Sign In</button></a>
         </li>
         )}
 
         {!token && (
         <li>
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/signup">Create Account</Link></a>
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/sign-up">Create Account</Link></a>
         </li>
         )}
        
@@ -146,23 +166,23 @@ const Nav = () => {
       className="p-2 text-sm text-body font-medium"
       aria-labelledby="multiLevelDropdownButton"
     >
-       <li className="py-1">
-          <a href="#" class="block py-2 px-5 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/list">WatchList</Link></a>
+       <li className="py-1 hover:bg-gray-200">
+          <a href="#" class="block py-2 px-5 text-heading rounded hover:bg-gray-200 md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/list">WatchList</Link></a>
         </li>
-        <li className="py-1">
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/liked">Liked</Link></a>
+        <li className="py-1 hover:bg-gray-200">
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-gray-200 md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/liked">Liked</Link></a>
         </li>
-        <li className="py-1">
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/diary">Diary</Link></a>
+        <li className="py-1 hover:bg-gray-200">
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-gray-200 md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/diary">Diary</Link></a>
         </li>
-        <li className="py-1">
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/rated">Ratings</Link></a>
+        <li className="py-1 hover:bg-gray-200">
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-gray-200 md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/rated">Ratings</Link></a>
         </li>
-         <li className="py-1">
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/account">Account</Link></a>
+         <li className="py-1 hover:bg-gray-200">
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-gray-200 md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><Link to ="/account">Account</Link></a>
         </li>
-         <li className="py-1">
-          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><button onClick={() => logout(navigate)}>Logout</button></a>
+         <li className="py-1 hover:bg-gray-200">
+          <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-gray-200 md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent"><button onClick={goToLogout}>Logout</button></a>
         </li>
     </ul>
   </div>
@@ -170,6 +190,18 @@ const Nav = () => {
 
         </li>
         )}
+
+        {showPopup && (
+            <div
+        className={`
+          fixed top-6 right-6 z-50 max-w-xs z-99 w-full p-4 rounded-xl shadow-lg
+          bg-gray-900 text-white text-sm font-medium transition-transform duration-300
+          ${showPopup ? "translate-x-0 opacity-100" : "translate-x-32 opacity-0"}
+        `}
+      >
+        {popupMessage}
+      </div>
+              )}
        
         
         

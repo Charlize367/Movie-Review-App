@@ -190,38 +190,65 @@ const RatingCard =  ({rating :
       }
     })
   }
-  return(
-                
-<div >
-                
-<div class="w-80 max-w-88 space-y-4 rounded-md  bg-gradient-to-br from-gray-800 to-blue-900
- p-3 text-white transition-all duration-300 hover:-translate-y-1">
-        <div class="flex items-center justify-between">
-            <div class="flex gap-1">
-                <img className="w-6 h-6 mr-2" src="/star.svg"/><p className="text-white">{rating}</p>
-            </div>
-            <p>{dayjs(createdAt).fromNow()}</p>
+  return (
+  <div className="w-full max-w-3xl mx-auto border-b border-white/10 py-6">
+
+    {/* HEADER */}
+    <div className="flex items-center justify-between mb-3">
+      {users.map(u => (
+        <div key={u._id} className="flex items-center gap-3">
+          <img
+            src={`${API_BASE_URL}/${u.image}`}
+            className="h-9 w-9 rounded-full object-cover"
+            alt={u.username}
+          />
+          <div>
+            <p className="text-sm font-medium text-white">
+              {u.username}
+            </p>
+            <p className="text-xs text-gray-400">
+              {dayjs(createdAt).fromNow()}
+            </p>
+          </div>
         </div>
-        <p>{review}</p>
-        <div className="flex">
-        {users.map(u => (
-        <div class="flex items-center gap-2 pt-3">
-            <img class="h-8 w-8 rounded-full" src={`${API_BASE_URL}/${u.image}`} alt="Richard Nelson" />
-            <p class="font-medium text-white">{u.username}</p>
-          
-        </div>
-        ))}
-        <div className="flex ml-13 text-white" >
-  <div className="flex p-3 rounded-4xl"><button className={`${token ? "cursor-pointer" : ""}`} disabled={!token} onClick={toggleLike} ><img className="w-5 h-5 mr-3" src={`${likedIcon}`} /></button><p>{reviewLikeCount}</p></div>
-  <div className="flex p-3 rounded-4xl ml-10"><button className="cursor-pointer" onClick={goToComments}  ><img className="w-5 h-5 mr-3" src={`/comment.svg`} /></button><p>{reviewCommentCount}</p></div>
-</div>
-    </div>
+      ))}
+
+     
+      <div className="flex items-center gap-1 text-cyan-400 text-sm">
+        <img src="/star.svg" className="w-4 h-4" />
+        <span className="font-medium">{rating}</span>
+      </div>
     </div>
 
-</div>
-              
-            
-            )
+   
+    <p className="text-gray-200 text-sm leading-relaxed mb-4">
+      {review}
+    </p>
+
+ 
+    <div className="flex items-center gap-6 text-gray-400 text-sm">
+      
+      {/* LIKE */}
+      <button
+        onClick={token ? toggleLike : goToLogin}
+        disabled={!token}
+        className="flex items-center gap-2 hover:text-white transition"
+      >
+        <img src={likedIcon} className="w-4 h-4" />
+        <span>{reviewLikeCount}</span>
+      </button>
+
+    
+      <button
+        onClick={goToComments}
+        className="flex items-center gap-2 hover:text-white transition"
+      >
+        <img src="/comment.svg" className="w-4 h-4" />
+        <span>{reviewCommentCount}</span>
+      </button>
+    </div>
+  </div>
+);
 
 
 }

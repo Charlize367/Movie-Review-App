@@ -117,47 +117,32 @@ const MovieListCard =  ({movieList :
     }, []);
 
 
-     const toggleLike = async(e) => {
-      e.preventDefault()
+     const toggleLike = async (e) => {
+  e.preventDefault();
 
-      likeRef.current = !likeRef.current;
-      setIsLiked(likeRef.current);
-      setLikeCount(prev => likeRef.current ? prev + 1 : prev - 1);
+  const newLikeState = !isLiked;
+  setIsLiked(newLikeState);
+  setLikeCount(prev => newLikeState ? prev + 1 : prev - 1);
 
-      try {
-        if(likeRef.current) {
-
-          await axios.post(`${API_URL}/movieList/${userID}/${_id}/likes`, {}, {
-            headers : {
-              'Content-Type' : 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
-        });
-
-        } else {
-
-          await axios.delete(`${API_URL}/movieList/${userID}/${_id}/likes`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
-                
-        }
-
-      getMovieListLikeCount();
-      getMovieListLikes();
-
-
-      } catch (error) {
-        console.log(error);
-        likeRef.current = !likeRef.current;
-        setIsLiked(likeRef.current);
-        setLikeCount(prev => likeRef.current ? prev + 1 : prev - 1);
-      }
-      
+  try {
+    if (newLikeState) {
+      await axios.post(`${API_URL}/movieList/${userID}/${_id}/likes`, {}, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setLikes(prev => [...prev, userID]);
+    } else {
+      await axios.delete(`${API_URL}/movieList/${userID}/${_id}/likes`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setLikes(prev => prev.filter(id => id !== userID)); 
     }
-
+  } catch (error) {
+    console.log(error);
+    
+    setIsLiked(!newLikeState);
+    setLikeCount(prev => newLikeState ? prev - 1 : prev + 1);
+  }
+};
 
 
 

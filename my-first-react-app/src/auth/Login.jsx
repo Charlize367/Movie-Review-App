@@ -13,7 +13,7 @@ const Login = () => {
   const from = location.state?.from || "/home";
   const { login } = useAuth();
   const API_URL = import.meta.env.VITE_API_URL;
-  
+  console.log(from);
 
     const handleUsernameChange = (event) => {
     setUsername(event.target.value);

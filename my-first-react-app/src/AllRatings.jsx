@@ -71,7 +71,7 @@ const AllRatings = () => {
                 <div className="testimonial-heading">
                     <h2 className="font-bold text-white text-4xl flex justify-center mb-5">All Ratings For This Film</h2>
                 </div>
-              <div class="m-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+              <div className="max-w-4xl mx-auto flex flex-col gap-6">
 
                 {ratings.map((r) => { 
 

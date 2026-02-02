@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
         console.log(id);
     }
 
-    const logout = (navigate) => {
+    const logout = () => {
       
   setUser(null);
   setToken(null);

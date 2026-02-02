@@ -188,7 +188,7 @@ console.log(movieListId);
 console.log(userId);
    
   return (
-    <div className="w-full bg-gray-900 h-screen">
+    <div className="w-full bg-gray-900 h-auto">
    
      
 

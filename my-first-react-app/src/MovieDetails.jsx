@@ -50,6 +50,7 @@ const MovieDetails = () => {
   const diaryRef = useRef(isWatched);
   const navigate = useNavigate();
   const location = useLocation();
+  const [likes, setLikes] = useState([]);
   
  
  
@@ -171,6 +172,12 @@ useEffect(() => {
       getMovies();
   }, [param.id]);
 
+
+  useEffect(() => {
+    
+    setIsLiked(likes.includes(userId));
+  }, [likes, userId]);
+      
    
 
   
@@ -248,13 +255,13 @@ useEffect(() => {
     const toggleLike = async(e) => {
       e.preventDefault()
 
-      likeRef.current = !likeRef.current;
-      setIsLiked(likeRef.current);
-      setMovieLikeCount(prev => likeRef.current ? prev + 1 : prev - 1);
+      const newLikeState = !isLiked;
+  setIsLiked(newLikeState);
+  setMovieLikeCount(prev => newLikeState ? prev + 1 : prev - 1);
 
       try {
         
-        if(likeRef.current) {
+        if(newLikeState) {
 
           await axios.post(`${API_URL}/users/${userId}/${movie_ID}/likes`, {}, {
             headers : {
@@ -262,6 +269,7 @@ useEffect(() => {
               'Authorization': `Bearer ${token}`
             }
         });
+        setLikes(prev => [...prev, userId]);
 
         
 
@@ -277,19 +285,16 @@ useEffect(() => {
                        'Authorization': `Bearer ${token}`
                   }
                 });
-
+        setLikes(prev => prev.filter(id => id !== userId)); 
                
         }
 
-      getUserLikes();
-      getMovieLikes();
-      
 
 
       } catch (error) {
         console.log(error);
-        likeRef.current = !likeRef.current;
-        setIsLiked(likeRef.current);
+        
+        setIsLiked(!newLikeState);
         setMovieLikeCount(prev => likeRef.current ? prev + 1 : prev - 1);
       }
       
@@ -588,6 +593,7 @@ const getMovieLikes = async () => {
               console.log(response);
              
               setMovieLikeCount(response.data.likeCount);
+             
 
               
               
@@ -848,31 +854,30 @@ backgroundPosition: 'center',
           <div>
              
 
-              <div className="flex justify-center text-white mt-15">
-                <div class="testimonial-heading">
-                    <h2 className="font-bold text-white text-4xl flex justify-center mb-5">Ratings For This Film</h2>
-              <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-                
-              {recentRatings?.length > 0 && recentRatings.map(r =>  
-                
-               
-               
-                
-            <RatingCard rating={r} tmdbId = {param.id}/>
-            
-           
-          )}
+             <div className="mt-16 text-white">
+  
 
-            </div>
-        
-          </div>
-         </div>
-            {recentRatings?.length === 0 && (
-              <p className="text-white m-5" style={{ display: "flex", justifyContent: "center" }}>
-                Be the first to rate this film.
-              </p>
-            )}
+  <h2 className="text-4xl font-bold text-center mb-10">
+    Ratings for This Film
+  </h2>
 
+
+  <div className="max-w-4xl mx-auto flex flex-col gap-6">
+    {recentRatings?.length > 0 ? (
+      recentRatings.map(r => (
+        <RatingCard
+          key={r._id}
+          rating={r}
+          tmdbId={param.id}
+        />
+      ))
+    ) : (
+      <p className="text-center text-gray-400 mb-8">
+        No reviews yet. Be the first to rate this film.
+      </p>
+    )}
+  </div>
+  </div>
             
            </div>
 
