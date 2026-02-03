@@ -259,7 +259,9 @@ useEffect(() => {
       const newLikeState = !isLiked;
   setIsLiked(newLikeState);
   setMovieLikeCount(prev => newLikeState ? prev + 1 : prev - 1);
-
+setLikes(prev =>
+    newLikeState ? [...prev, userId] : prev.filter(id => id !== userId)
+  );
       try {
         
         if(newLikeState) {
@@ -296,7 +298,7 @@ useEffect(() => {
         console.log(error);
         
         setIsLiked(!newLikeState);
-        setMovieLikeCount(prev => likeRef.current ? prev + 1 : prev - 1);
+setMovieLikeCount(prev => newLikeState ? prev - 1 : prev + 1);
       }
       
     }
