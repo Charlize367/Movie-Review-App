@@ -730,12 +730,13 @@ backgroundPosition: 'center',
                     <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" >{release_date}  </p>
                     <p className="flex flex-wrap m-3">●</p>
                     <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" > {movieDetails.runtime} mins</p>
+                    
                  </div>
 
                 
                 <div className="flex max-w-full flex-wrap">
-                  <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-900 to-cyan-900" >{movieDetails.original_language}</p> 
-                  <div className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-900 to-cyan-900"><img className="w-5 h-5 mr-2" src="/star.svg"/> <p className="ratings-details">{rating}</p></div>
+                   
+                  <div className="flex flex-wrap text-white text-sm font-medium p-3 rounded-4xl "><img className="w-5 h-5 mr-2" src="/star.svg"/> <p className="ratings-details">{rating}</p></div>
                 </div>
               
                 <p className="w-full text-[2vh] lg:text-md">{movieDetails.overview}</p>
