@@ -10,8 +10,8 @@ const Diary = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const userId = localStorage.getItem('user_ID');
   const [diary, setDiary] = useState([]);
-   const [isLoading, setIsLoading] = useState(false);
-   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem('jwtToken');
 
 
@@ -26,11 +26,13 @@ const Diary = () => {
 
               console.log(response);
               setDiary(response.data.diary);
+              setIsLoading(false);
 
               
               
             } catch (error) {
               console.log(error);
+              setErrorMessage(error);
               
             }
           }
@@ -40,13 +42,11 @@ const Diary = () => {
       
     }, [userId]);
   return (
-    <div className="container">
+    <div className="w-full">
       <Nav/>
 
-        <h2 className="text-3xl text-white font-bold ml-10 mt-5">Browse Diary</h2>
-        {diary.length == 0 && (
-            <p className="text-white text-md m-10"> No movies in Diary.</p>
-          )}
+        <h2 className="text-3xl text-white font-bold ml-15 mt-5">Browse Diary</h2>
+       
       <section className="all-movies">
         {isLoading ? (
             <center>
@@ -54,8 +54,10 @@ const Diary = () => {
           </center>
         ) : errorMessage ? (
         <p>{errorMessage}</p>
+      ) : diary.length == 0 ? (
+         <p className="text-white text-md m-15"> No movies in Diary.</p>
       ) : (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5 sm:grid-cols-2
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-6 sm:grid-cols-2
     md:grid-cols-3 lg:gap-8 py-6 px-4 m-10">
           {diary.map((movie) => (
             <div className="aspect-[2/3] rounded-lg overflow-hidden rounded bg-gray-300">

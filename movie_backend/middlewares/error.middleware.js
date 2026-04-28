@@ -1,39 +1,48 @@
 const errorMiddleware = (err, req, res, next) => {
 
-    try {
-        let error = { ...err};
-        error.message = err.message;
+   
+    let customError = { 
+        statusCode: err.statusCode || 500, 
+        message: err.message || 'Server Error' 
+    };
 
-        console.error(err);
+    console.error(err);
 
-
-    //bad object id
-    if (err.name === "Cast Error") {
-        const message = "Resource not found";
-        error = new Error(message);
-        error.statusCode = 404;
+    if (err.name === "CastError") {
+        customError = {
+            statusCode: 404,
+            message: "Resource not found"
+        };
     }
 
-    //duplicate key
-    if(err.code === 11000) {
-        const message = "Duplicate field value entered";
-        error = new Error(message);
-        error.statusCode = 400;
+
+    if (err.code === 11000) {
+        customError = {
+            statusCode: 400,
+            message: `Duplicate field value entered: ${JSON.stringify(err.keyValue)}`
+        };
     }
 
-    //validation error
 
-    if(err.name === "ValidationError") {
-        const message = Object.values(err.errors).map(val => val.message);
-        error = new Error(message.join(', '));
-        error.statusCode = 400;
+    if (err.name === "ValidationError") {
+        const messages = Object.values(err.errors).map(val => val.message);
+        customError = {
+            statusCode: 400,
+            message: messages.join(', ')
+        };
     }
 
-    res.status(error.statusCode || 500).json({ success: false, error: error.message || 'Server Error'});
 
-} catch (error) {
-    next(error);
-}
+    if (process.env.NODE_ENV === 'development') {
+        customError.stack = err.stack;
+    }
+
+    res.status(customError.statusCode).json({
+        success: false,
+        error: customError.message,
+        ...(customError.stack && { stack: customError.stack })
+    });
 };
+
 
 export default errorMiddleware;

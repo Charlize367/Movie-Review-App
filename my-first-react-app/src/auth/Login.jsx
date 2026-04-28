@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation} from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { Link } from "react-router-dom";
 
@@ -9,8 +9,11 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/home";
   const { login } = useAuth();
   const API_URL = import.meta.env.VITE_API_URL;
+  console.log(from);
 
     const handleUsernameChange = (event) => {
     setUsername(event.target.value);
@@ -19,6 +22,14 @@ const Login = () => {
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
+
+  const handleGoToSignup = () => {
+  navigate("/sign-up", {
+    state: {
+      from: location.state?.from
+    }
+  });
+};
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -33,10 +44,16 @@ const Login = () => {
                     headers: {
                         
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    withCredentials: true 
                 });
                  login({username: response.data.data.user.username, role: response.data.data.user.role, id: response.data.data.user._id}, response.data.data.token)
-                navigate('/home');
+                navigate(from, {
+                replace: true,
+                state: {
+                    popup: "✅ Logged in successfully",
+                }
+                });
                 return true;
 
             } catch (error) {
@@ -64,8 +81,8 @@ const Login = () => {
             <input type="password" id="password" value={password} onChange={handlePasswordChange} class="bg-transparent text-white border border-[0.5px] rounded-lg border-gray-100 border-default-small text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" placeholder="Password" required />
         </div>
         
-        <button type="submit" class="block w-full  mt-10 mb-5 rounded-lg border border-blue-600 bg-blue-900 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white">Login</button>
-        <Link className="text-white" to ="/sign-up">Don't have an account? Sign up here.</Link>
+        <button type="submit" class="block w-full  mt-10 mb-5 rounded-lg bg-gradient-to-r from-blue-700 to-cyan-600 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white">Login</button>
+        <button className="text-white cursor-pointer" onClick={handleGoToSignup}>Don't have an account? Sign up here.</button>
     </form>
 </div>
 

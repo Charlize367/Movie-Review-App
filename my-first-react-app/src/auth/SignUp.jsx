@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { Link } from "react-router-dom";
 
@@ -11,6 +11,10 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const API_URL = import.meta.env.VITE_API_URL;
+  const location = useLocation();
+
+  const from = location.state?.from || "/home";
+
   
   const navigate = useNavigate();
   const { signup } = useAuth();
@@ -60,7 +64,12 @@ const SignUp = () => {
                 });
                 console.log(response);
                 signup({username: response.data.data.user.username, email: response.data.data.user.email, role: response.data.data.user.role, id: response.data.data.user._id}, response.data.data.token)
-                navigate('/home');
+                navigate(from, {
+                replace: true,
+                state: {
+                    popup: "✅ Account created successfully",
+                }
+                });
                 return true;
 
             } catch (error) {
@@ -95,14 +104,14 @@ const SignUp = () => {
                 </div>
                 <div>
                     <label for="password" class="block text-white mb-2.5 text-sm font-medium text-heading">Your password</label>
-                    <input type="password" id="password" value={password} onChange={handlePasswordChange} class="bg-transparent text-white border border-[0.5px] rounded-lg border-gray-100 border-default-small text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" placeholder="Password" required />
+                    <input type="password" id="password" value={password} onChange={handlePasswordChange} class="bg-transparent mb-5 text-white border border-[0.5px] rounded-lg border-gray-100 border-default-small text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" placeholder="Password" required />
                 </div>
                 <div>
                     <label for="confirmPassword" class="block text-white mb-2.5 text-sm font-medium text-heading">Confirm password</label>
                     <input type="password" id="confirmPassword" value={confirmPassword} onChange={handleConfirmPasswordChange} class="bg-transparent text-white border border-[0.5px] rounded-lg border-gray-100 border-default-small text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" placeholder="Password" required />
                 </div>
                 
-                <button type="submit" class="block w-full  mt-10 mb-5 rounded-lg border border-blue-600 bg-blue-900 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white">Sign Up</button>
+                <button type="submit" class="block w-full  mt-10 mb-5 rounded-lg bg-gradient-to-r from-blue-700 to-cyan-600 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white">Sign Up</button>
                 
             </form>
         </div>

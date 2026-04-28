@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 
 import { useState, useEffect } from 'react'
 import axios from 'axios';
@@ -14,14 +14,14 @@ const RatingCard =  ({rating :
     const API_URL =  import.meta.env.VITE_API_URL;
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('jwtToken');
-    const userID = localStorage.getItem('user_ID');
     const navigate = new useNavigate();
+    const userID = localStorage.getItem('user_ID');
     const [ratingLikes, setRatingLikes] = useState([]);
-    const [likedIcon, setlikedIcon] = useState("");
-    const [likeFunction, setLikeFunction] = useState(() => () => {});
     const [reviewLikeCount, setReviewLikeCount] = useState(0);
     const [reviewCommentCount, setReviewCommentCount] = useState(0);
-
+    const isCurrentlyLiked = ratingLikes.includes(userID);
+    const likedIcon = isCurrentlyLiked ? "/liked.svg" : "/like.svg"; 
+    
     dayjs.extend(relativeTime);
    
 
@@ -38,7 +38,7 @@ const RatingCard =  ({rating :
               });
 
               console.log(response);
-              setRatingLikes(response.data.likes);
+              setRatingLikes(response.data.data.likes);
               
               
   
@@ -69,7 +69,7 @@ const RatingCard =  ({rating :
               });
 
               console.log(response);
-              setReviewLikeCount(response.data.likeCount);
+              setReviewLikeCount(response.data.data);
               
               
   
@@ -85,7 +85,7 @@ const RatingCard =  ({rating :
       useEffect(() => {
       getRatingLikesCount();
       
-    }, []);
+    }, [userID]);
 
     const getRatingCommentsCount = async () => {
        try {
@@ -100,7 +100,7 @@ const RatingCard =  ({rating :
               });
 
               console.log(response);
-              setReviewCommentCount(response.data.commentCount);
+              setReviewCommentCount(response.data.data);
               
               
   
@@ -123,128 +123,128 @@ const RatingCard =  ({rating :
 
      const users = userId;
 
+     console.log("Likes: ", ratingLikes);
+     console.log("Like count: ", reviewLikeCount)
+    const toggleLike = async(e) => {
+     e.preventDefault();
 
-const likeRating = async(e) => {
+
+
+      const previousLikes = [...ratingLikes];
+      const previousCount = reviewLikeCount;
+
+      const willBeLiked = !isCurrentlyLiked;
+
+      setRatingLikes(prev =>
+        willBeLiked ? [...prev, userID] : prev.filter(id => id !== userID)
+      );
+
+      setReviewLikeCount(prev => willBeLiked ? prev + 1 : prev - 1);
       
-      e.preventDefault();
 
-      try {
+     
+          try {
+            
+            const response = await axios.post(`${API_URL}/ratings/${userID}/${_id}/like`, {}, {
+              headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json' 
+              }
+            });
 
-      
-        const response = await axios.post(`${API_URL}/ratings/${userID}/${_id}/likes`, {}, {
-            headers : {
-              'Content-Type' : 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
-        });
+            console.log(response);
+            console.log("Transaction Success:", response.data.action);
 
-        console.log(response);
-        getRatingLikes();
-        getRatingLikesCount();
-       
+            
+
+
 
       } catch (error) {
-        console.log(error);
+       console.error("Transaction failed or timed out:", error);
+    
+        setRatingLikes(previousLikes);
+        setReviewLikeCount(previousCount);
       }
-    }
-
-const removeLike = async(e) => {
-    e.preventDefault();
-    
-     try {
-      
-
-    
-          const response = await axios.delete(`${API_URL}/ratings/${userID}/${_id}/likes`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
-                
-                console.log(response);
-               getRatingLikes();
-               getRatingLikesCount();
-                
-                
-        
-      } catch (error) {
-      console.log(error);
-    }
-  }
-
-      
-     
-
-
-     console.log(ratingLikes);
-
-useEffect(() => {
-    const selectedRatingLike = ratingLikes.find(rl => rl.toString() === userID)
-     
-
-    if(selectedRatingLike) {
-      
-      
-      setlikedIcon('/liked.svg');
-      setLikeFunction(() => removeLike);
       
     }
-    
-    
-     else {
-      setlikedIcon('/like.svg');
-      console.log("test not liked");
-      setLikeFunction(() => likeRating);
-    
+
    
-    }
-     }, [ratingLikes]);
-    
-    
-     console.log(likeFunction);
 
-     const goToComments = () => {
+     
+
+  const goToComments = () => {
 
         navigate(`/comments/${tmdbId}/${_id}`);
      
 
       }
+
+  const goToLogin = () => {
+    navigate("/login", {
+      state: {
+        from: location.pathname + location.search
+      }
+    })
+  }
+  return (
+  <div className="w-full max-w-3xl mx-auto border-b border-white/10 py-6">
+
+
+    <div className="flex items-center justify-between mb-3">
+      {users.map(u => (
+        <div key={u._id} className="flex items-center gap-3">
+          <img
+            src={`${API_BASE_URL}/${u.image}`}
+            className="h-9 w-9 rounded-full object-cover"
+            alt={u.username}
+          />
+          <div>
+            <p className="text-sm font-medium text-white">
+              {u.username}
+            </p>
+            <p className="text-xs text-gray-400">
+              {dayjs(createdAt).fromNow()}
+            </p>
+          </div>
+        </div>
+      ))}
+
+     
+      <div className="flex items-center gap-1 text-cyan-400 text-sm">
+        <img src="/star.svg" className="w-4 h-4" />
+        <span className="font-medium">{rating}</span>
+      </div>
+    </div>
+
+   
+    <p className="text-gray-200 text-sm leading-relaxed mb-4">
+      {review}
+    </p>
+
+ 
+    <div className="flex items-center gap-6 text-gray-400 text-sm">
+      
+  
+      <button
+        onClick={token ? toggleLike : goToLogin}
+        disabled={!token}
+        className="flex items-center gap-2 cursor-pointer hover:text-white transition"
+      >
+        <img src={likedIcon} className="w-4 h-4" />
+        <span>{reviewLikeCount}</span>
+      </button>
+
     
-
-      console.log(reviewLikeCount);
-  return(
-                
-<div >
-                
-<div class="w-80 max-w-88 space-y-4 rounded-md  bg-gradient-to-br from-gray-800 to-blue-900
- p-3 text-white transition-all duration-300 hover:-translate-y-1">
-        <div class="flex items-center justify-between">
-            <div class="flex gap-1">
-                <img className="w-6 h-6 mr-2" src="/star.svg"/><p className="text-white">{rating}</p>
-            </div>
-            <p>{dayjs(createdAt).fromNow()}</p>
-        </div>
-        <p>{review}</p>
-        <div className="flex">
-        {users.map(u => (
-        <div class="flex items-center gap-2 pt-3">
-            <img class="h-8 w-8 rounded-full" src={`${API_BASE_URL}/${u.image}`} alt="Richard Nelson" />
-            <p class="font-medium text-white">{u.username}</p>
-          
-        </div>
-        ))}
-        <div className="flex ml-13 text-white" >
-  <div className="flex p-3 rounded-4xl"><button className="like-review" onClick={likeFunction} ><img className="w-5 h-5 mr-3" src={`${likedIcon}`} /></button><p>{reviewLikeCount}</p></div>
-  <div className="flex p-3 rounded-4xl ml-10"><button className="comment-review" onClick={goToComments}  ><img className="w-5 h-5 mr-3" src={`/comment.svg`} /></button><p>{reviewCommentCount}</p></div>
-</div>
+      <button
+        onClick={goToComments}
+        className="flex items-center gap-2 cursor-pointer hover:text-white transition"
+      >
+        <img src="/comment.svg" className="w-4 h-4" />
+        <span>{reviewCommentCount}</span>
+      </button>
     </div>
-    </div>
-
-</div>
-              
-            
-            )
+  </div>
+);
 
 
 }

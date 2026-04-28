@@ -3,9 +3,10 @@ import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
+import asyncHandler from "../utils/asyncHandler.js";
 
 
-export const signUp = async (req, res, next) => {
+export const signUp = asyncHandler(async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -29,6 +30,16 @@ export const signUp = async (req, res, next) => {
     
         const token = jwt.sign({userId : newUsers[0]._id }, JWT_SECRET, {expiresIn :JWT_EXPIRES_IN})
         await session.commitTransaction();
+
+        res.cookie("token", token, {
+            httpOnly: true,         
+            secure: false,          
+            sameSite: "lax",        
+            maxAge: 1000 * 60 * 60 * 24 ,
+            path: "/"
+            });
+
+        console.log("Setting cookie:", token);
        
 
         res.status(201).json({
@@ -45,9 +56,9 @@ export const signUp = async (req, res, next) => {
         session.endSession();
         next(error);
     }
-}
+});
 
-export const signIn = async (req, res, next) => {
+export const signIn = asyncHandler(async (req, res, next) => {
     try {
         const { username, password} = req.body;
 
@@ -55,7 +66,6 @@ export const signIn = async (req, res, next) => {
 
         if(!user) {
             const error = new Error('User not found');
-            error.statusCode = 404;
             throw error;
         }
 
@@ -63,11 +73,19 @@ export const signIn = async (req, res, next) => {
 
         if(!isPasswordValid) {
             const error = new Error('Invalid Password');
-            error.statusCode(401);
             throw error;
         }
 
         const token = jwt.sign({userId: user.id }, JWT_SECRET, {expiresIn : JWT_EXPIRES_IN});
+
+        res.cookie("token", token, {
+            httpOnly: true,         
+            secure: false,          
+            sameSite: "lax",        
+            maxAge: 1000 * 60 * 60 * 24 ,
+            path: "/"
+            });
+
 
         res.status(200).json({
             success:true,
@@ -81,7 +99,7 @@ export const signIn = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-}
+});
 
 export const signOut = async (req, res, next) => {
    

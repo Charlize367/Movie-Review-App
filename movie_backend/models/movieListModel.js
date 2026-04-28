@@ -14,10 +14,11 @@ const movieListSchema = new mongoose.Schema(
                 user: {type: mongoose.Schema.Types.ObjectId, ref: "User", required:true},
                 comment: {type:String, required: true}
             }],
-        movies : [{type: mongoose.Schema.Types.ObjectId,ref: "Movie"}],
+        movies : [{type: mongoose.Schema.Types.ObjectId,ref: "Movie", required:true,}],
         userId : {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
+            ref: "User",
+            required:true,
         
     },
     image : {

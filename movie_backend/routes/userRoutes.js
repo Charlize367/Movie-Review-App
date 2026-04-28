@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addMovieToDiary, addMovietoList, addUserLikedMovies, updateUserImage, deleteUser, getUser, getUserDiary, getUserLikedMovies, getUsers, getUserWatchList, removeMovieFromDiary, removeMovieFromLikes, removeMovieFromWatchList, updateUser } from "../controllers/userController.js";
+import { addMovieToDiary, addMovietoList, updateUserImage, deleteUser, getUser,  getUsers, removeMovieFromDiary, removeMovieFromLikes, removeMovieFromWatchList, updateUser,  addFollowing, getFollowers, getFollowing, removeFollowing, addLikeToMovie, toggleLikeMovie, toggleWatchList } from "../controllers/userController.js";
 import authorize from "../middlewares/auth.middleware.js";
 import multer from 'multer';
 
@@ -17,19 +17,20 @@ const upload = multer({ storage : storage});
 
 const userRouter = Router();
 
-userRouter.get('/', authorize, getUsers);
+userRouter.get('/', getUsers);
 
-userRouter.get('/:id', authorize, getUser);
+userRouter.get('/:id', getUser);
 
-userRouter.get('/:id/likedMovies', authorize, getUserLikedMovies);
+userRouter.get('/:id/followers', getFollowers);
 
-userRouter.get('/:id/watchlist', authorize, getUserWatchList);
+userRouter.get('/:id/following', getFollowing);
 
-userRouter.get('/:id/diary', authorize, getUserDiary);
+userRouter.post('/:userId/:movieId/like', authorize, toggleLikeMovie);
 
-userRouter.post('/:userId/:movieId/likes', authorize, addUserLikedMovies);
 
-userRouter.post('/:userId/:movieId/watchlist', authorize, addMovietoList);
+userRouter.post('/:userId/:movieId/watchlist', authorize, toggleWatchList);
+
+userRouter.post('/:userId/follower/:followingId/following', authorize, addFollowing);
 
 userRouter.post('/:userId/:movieId/diary', authorize, addMovieToDiary);
 
@@ -43,6 +44,8 @@ userRouter.delete('/:userId/:likeId/:movieId/like', authorize, removeMovieFromLi
 
 userRouter.delete('/:userId/:watchListId/watchlist', authorize, removeMovieFromWatchList )
 
-userRouter.delete('/:userId/:diaryId/diary', authorize, removeMovieFromDiary )
+userRouter.delete('/:userId/:diaryId/diary', authorize, removeMovieFromDiary );
+
+userRouter.delete('/:userId/follower/:followingId/following', authorize, removeFollowing);
 
 export default userRouter;

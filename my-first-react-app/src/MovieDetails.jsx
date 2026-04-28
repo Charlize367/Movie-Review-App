@@ -1,744 +1,416 @@
-import React from 'react'
-import { Form, useParams } from 'react-router-dom';
+
+import { Form, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react'
 import Nav from './components/Nav.jsx'
 import axios from 'axios';
-import emptyStar from "/star1.svg";
-import halfStar from "/halfStar.svg";
-import fullStar from "/star2.svg";
-import RatingCard from './components/RatingCard.jsx';
-
+import ActionSkeleton from './components/ActionSkeleton.jsx';
+import RateMovieForm from './components/RateMovieForm.jsx';
+import MovieRatings from './components/MovieRatings.jsx';
+import { getCredits, getMovieDetails, getMovieLikes, toggleMovieLike, getUserWatchlist, getMovieRatings } from './services/api.js';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const MovieDetails = () => {
   const API_URL = import.meta.env.VITE_API_URL;
- const apiUrl =  import.meta.env.VITE_TMDB_API_URL;
-  const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   const token = localStorage.getItem('jwtToken');
-  const [movieDetails, setMovieDetails] = useState(null);
-  const [vote, setVote] = useState(0);
-  const [date, setDate] = useState("");
-  const [credits, setCredits] = useState([]);
-  const [cast, setCast] = useState([]);
-  const [genre, setGenre] = useState([]);
-  const [director, setDirector] = useState([]);
-  const [backdrop, setBackdrop] = useState([]);
   const param = useParams();
-  const [movies, setMovies] = useState([]);  
-  const username = localStorage.getItem('username');
-  const userId = localStorage.getItem('user_ID');
-  const [likedMovies, setLikedMovies] = useState([]);
-  const [likedIcon, setlikedIcon] = useState('');
-  const [likedText, setLikedText] = useState("");
-  const [likeFunction, setLikeFunction] = useState(() => () => {});
+  const userId = localStorage.getItem('user_ID'); 
   const [watchList, setWatchList] = useState([]);
-  const [listIcon, setListIcon] = useState('');
-  const [listText, setListText] = useState("");
-  const [listFunction, setListFunction] = useState(() => () => {});
-  const [diary, setDiary] = useState([]);
-  const [diaryIcon, setDiaryIcon] = useState('');
-  const [diaryText, setDiaryText] = useState("");
-  const [diaryFunction, setDiaryFunction] = useState(() => () => {});
   const [rate, setRate] = useState([]);
-  const [rateIcon, setRateIcon] = useState('');
-  const [rateText, setRateText] = useState("");
-  const [rateFunction, setRateFunction] = useState(() => () => {});
   const [isActive, setIsActive] = useState(false);
-  const [ratings, setRatings] = useState(0);
-  const [review, setReview] = useState("");
   const [movieLikeCount, setMovieLikeCount] = useState(0);
   const [movie_ID, setMovie_ID] = useState(null);
-  const [test, setTest] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [likes, setLikes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const isCurrentlyLiked = likes.includes(userId);
+  const likedIcon = isCurrentlyLiked ? "/liked.svg" : "/like.svg"; 
+  const likedText = isCurrentlyLiked ? "Liked" : "Like";
+  const isCurrentlyListed = watchList.includes(userId);
+  const listIcon = isCurrentlyListed ? '/listed.svg' : '/add.svg';
+  const listText = isCurrentlyListed ? 'Saved' : 'List';
+ 
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (location.state?.popup) {
+      setPopupMessage(location.state.popup);
+      setShowPopup(true);
+  
+      setTimeout(() => setShowPopup(false), 3000);
+    }
+  }, []);
+   
+  const movieId = param.id
+  const { data: movieDetails } = useQuery({
+    queryKey: ['movieDetails', movieId],
+    queryFn: () => getMovieDetails(movieId),
+
+    enabled: !!movieId
+  });
+
+    const addMovieIfNotExists = async () => {
+      if (!movieDetails) {
+      console.warn("Movie details not loaded yet");
+      return null;
+    }
+      const inputData = {
+        'tmdbId' : Number(param.id),
+        'title' : movieDetails.title,
+        'posterPath' : movieDetails.poster_path,
+        'releaseDate' : movieDetails.release_date,
+        'likedBy' : [],
+        'ratings' : []
+      
+      }
+              const response = await axios.post(`${API_URL}/movies`, inputData, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        
+                    }
+                });
+                console.log(response);
+                
+             
+                return response.data.data._id;
+            
+            } 
+
+  useEffect(() => {
+    if (!movieDetails) {
+      console.log("No movie details found. Cannot create movie ID")
+      return;
+    }
+
+    const ensureMovieExists = async () => {
+      const id = await addMovieIfNotExists();
+      setMovie_ID(id);
+      console.log(id);
+    };
+
+    ensureMovieExists();
+  }, [movieDetails]);
+
+
+  const { data: movieLikes } = useQuery({
+    queryKey: ['movieLikes', movie_ID],
+    queryFn: () => getMovieLikes(movie_ID),
+
+    enabled: !!movie_ID
+  });
+
+  console.log("Movie likes: ", movieLikes);
+  
+  const { data: userWatchlist } = useQuery({
+    queryKey: ['watchlist', userId],
+    queryFn: () => getUserWatchlist(userId),
+
+    enabled: !!userId
+  });
+
+  
+
+  
+
+  // const getMovieLikes = async () => {
+  //       try {
+        
+  //         if (!movie_ID) return;
+
+          
+  //             const response = await axios.get(`${API_URL}/movies/${movie_ID}/likes`, {
+  //                   headers: {
+  //                       'Content-Type': 'application/json',
+  //                       'Authorization': `Bearer ${token}`
+  //                   }
+  //               });
+
+  //               console.log(response);
+              
+  //               setMovieLikeCount(response.data.count);
+  //               setLikes(response.data.likes);
+              
+
+                
+                
+  //             } catch (error) {
+  //               console.log(error);
+                
+  //             }
+  // }
  
   
-   
+ 
+  // const getUserWatchList = async () => {
+  //       try {
+  //             const response = await axios.get(`${API_URL}/users/${userId}/watchlist`, {
+  //                   headers: {
+  //                       'Content-Type': 'application/json',
+  //                       'Authorization': `Bearer ${token}`
+  //                   }
+  //               });
 
-  
+  //               console.log(response);
+  //               setWatchList(response.data.watchListMovies);
 
-              
-  const getMovieDetails = async () => {
-  try {
-    const endpoint = `${apiUrl}/movie/${param.id}`;
+  //             } catch (error) {
+  //               console.log(error);
+                
+  //             }
+  // }
 
-    const response = await fetch (endpoint, apiOptions);
+      
+  const toggleLike = async(e) => {
+        e.preventDefault();
 
-    if (!response.ok) {
-      throw new Error ("Failed to fetch movie details");
-    }
+        if(!movie_ID) return;
 
-    const data = await response.json();
+        const previousLikes = [...likes];
+        const previousCount = movieLikeCount;
 
-    console.log(data);
+        const willBeLiked = !isCurrentlyLiked;
 
-    if (data.Response == false) {
-      setErrorMessage(data.Error || 'Failed to fetch movie details');
-      setMovieDetails([]);
-      return;
-    }
+        setLikes(prev =>
+          willBeLiked ? [...prev, userId] : prev.filter(id => id !== userId)
+        );
 
-    setMovieDetails(data);
-
-    setVote(data.vote_average);
-    setDate(data.release_date);
-    setGenre(data.genres);
-    
-  } catch (error) {
-    console.error(`Error handling movie details ${error}`);
-  }
-}
-
-
-
-  const addMovieIfNotExists = async () => {
-     if (!movieDetails) {
-    console.warn("Movie details not loaded yet");
-    return null;
-  }
-    const inputData = {
-      'tmdbId' : Number(param.id),
-      'title' : movieDetails.title,
-      'posterPath' : movieDetails.poster_path,
-      'releaseDate' : movieDetails.release_date,
-      'likedBy' : [],
-      'ratings' : []
-    
-    }
-
-  
-
-            const response = await axios.post(`${API_URL}/movies`, inputData, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-              });
-              console.log(response);
-              
-             
-
-
-              return response.data.data._id;
-          
-          } 
-
-useEffect(() => {
-  if (!movieDetails) {
-    console.log("No movie details found. Cannot create movie ID")
-    return;
-  }
-
-  const ensureMovieExists = async () => {
-    const id = await addMovieIfNotExists();
-    setMovie_ID(id);
-    console.log(id);
-  };
-
-  ensureMovieExists();
-}, [movieDetails]);
-
-  
-  const getMovies = async () => {
-       try {
-             const response = await axios.get(`${API_URL}/movies`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-              });
-
-              console.log(response);
-              setMovies(response.data.data);
-
-              
-            } catch (error) {
-              console.log(error);
-              
-            }
-          }
-  useEffect(() => {
-      getMovies();
-  }, [param.id]);
-
-   
-
-  
-  
+        setMovieLikeCount(prev => willBeLiked ? prev + 1 : prev - 1);
         
-
-  const getUserLikes = async () => {
-       try {
-             const response = await axios.get(`${API_URL}/users/${userId}/likedMovies`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
+            try {
+              
+              const response = await axios.post(`${API_URL}/watch/liked/${userId}/${movie_ID}`, {}, {
+                headers: { 
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json' 
+                }
               });
 
               console.log(response);
-              setLikedMovies(response.data.likedMovies);
+              console.log("Transaction Success:", response.data.action);
 
-              
-              
-            } catch (error) {
-              console.log(error);
-              
-            }
-          }
-  
+        } catch (error) {
+        console.error("Transaction failed or timed out:", error);
+      
+          setLikes(previousLikes);
+          setMovieLikeCount(previousCount);
+        }
+        
+  }
+// MUTATE DOESNT WORK COME BACK HERE
+
+  const likeMutation = useMutation({
+    mutationFn: ({ userId, movie_ID }) => {
+    console.log("SENT TO API: Hitting toggleMovieLike now!"); 
+    return toggleMovieLike(userId, movie_ID);
+  },
     
+    onMutate: async (variables) => {
+      console.log("1. onMutate started");
+
+      if (!variables.movie_ID || !variables.userId) {
+       console.error("❌ SHUTTING DOWN: mutate() called with missing data", variables);
+       return; 
+    }
+
+      try {
+      await queryClient.cancelQueries({ queryKey: ['movieLikes', variables.movie_ID ]});
+
+      const previousLikes = queryClient.getQueryData(['movieLikes', variables.movie_ID ]);
+
+      
+      queryClient.setQueryData(['movieLikes', variables.movie_ID ], (prev) => {
+        const likeArray = prev?.data;
+        const isCurrentlyLiked = likeArray?.some(likes =>
+        (likes.userId === variables.userId ));
+
+        console.log("Like array: ", likeArray);
+
+        
+        
+        
+        return{
+          ...prev,
+          count: isCurrentlyLiked ? likeArray?.count - 1 : likeArray?.count + 1,
+          likes: isCurrentlyLiked
+                ? likeArray.filter(likes => likes.userId !== variables.userId)
+                : [...likeArray, {userId: variables.userId, movieId: variables.movie_ID}]
+        };
+      });
+      return { previousLikes }
+    } catch (err) {
+      console.error("THE CRASH HAPPENED HERE", err);
+      throw err;
+    }
+    },
+
+    onError: (err, variables, context) => {
+      console.error("❌ CRITICAL FAILURE:", err.message);
+   
+    if (context?.previousLikes) {
+      queryClient.setQueryData(['movieLikes', variables.movie_ID], context.previousLikes);
+    }
+   
+  },
+
+  onSettled: (data, error, variables) => {
+  console.log("Settling with variables:", variables);
+  queryClient.invalidateQueries({ queryKey: ['movieLikes', variables.movie_ID] });
+},
     
 
-  const getUserWatchList = async () => {
-       try {
-             const response = await axios.get(`${API_URL}/users/${userId}/watchlist`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-              });
-
-              console.log(response);
-              setWatchList(response.data.watchListMovies);
-
-              
-              
-            } catch (error) {
-              console.log(error);
-              
-            }
-          }
-  
-     
 
 
-  const getUserDiary = async () => {
-       try {
-             const response = await axios.get(`${API_URL}/users/${userId}/diary`, {
-                  headers: {
-                       'Content-Type': 'application/json',
+  })
+    
+
+  const toggleList = async (e) => {
+
+        e.preventDefault();
+
+        if(!movie_ID) return;
+
+        const previousList = [...watchList];
+      
+        const willBeListed = !isCurrentlyListed;
+
+        setWatchList(prev =>
+          willBeListed ? [...prev, userId] : prev.filter(id => id !== userId)
+        );
+
+        let message = "";
+
+        try {
+
+            const response = await axios.post(`${API_URL}/watch/watchlist/${userId}/${movie_ID}`, {}, {
+                    headers: {
+                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
-                  }
-              });
+                    }
+            });
 
-              console.log(response);
-              setDiary(response.data.diary);
+            console.log(response);
+            console.log("Transaction Success:", response.data.action);
 
-              
-              
-            } catch (error) {
-              console.log(error);
-              
-            }
+        
+          if(response.data.action === "removed from") {
+            message =  "🎬 Movie removed from your watchlist"
+          } else {
+            message =  "🎬 Movie added to your watchlist"
           }
+
+        setShowPopup(true);
+        setPopupMessage(message);
+
+        setTimeout(() => setShowPopup(false), 3000);
+        
+
+        } catch (error) {
+          console.error("Transaction failed or timed out:", error);
+          setWatchList(previousList);
+        }
+  }
+
+      console.log("Watchlist: ", watchList);
+      console.log("Likes: ", likes);
+
+
+  const { data: movieRatings } = useQuery({
+    queryKey: ['movieRatings', movie_ID],
+    queryFn: () => getMovieRatings(movie_ID),
+
+    enabled: !!movie_ID
+  });
+
+
+  console.log("User watchlist: ", userWatchlist);
+  console.log("Movie ratings: ", movieRatings);
   
-   
 
+  // const getMovieRatings = async () => {
+  //       try {
 
-    const addToMovieLike = async(e) => {
-      
-      e.preventDefault();
-      if (!movie_ID) {
-      console.error("Movie ID missing. Like aborted. Movie ID: ", movie_ID);
-      return;
-    }
+  //         if (!movie_ID) return;
 
-      try {
+  //             const response = await axios.get(`${API_URL}/ratings/movieRatings/${movie_ID}`, {
+  //                   headers: {
+  //                       'Content-Type': 'application/json',
+                        
+  //                   }
+  //               });
 
-        
-       
-        
-        
-        const response = await axios.post(`${API_URL}/users/${userId}/${movie_ID}/likes`, {}, {
-            headers : {
-              'Content-Type' : 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
-        });
-
-        console.log(response);
-
-        getUserLikes();
-        getMovieLikes();
-        
-
-      } catch (error) {
-        console.log(error);
-      }
-
-  }
-
-
-  const removeLike = async(e) => {
-    e.preventDefault();
-    
-     try {
-      const selectedLikedMovie = likedMovies.find(movie => movie.tmdbId === Number(param.id));
-      const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id));
-
-      const likeId = selectedLikedMovie._id;
-      
-          const response = await axios.delete(`${API_URL}/users/${userId}/${likeId}/${movie_ID}/like`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
+  //               console.log(response);
+  //               setRate(response.data.data);
+  //               setIsLoading(false);
                 
-                console.log(response);
-                console.log(likeId);
-              
-                getUserLikes();
-                getMovieLikes();
+             
+  //             } catch (error) {
+  //               console.log(error);
                 
-                
-        
-      } catch (error) {
-      console.log(error);
-    }
-  }
-
-
-    const addToWatchList = async(e) => {
-      e.preventDefault();
-      try {
-         if (!movie_ID) return;
-          const response = await axios.post(`${API_URL}/users/${userId}/${movie_ID}/watchlist`, {}, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
-                
-                console.log(response);
-                
-                getUserWatchList();
-                
-        
-      } catch (error) {
-      console.log(error);
-    }
-  }
-
-
-  const removeList = async(e) => {
-    e.preventDefault();
-    
-     try {
-      const selectedListMovie = watchList.find(movie => movie.tmdbId === Number(param.id));
-      const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id));
-
-      const listId = selectedListMovie._id;
-      const movieId = selectedMovie._id;
-          const response = await axios.delete(`${API_URL}/users/${userId}/${listId}/watchlist`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
-                
-                console.log(response);
-                console.log(listId);
-                console.log(movieId);
-                getUserWatchList();
-                
-                
-        
-      } catch (error) {
-      console.log(error);
-    }
-  }
-
-
-  const handleChange = (e) => {
-  setReview(e.target.value);
-};
+  //             }
+  // }
 
   const openForm = () => {
-    setIsActive(!isActive);
-    
-  }
-
-
-
-    const addToDiary = async(e) => {
-     
-      e.preventDefault();
-      if(!movie_ID) return;
-
-      try {
-        
-          const response = await axios.post(`${API_URL}/users/${userId}/${movie_ID}/diary`, {},  {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
-                
-                console.log(response);
-                
-                getUserDiary();
-
-        
-      } catch (error) {
-      console.log(error);
-    }
-  }
-
-
-  const addToRating = async(e) => {
-     
-      e.preventDefault();
-      if (!movie_ID) return;
-
-      try{
-        
-
-        const finalData = {
-          rating: ratings,
-          review: review,
-          userId: userId,
-          movieId: movie_ID
-        };
-
-
-        const response = await axios.post(`${API_URL}/ratings`, finalData, {
-          headers : {
-            'Content-Type' : 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        console.log(response);
-
-                setShowPopup(true);
-
-
-         setTimeout(() => setShowPopup(false), 3000);
-
-        openForm(!isActive);
-        e.target.reset();
-        getMovieRatings();
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-
-
-  const removeDiary = async(e) => {
-    e.preventDefault();
-    
-     try {
-      const selectedDiary = diary.find(movie => movie.tmdbId === Number(param.id));
-      const selectedMovie = movies.find(movie => movie.tmdbId === Number(param.id));
-
-      const diaryId = selectedDiary._id;
-      const movieId = selectedMovie._id;
-          const response = await axios.delete(`${API_URL}/users/${userId}/${diaryId}/diary`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-                });
-                
-                console.log(response);
-                console.log(diaryId);
-                console.log(movieId);
-                getUserDiary();
-                
-                
-        
-      } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const getMovieRatings = async () => {
-       try {
-
+      setIsActive(!isActive);
       
-        if (!movie_ID) return;
+  }
+               
 
-        
-        
-             const response = await axios.get(`${API_URL}/ratings/movieRatings/${movie_ID}`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-              });
-
-              console.log(response);
-              setRate(response.data);
-              
-              
-  
-              
-            } catch (error) {
-              console.log(error);
-              
-            }
-          }
-
-          
-  
-
-    console.log(rate);
-   
-console.log(likedMovies);
+    
 
   useEffect(() => {
-
-    const selectedLikedMovie = likedMovies.find(movie => movie.tmdbId === Number(param.id))
+    if (movie_ID) {
+      
+    
+      getMovieRatings();
      
-
-    if(selectedLikedMovie) {
-      
-      
-      setlikedIcon('/liked.svg');
-      setLikedText('Liked');
-      setLikeFunction(() => removeLike);
       
     }
-    
-    
-     else {
-      setlikedIcon('/like.svg');
-      setLikedText('Like');
-      console.log('like');
-      setLikeFunction(() => addToMovieLike);
-    
-   
-    }
-     }, [likedMovies]);
+  }, [movie_ID]);
 
 
+  const { data: credits } = useQuery({
+    queryKey: ['credits', movieId],
+    queryFn: () => getCredits(movieId),
 
-
-
-  useEffect(() => {
-
-    const selectedListMovie = watchList.find(movie => movie.tmdbId === Number(param.id))
-     
-
-    if(selectedListMovie) {
-      
-     
-      setListIcon('/listed.svg');
-      setListText('Saved');
-      console.log("listed");
-      setListFunction(() => removeList);
-      
-    }
-
-     else {
-      setListIcon('/add.svg');
-      setListText('List');
-      console.log("not listed");
-      setListFunction(() => addToWatchList);
-    
-   
-    }
-     }, [watchList]);
-
-  
-  useEffect(() => {
-
-    const selectedDiary = diary.find(movie => movie.tmdbId === Number(param.id))
-     
-
-    if(selectedDiary) {
-      
-      
-      setDiaryIcon('/watched.svg');
-      setDiaryText('Watched');
-      setDiaryFunction(() => removeDiary);
-      
-    }
-    
-    
-     else {
-      setDiaryIcon('/watch.svg');
-      setDiaryText('Mark');
-      setDiaryFunction(() => addToDiary);
-    
-   
-    }
-     }, [diary]);
-
-
-  
-
-
-     useEffect(() => {
-
-    const selectedRating = rate.find(movie => movie.tmdbId === Number(param.id))
-     
-
-    console.log(rate);
-
-    if(selectedRating) {
-      
-      
-      setRateIcon('/logged.svg');
-      setRateText('Rated');
-     setRateFunction(() => addToRating);
-      
-    }
-    
-    
-     else {
-      setRateIcon('/add.svg');
-      setRateText('Add Review');
-      setRateFunction(() => addToRating);
-    
-   
-    }
-     }, [rate]);
-  
-    
-  console.log(API_URL);
-  console.log(likeFunction);
-  
-  console.log(userId);
-  const apiOptions = {
-  method: 'GET',
-  headers : {
-    accept: 'application/json',
-    Authorization: `Bearer ${apiKey}`
-  }
-}
-
-useEffect(() => {
-      getMovieDetails();
-      getCredits();
-      getBackdrop();
-  }, [param.id]);
-
-
-  useEffect(() => {
-  if (movie_ID) {
-    getUserLikes();
-    getUserWatchList();
-    getUserDiary();
-    getMovieRatings();
-    getMovieLikes();
-  }
-}, [movie_ID]);
-
-
-
-
-const getMovieLikes = async () => {
-       try {
-      
-         if (!movie_ID) return;
-
-         
-             const response = await axios.get(`${API_URL}/movies/${movie_ID}/likeCount`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-              });
-
-              console.log(response);
-             
-              setMovieLikeCount(response.data.likeCount);
-
-              
-              
-            } catch (error) {
-              console.log(error);
-              
-            }
-          }
-
-    const release_date = date.substring(0,4);
-    const rating = vote.toFixed(1);
-    
-    const getCredits = async () => {
-       try {
-              const endpoint = `${apiUrl}/movie/${param.id}/credits`;
-        
-              const response = await fetch (endpoint, apiOptions);
-        
-              if (!response.ok) {
-                throw new Error ("Failed to fetch movie credits");
-              }
-        
-              const data = await response.json();
-              
-            
-              if (data.Response == false) {
-                setErrorMessage(data.Error || 'Failed to fetch movie credits')
-                setCredits([]);
-                return;
-              }
-        
-              setCredits(data);
-
-              setCast(data.cast);
-
-              setDirector(data.crew[1]);
-              
-
-              
-            } catch (error) {
-              console.error(`Error fetching movie credits: ${error}`);
-              setErrorMessage('Error fetching movie credits. Try again later');
-            }
-          }
-  
+    enabled: !!movieId
+  });
     
 
+  const final_cast = credits?.cast.slice(0, 4);
 
-    const final_cast = cast.slice(0, 4);
+    console.log(final_cast);
 
-    const getBackdrop = async () => {
-       try {
-              const endpoint = `${apiUrl}/movie/${param.id}/images`;
-        
-              const response = await fetch (endpoint, apiOptions);
-        
-              if (!response.ok) {
-                throw new Error ("Failed to fetch movie image");
-              }
-        
-              const data = await response.json();
-              
-           
-              if (data.Response == false) {
-                setErrorMessage(data.Error || 'Failed to fetch movie image')
-                setBackdrop([]);
-                return;
-              }
-        
-              setBackdrop(data.backdrops[0]);
 
-              
-
-              
-            } catch (error) {
-              console.error(`Error fetching movie image: ${error}`);
-              setErrorMessage('Error fetching movie image. Try again later');
-            }
-          }
-  
-
-    const imageUrl = `https://image.tmdb.org/t/p/original/${backdrop.file_path}`
-    const divStyle = {
+  const imageUrl = `https://image.tmdb.org/t/p/original/${movieDetails?.backdrop_path}`
+  const divStyle = {
     backgroundImage: `url(${imageUrl})`,
     backgroundSize: 'cover',
-backgroundPosition: 'center',
-
-    
+    backgroundPosition: 'center',
   };
 
-  const recentRatings = rate.slice(0, 4);
+  const goToLogin = () => {
+    navigate("/login", {
+      state: {
+        from: location.pathname + location.search
+      }
+    })
+  }
+
+
+  console.log(token);
+
+   const release_date = movieDetails?.release_date?.substring(0,4);
+  const rating = movieDetails?.vote_average?.toFixed(1);
 
   
-   if (movieDetails) {
+
+  const isLiked = movieLikes?.data?.some(likes =>
+        (likes.userId === userId ));
+  
+   if (movieDetails && credits) {
   return (
     <div className="w-full">
       
@@ -764,17 +436,18 @@ backgroundPosition: 'center',
                 <h2 className="font-bold text-4xl mb-3">{movieDetails.title}</h2>
 
                 <div className="flex max-w-full flex-wrap">
-                    {genre.map((g) => (<p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" >{g.name}</p> ))} 
+                    {movieDetails?.genres.map((g) => (<p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" >{g.name}</p> ))} 
                     <p className="flex flex-wrap m-3">●</p>
                     <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" >{release_date}  </p>
                     <p className="flex flex-wrap m-3">●</p>
                     <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl" > {movieDetails.runtime} mins</p>
+                    
                  </div>
 
                 
                 <div className="flex max-w-full flex-wrap">
-                  <p className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" >{movieDetails.original_language}</p> 
-                  <div className="flex flex-wrap m-1 text-white text-sm font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600"><img className="w-5 h-5 mr-2" src="/star.svg"/> <p className="ratings-details">{rating}</p></div>
+                   
+                  <div className="flex flex-wrap text-white text-sm font-medium p-3 rounded-4xl "><img className="w-5 h-5 mr-2" src="/star.svg"/> <p className="ratings-details">{rating}</p></div>
                 </div>
               
                 <p className="w-full text-[2vh] lg:text-md">{movieDetails.overview}</p>
@@ -788,134 +461,77 @@ backgroundPosition: 'center',
                     ))}
                     </div>
                   </div>
-                   <p className="text-[2vh] lg:text-md"><b>Directed By:</b> {director.name} </p>
+                   <p className="text-[2vh] lg:text-md"><b>Directed By:</b> {credits?.crew[1].name} </p>
 
-              <div className="flex max-w-full flex-wrap mt-2">
-                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99"  disabled={!movie_ID} onClick={likeFunction}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div>
-                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="listBtn" onClick={listFunction}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
-                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="diaryBtn" onClick={diaryFunction}><img className="w-8 h-8" src={`${diaryIcon}`}/></button> <p className="m-1"> {diaryText}</p> </div>
-                <div className="flex text-white text-[2vh] lg:text-md font-medium p-3 rounded-4xl ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="ratingBtn" onClick={openForm}><img className="w-8 h-8" src={`${rateIcon}`}/></button> <p className="m-1"> {rateText}</p> </div>
+
+        
+              { !token ? (
+                 <div className="flex max-w-full flex-col lg:flex-row mt-2 lg:ml-auto lg:items-center lg:gap-3">
+                <button className="z-99 cursor-pointer" onClick={goToLogin} ><div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" >  <p className="m-1">Sign in to like, log, or review</p></div></button>
+            </div>
+            
+          ) : !movie_ID  ? (
+            <div className="flex gap-2 mt-2">
+              <ActionSkeleton />
+              <ActionSkeleton />
+              <ActionSkeleton />
+              <ActionSkeleton />
+            </div>
+
+          ) : ( 
+              <div className="flex max-w-full flex-col lg:flex-row mt-2 lg:ml-auto lg:items-center lg:gap-3">
+                {/* <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="z-99 cursor-pointer"  disabled={!movie_ID} onClick={toggleLike}><img className="w-8 h-8" src={`${likedIcon}`}/> </button> <p className="m-1">{likedText}</p></div> */}
+                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button 
+  onClick={(e) => {
+    e.preventDefault(); // 👈 ADD THIS LINE
+    e.stopPropagation(); // Prevents the click from bubbling up
+    
+    if (!userId || !movie_ID) {
+      console.error("Missing IDs", { userId, movie_ID });
+      return;
+    }
+
+    likeMutation.mutate({ userId, movie_ID });
+  }}
+  disabled={likeMutation.isPending} 
+  className={`btn ${isLiked ? 'active' : ''}`}
+>
+                  <img className="w-8 h-8" src={isLiked ? "/liked.svg" : "/like.svg"}/>
+                
+                </button> <p className="m-1">{isLiked ? "Liked" : "Like"}</p></div>
+                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl lg:ml-2 bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="cursor-pointer" onClick={toggleList}><img className="w-8 h-8" src={`${listIcon}`}/></button> <p className="m-1"> {listText}</p> </div>
+                <div className="flex text-white text-[2vh] max-w-sm justify-center mb-3 lg:text-md font-medium p-3 rounded-4xl lg:ml-2 bg-gradient-to-r from-blue-700 to-cyan-600"><button className="cursor-pointer" onClick={openForm}><img className="w-8 h-8" src={`/add.svg`}/></button> <p className="m-1">Add Review</p> </div>
                 </div>
-
+          )}
               </div>
          
 
           <div className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full" style={isActive ? {display: "flex"} : {display: "none"}}>
           <div class="relative p-4 w-full max-w-md max-h-full">
             
-            <div class="w-full mx-auto max-w-md space-y-4 m-30 bg-gray-900 p-6 rounded-lg shadow-xs">
-          <div class="flex items-center rounded-lg  pb-4 md:pb-5">
-            
-                <h3 class="text-xl font-semibold text-white text-heading">
-                    Add your review
-                </h3>
-                <button type="button" onClick={openForm} class="text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
-                    <span class="sr-only">Close modal</span>
-                </button>
-            </div>
-          <form className=" md:pt-6" onSubmit={addToRating}>
-          <label className="rating-lbl">Rating:</label>
-           <div style={{ display: "flex", gap: "6px", cursor: "pointer", marginBottom: "10%"}}>
-  {[1, 2, 3, 4, 5].map((star) => (
-    <div key={star} style={{ position: "relative", width: "32px", height: "32px" }}>
-      <img
-        src={
-          ratings >= star
-            ? fullStar
-            : ratings >= star - 0.5
-            ? halfStar
-            : emptyStar
-        }
-        alt={`${star} star`}
-        style={{ width: "100%", height: "100%" }}
-        onClick={() => setRatings(star)}
-      />
-    
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "50%",
-          height: "100%",
-          cursor: "pointer",
-        }}
-        onClick={() =>
-          setRatings(star - 0.5)
-        }
-      />
-    </div>
-
-  ))}
-
-  
-</div>
-
-          <label className="review-lbl">Review:</label>
-          <textarea rows="6" class="p-5 rounded-lg w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Add review..." name="review" value={review} onChange={handleChange} />
-          <input class="block w-full  mt-10 mb-5 rounded-lg border border-blue-600 bg-blue-900 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white" type="submit" value="Add"/>
-          </form>
-        </div>
+          <RateMovieForm openForm={openForm}/>
           
             </div>
-               </div>
+          </div>
         </div>
 
-{showPopup && (
-            <div className="add-popup">
-              Rating added successfully.
-            </div>
-              )}
+        {showPopup && (
+                    <div
+                className={`
+                  fixed top-6 right-6 z-50 max-w-xs z-99 w-full p-4 rounded-xl shadow-lg
+                  bg-gray-900 text-white text-sm font-medium transition-transform duration-300
+                  ${showPopup ? "translate-x-0 opacity-100" : "translate-x-32 opacity-0"}
+                `}
+              >
+                {popupMessage}
+              </div>
+        )}
+  
+      </div>
+   
+           <MovieRatings rate={rate} tmdbId={param.id} movie_ID={movie_ID} isLoading={isLoading} />
+  </div>
 
-            
-              
-          </div>
-          <div>
-             
-
-              <div className="flex justify-center text-white mt-15">
-                <div class="testimonial-heading">
-                    <h2 className="font-bold text-white text-4xl flex justify-center mb-5">Ratings For This Film</h2>
-              <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-                
-              {recentRatings?.length > 0 && recentRatings.map(r =>  
-                
-               
-               
-                
-            <RatingCard rating={r} tmdbId = {param.id}/>
-            
-           
-          )}
-
-            </div>
-        
-          </div>
-         </div>
-            {recentRatings?.length === 0 && (
-              <p className="text-white m-5" style={{ display: "flex", justifyContent: "center" }}>
-                Be the first to rate this film.
-              </p>
-            )}
-
-            
-           </div>
-
-           <center>
-              {recentRatings?.length > 0 && (
-                <a className="mt-10 mb-10 bg-gradient-to-r from-blue-700 to-cyan-600 w-sm rounded-4xl p-5 to-blue-700 text-white"
-                  style={{ display: "flex", justifyContent: "center" }} 
-                  href={`/all_ratings/${movie_ID}/`}
-                >
-                  Check all reviews for this movie.
-                </a>
-              )}
-            </center>
-         </div>
-
-         
- 
   )
       
   } else {
@@ -928,9 +544,5 @@ backgroundPosition: 'center',
     )
   }
 }
-
-      
-      
-
 
 export default MovieDetails

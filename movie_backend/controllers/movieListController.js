@@ -1,122 +1,144 @@
 import MovieList from '../models/movieListModel.js'
 import User from '../models/userModel.js'
+import asyncHandler from '../utils/asyncHandler.js'
 
-export const getMovieList = async (req, res) => {
-     try {
-            const movieList = await MovieList.find().populate('movies').populate('userId');
+export const getMovieList = asyncHandler(async (req, res) => {
+    
+            const movieList = await MovieList.find().populate('movies').populate('userId').lean();
     
             res.status(200).json({ success: true, data: movieList});
-        } catch (error) {
-            console.log(error);
-        }
-}
+       
+});
 
-export const getMovieListById = async (req, res) => {
-    try {
-        const movieList = await MovieList.findById(req.params.id).populate('movies');
+export const getMovieListById = asyncHandler(async (req, res) => {
+   
+        const movieList = await MovieList.findById(req.params.id).populate('movies').lean();
 
         if(!movieList) {
-            const error = new Error('Movie not found');
-            error.statusCode(404);
-            throw error;
+            return res.status(404).json({message : 'Movie not found'});
         }
         res.status(200).json({ success: true, data: movieList});
-    } catch (error) {
-        console.log(error);
-    }
-}
+   
+});
 
-export const getMovieListByUser = async (req, res) => {
-    try {
+export const getMovieListByUser = asyncHandler(async (req, res) => {
+   
         const userId = req.params.userId;
-        const user = await User.findById(userId).populate('movies');
+        const user = await User.findById(userId).populate('movies').lean();
 
         if(!user) {
             return res.status(404).json({message : 'User not found'});
         }
 
-        const movieList = await MovieList.find({ user : userId }).populate('movieList', ' listTitle');
-        res.json(movieList);
-    } catch (error) {
-    console.log(error);
-    }
-}
+        const movieList = await MovieList.find({ userId : userId }).populate('movieList', ' listTitle').lean();
+        res.status(200).json({ success: true, data: movieList});
+    
+});
 
-export const getMovieListLikes = async (req, res) => {
-    try{
+export const getMovieListLikes = asyncHandler(async (req, res) => {
+   
 
         const movieList = await MovieList.findById(req.params.id).lean();
 
-      res.status(200).json(movieList);
-    } catch (error) {
-     console.log(error);
-    }
-}
+      res.status(200).json({ success: true, data: movieList});
+   
+});
 
-export const getMovieListComments = async (req, res) => {
+export const getMovieListComments = asyncHandler(async (req, res) => {
     console.log(req.params.id);
-    try{
+   
 
-        const movieListComments =  await MovieList.findById(req.params.id).select('comments').populate('comments.user');
+        const movieListComments =  await MovieList.findById(req.params.id).select('comments').populate('comments.user').lean();
 
-        res.status(200).json(movieListComments);
+        res.status(200).json({ success: true, data: movieListComments});
 
-    } catch (error) {
-        console.error(error);
-    }
-}
+    
+});
 
-export const getMovieListLikeNumber = async (req, res) => {
-    try{
+export const getMovieListLikeNumber = asyncHandler(async (req, res) => {
+    
 
         const movieList = await MovieList.findById(req.params.id).lean();
 
         if (!movieList) {
-      return res.status(404).json({ message: "List not found" });
-    }
+        return res.status(404).json({ message: "List not found" });
+        }
 
         const likeCount = movieList.likes.length;
 
 
-        res.status(200).json({ likeCount});
-    } catch (error) {
-     console.log(error);
-    }
-}
+       res.status(200).json({ success: true, data: likeCount});
+    
+});
 
-export const getMovieListCommentNumber = async (req, res) => {
-    try{
+export const getMovieListCommentNumber = asyncHandler(async (req, res) => {
+   
 
         const movieList = await MovieList.findById(req.params.id).lean();
 
-        if (!rating) {
-      return res.status(404).json({ message: "List not found" });
-    }
+        if (!movieList) {
+        return res.status(404).json({ message: "List not found" });
+        }
 
         const commentCount = movieList.comments.length;
 
 
-        res.status(200).json({ commentCount});
-    } catch (error) {
-     console.log(error);
-    }
-}
+         res.status(200).json({
+            success:true,
+            message : 'Comment count fetched successfully',
+            data: commentCount
+        });
+   
+});
 
-export const addLikeToMovieList = async (req, res) => {
 
-    try {
-        const existingLike = await MovieList.findById(req.params.userId).findOne({'likes' : req.params.userId});
+export const toggleMovieListLike = asyncHandler(async (req, res) => {
+        const { userId, movieListId } = req.params;
+
+
+        const unlikeAttempt =  await MovieList.findOneAndUpdate(
+            { _id: movieListId, likes: userId },
+            { $pull : { likes : userId  } },
+            { new: true }
+        )
+            
+        let action = "removed";
+        
+    
+        if (!unlikeAttempt) {
+         await MovieList.findByIdAndUpdate(
+                movieListId,
+                { $addToSet: { likes : userId } },
+                { new: true }
+            );
+            action = "added";
+        }
+      
+        res.status(201).json({
+            success:true,
+            action: action,
+            message: `Movie List ${action}`
+        })
+
+});
+
+export const addLikeToMovieList = asyncHandler(async (req, res) => {
+
+        const { userId, movieListId } = req.params;
+
+        const existingLike = await MovieList.findOne({
+            _id: movieListId,
+            likes: userId
+        });
 
         if (existingLike) {
-            const error = new Error('List already liked');
-            error.statusCode = 409;
-            throw error;
+            return res.status(409).json({message : 'List already liked'});
         }
 
-        const movieList = await MovieList.findById(req.params.movieListId).select('_id');
-        const addLike = await MovieList.findOneAndUpdate(
-            { _id : movieList._id },
-            { $push: {likes : [req.params.userId]}},
+    
+        const addLike = await MovieList.findById(
+            movieListId,
+            { $push: {likes : userId }},
             { new: true}
         )
 
@@ -127,23 +149,20 @@ export const addLikeToMovieList = async (req, res) => {
             data: {
                 liked : addLike
             },
-            userId: req.params.userId
+            userId: userId
         })
-    } catch (error) {
-        console.log("Failed to like list");
-        console.log(error);
-    }
-}
+    
+});
 
 export const addCommentToMovieList = async (req, res) => {
 
-    try {
+    
 
         const {comment} = req.body;
         console.log(req.params.movieId);
-        const movieList = await MovieList.findById(req.params.movieListId).select('_id');
-        const addComment = await MovieList.findOneAndUpdate(
-            { _id : movieList._id },
+        
+        const addComment = await MovieList.findByIdAndUpdate(
+            req.params.movieListId,
             { $push: {comments : [{user: req.params.userId, comment: comment, createdAt: new Date(),
         updatedAt: new Date()}]}},
             { new: true}
@@ -157,14 +176,11 @@ export const addCommentToMovieList = async (req, res) => {
                 liked : addComment
             }
         })
-    } catch (error) {
-        console.log("Failed to add comment to list");
-        console.log(error);
-    }
+   
 }
 
-export const removeLikeFromList = async (req, res) => {
-    try {
+export const removeLikeFromList = asyncHandler(async (req, res) => {
+   
         const deleteLike = await MovieList.findByIdAndUpdate(
             req.params.movieListId,
             { $pull : {likes : req.params.userId  } },
@@ -175,16 +191,14 @@ export const removeLikeFromList = async (req, res) => {
         }
 
         res.status(200).json({
+            success:true,
             message : 'Like removed successfully'
         });
-    } catch (error) {
-        res.status(500).json({ message : error.message, data :deleteLike });
-        console.log(error);
-    }
-}
+    
+});
 
-export const removeCommentFromList = async (req, res) => {
-    try {
+export const removeCommentFromList = asyncHandler(async (req, res) => {
+   
         const deleteComment = await MovieList.findByIdAndUpdate(
             req.params.movieListId,
             { $pull : {comments : { _id: req.params.commentId }   } },
@@ -197,16 +211,14 @@ export const removeCommentFromList = async (req, res) => {
 
 
         res.status(200).json({
+            success:true,
             message : 'Comment removed successfully'
         });
-    } catch (error) {
-        res.status(500).json({ message : error.message });
-        console.log(error);
-    }
-}
+    
+});
 
-export const updateComment = async (req, res) => {
-    try {
+export const updateComment = asyncHandler(async (req, res) => {
+   
         const { movieListId, commentId } = req.params;
         const { comment } = req.body
 
@@ -226,14 +238,16 @@ export const updateComment = async (req, res) => {
             return res.status(404).json({message : 'Comment not found'})
         }
 
-        res.json(updateComment)
-    } catch (error) {
-        console.log(error.message);
-    }
-}
+         res.status(200).json({
+            success:true,
+            message : 'Comment updated successfully',
+            data: updateComment
+        });
+    
+});
 
-export const createMovieList = async(req, res) => {
-    try {
+export const createMovieList = asyncHandler(async(req, res) => {
+    
             let { listTitle, listDescription, movies } = req.body;
             
             if (typeof movies === "string") {
@@ -251,14 +265,11 @@ export const createMovieList = async(req, res) => {
                     movieList: newMovieList,
                 }
             })
-        } catch (error) {
-            console.log("Failed to add to Movie List");
-            console.log(error);
-        }
-}
+        
+});
 
-export const updateListImage = async (req, res) => {
-    try {
+export const updateListImage = asyncHandler(async (req, res) => {
+    
         const { id } = req.params;
        if (!req.file) {
       return res.status(400).json({ message: "No image uploaded" });
@@ -282,14 +293,11 @@ export const updateListImage = async (req, res) => {
       message: "List image updated",
       image: updateList.image,
     });
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ message : error.message });
-    }
-}
+   
+});
 
-export const addMovieToMovieList = async (req, res) => {
-    try {
+export const addMovieToMovieList = asyncHandler(async (req, res) => {
+   
 
         let { movies } = req.body;
         
@@ -312,14 +320,12 @@ export const addMovieToMovieList = async (req, res) => {
                 }
             })
 
-    } catch (error) {
-        console.log(error);
-    }
+   
 
-}
+});
 
-export const updateMovieListDetails = async (req, res) => {
-    try {
+export const updateMovieListDetails = asyncHandler(async (req, res) => {
+   
      
        
 
@@ -334,16 +340,15 @@ export const updateMovieListDetails = async (req, res) => {
         }
 
        res.status(200).json({
+         success:true,
         message : 'Movie updated from list successfully',
         data: updateMovieList
        });
-    } catch (error) {
-        console.log(error.message);
-    }
-}
+    
+});
 
-export const deleteMovieFromMovieList = async (req, res) => {
-    try{
+export const deleteMovieFromMovieList = asyncHandler(async (req, res) => {
+    
         const deleteMovie = await MovieList.findByIdAndUpdate(
             req.params.listId,
             { $pull : {movies : req.params.movieId}},
@@ -354,23 +359,19 @@ export const deleteMovieFromMovieList = async (req, res) => {
             return res.status(404).json({message : 'Movie not found'});
         }
 
-        res.status(200).json({message : 'Movie deleted from list successfully'});
+        res.status(200).json({ success:true, message : 'Movie deleted from list successfully'});
 
 
-    } catch (error) {
-        console.log(error);
-    }
-}
+    
+});
 
-export const deleteMovieList = async (req, res) => {
-    try {
+export const deleteMovieList = asyncHandler(async (req, res) => {
+   
         const movieListDelete = await MovieList.findByIdAndDelete(req.params.id);
         if(!movieListDelete) {
             return res.status(404).json({message : 'Movie not found'});
         }
 
-        res.status(200).json({message : 'Movie List deleted  successfully'});
-    } catch (error) {
-        res.status(500).json({ message : error.message });
-    }
-}
+        res.status(200).json({ success:true, message : 'Movie List deleted  successfully'});
+    
+});

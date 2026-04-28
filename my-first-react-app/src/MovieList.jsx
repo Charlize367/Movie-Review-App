@@ -4,13 +4,15 @@ import { useState, useEffect } from 'react'
 import Nav from './components/Nav.jsx'
 import axios from 'axios';
 import MovieListCard from './components/MovieListCard.jsx';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 
 
 const MovieList = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const apiUrl =  import.meta.env.VITE_TMDB_API_URL;
-const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODI1MGEyNjQ5YTAwYTk2OTdlYjIxMGUzMTExZGE1YyIsIm5iZiI6MTcyMjU4NzAzNS43MTYsInN1YiI6IjY2YWM5NzliNTEyMTNhZjA5MWJkNThhMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zrM-3dtjvwa-al-qRd70tlGRD0VkxCFbHgYmZEzY6gA';
+  const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+  
 
 const apiOptions = {
   method: 'GET',
@@ -23,17 +25,25 @@ const apiOptions = {
   const userId = localStorage.getItem('user_ID');
   const [isActive, setIsActive] = useState(false);
   const [movieLists, setMovieLists] = useState([]);
-  const [myMovieLists, setMyMovieLists] = useState([]);
   const [movieOptions, setMovieOptions] = useState([]);
   const [selectedMovieIds, setSelectedMovieIds] = useState([]);
   const [selectedMovies, setSelectedMovies] = useState([]);
   const [search, setSearch] = useState("");
-  
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const location = useLocation();
 
-console.log(selectedMovies);
-console.log(movieOptions);
 
+  useEffect(() => {
+  if (location.state?.popup) {
+    setPopupMessage(location.state.popup);
+    setShowPopup(true);
+
+    setTimeout(() => setShowPopup(false), 3000);
+  }
+}, []);
 
   const openForm = (id) => {
     setIsActive(!isActive);
@@ -66,36 +76,6 @@ const [formData, setFormData] = useState({
             });
     }
 
-
-
-  const getMyMovieLists = async () => {
-       try {
-
-       
-             const response = await axios.get(`${API_URL}/movieLists/${userId}`, {
-                  headers: {
-                       'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
-                  }
-              });
-
-              console.log(response);
-              setMyMovieLists(response.data);
-              
-              
-  
-              
-            } catch (error) {
-              console.log(error);
-              
-            }
-          }
-  
-      useEffect(() => {
-      getMyMovieLists();
-      
-    }, []);
-
     const getMovieLists = async () => {
        try {
 
@@ -103,12 +83,13 @@ const [formData, setFormData] = useState({
              const response = await axios.get(`${API_URL}/movieList`, {
                   headers: {
                        'Content-Type': 'application/json',
-                       'Authorization': `Bearer ${token}`
+                       
                   }
               });
 
               console.log(response);
               setMovieLists(response.data.data);
+              setIsLoading(false);
               
               
   
@@ -319,10 +300,22 @@ const [formData, setFormData] = useState({
                 });
                 setSelectedMovieIds([]);
                 setSelectedMovies([]);
+                setShowPopup(true);
+                setPopupMessage("Movie List created succesfully.");
+
+                setTimeout(() => setShowPopup(false), 3000);
         } catch (error) {
             console.error("FULL ERROR:", error);
         }
       }
+
+      const goToLogin = () => {
+    navigate("/login", {
+      state: {
+        from: location.pathname + location.search
+      }
+    })
+  }
 
       
    
@@ -335,13 +328,35 @@ const [formData, setFormData] = useState({
 
       <div className="mb-10 flex flex-col items-center text-center">
          <h2 className="font-bold text-white text-4xl flex items-center mb-5">Movie Lists</h2> 
-         <div className="flex items-center text-white text-sm font-medium p-3 max-w-35 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="ratingBtn" onClick={openForm}><p className="m-1"> + Add Movie list</p> </button> </div>
+         {showPopup && (
+            <div
+        className={`
+          fixed top-6 right-6 z-50 max-w-xs z-99 w-full p-4 rounded-xl shadow-lg
+          bg-gray-900 text-white text-sm font-medium transition-transform duration-300
+          ${showPopup ? "translate-x-0 opacity-100" : "translate-x-32 opacity-0"}
+        `}
+      >
+        {popupMessage}
+      </div>
+              )}
+         
+         <div className="flex items-center cursor-pointer text-white text-sm font-medium p-3 max-w-35 rounded-4xl bg-gradient-to-r from-blue-700 to-cyan-600" ><button className="cursor-pointer" onClick={() => {
+    if (!token) {
+      goToLogin();
+    } else {
+      openForm();
+    }
+  }}><p className="m-1"> + Add Movie list</p> </button> </div>
         </div>
 
        </div>
      
        
-        
+        {isLoading ? (
+          <center>
+          <img className="spinner" src="./Spinner.svg"/>
+          </center>
+        ) : (
               
              <div class="grid grid-cols-1 mx-20 lg:mx-auto lg:max-w-5xl gap-6 md:grid-cols-2 lg:grid-cols-3 ">
             
@@ -357,6 +372,7 @@ const [formData, setFormData] = useState({
 
          
             </div>
+        )}
             
  
  <div className=" overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full" style={isActive ? {display: "flex"} : {display: "none"}}>
@@ -365,10 +381,10 @@ const [formData, setFormData] = useState({
              <div class="w-full mx-auto max-w-2xl space-y-4 m-30 bg-gray-900 p-6 rounded-lg shadow-xs">
            <div class="flex  items-center rounded-lg  pb-4 md:pb-5">
              
-                 <h3 class="text-xl font-semibold text-white text-heading">
+                 <h3 class="text-xl  font-semibold text-white text-heading">
                      Create a Movie List
                  </h3>
-                 <button type="button" onClick={openForm} class="text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
+                 <button type="button" onClick={openForm} class=" cursor-pointer text-white text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
                      <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
                      <span class="sr-only">Close modal</span>
                  </button>
@@ -437,6 +453,7 @@ const [formData, setFormData] = useState({
 </div>
 
 
+
     <div className="col-span-2 "><label className="block text-sm font-medium text-white mb-1" htmlFor="file_input">Upload an image</label>
                             <input onChange={handleChange} className="block w-full text-sm text-gray-200
                file:mr-4 file:py-2 file:px-4
@@ -450,7 +467,7 @@ const [formData, setFormData] = useState({
                         <div className="col-span-2 flex justify-center">
                        
           </div>
-           <button class="block w-full  mt-10 mb-5 rounded-lg border border-blue-600 bg-blue-900 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white" type="submit">Add</button>
+           <button class="block w-full  cursor-pointer mt-10 mb-5 rounded-lg bg-gradient-to-r from-blue-700 to-cyan-600 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white" type="submit">Add</button>
          
            </form>
          </div>

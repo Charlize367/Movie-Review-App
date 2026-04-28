@@ -10,13 +10,13 @@ const Liked = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const userId = localStorage.getItem('user_ID');
   const [likedMovies, setLikedMovies] = useState([]);
-   const [isLoading, setIsLoading] = useState(false);
+   const [isLoading, setIsLoading] = useState(true);
    const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem('jwtToken');
 
   const getUserLikes = async () => {
        try {
-             const response = await axios.get(`${API_URL}/users/${userId}/likedMovies`, {
+             const response = await axios.get(`${API_URL}/watch/liked/${userId}`, {
                   headers: {
                        'Content-Type': 'application/json',
                        'Authorization': `Bearer ${token}`
@@ -24,12 +24,13 @@ const Liked = () => {
               });
 
               console.log(response);
-              setLikedMovies(response.data.likedMovies);
-
+              setLikedMovies(response.data.data);
+              setIsLoading(false);
               
               
             } catch (error) {
               console.log(error);
+              setErrorMessage(error);
               
             }
           }
@@ -39,15 +40,13 @@ const Liked = () => {
       
     }, [userId]);
 
-    console.log(likedMovies);
+    console.log("Liked data: ", likedMovies);
   return (
-    <div className="container">
+    <div className="w-full">
       <Nav/>
 
-        <h2 className="text-3xl text-white font-bold ml-10 mt-5">Browse Liked Movies</h2>
-        {likedMovies.length == 0 && (
-            <p className="text-white text-md m-10"> No liked movies.</p>
-          )}
+        <h2 className="text-3xl text-white font-bold ml-15 mt-5">Browse Liked Movies</h2>
+       
       <section className="all-movies">
         {isLoading ? (
             <center>
@@ -55,15 +54,19 @@ const Liked = () => {
           </center>
         ) : errorMessage ? (
         <p>{errorMessage}</p>
+        ) : likedMovies.length == 0 ? (
+
+        <p className="text-white text-md m-15"> No liked movies.</p>
       ) : (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5 sm:grid-cols-2
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-6 sm:grid-cols-2
     md:grid-cols-3 lg:gap-8 py-6 px-4 m-10">
   
-          {likedMovies.map((movie) => (
+          {likedMovies.map((movie) =>  { 
+            return(
              <div className="aspect-[2/3] rounded-lg overflow-hidden rounded bg-gray-300">
-            <MovieCard movie={movie}/>
+            <MovieCard movie={movie?.movieId[0]}/>
             </div>
-          ))}
+          )})}
           
           
           </div>

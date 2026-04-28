@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addMovieToMovieList,  createMovieList,  deleteMovieFromMovieList, deleteMovieList, getMovieList, getMovieListById, getMovieListByUser, updateMovieListDetails, getMovieListLikes, getMovieListComments, getMovieListLikeNumber, getMovieListCommentNumber, addCommentToMovieList, addLikeToMovieList, removeCommentFromList, removeLikeFromList, updateComment, updateListImage } from "../controllers/movieListController.js";
+import { addMovieToMovieList,  createMovieList,  deleteMovieFromMovieList, deleteMovieList, getMovieList, getMovieListById, getMovieListByUser, updateMovieListDetails, getMovieListLikes, getMovieListComments, getMovieListLikeNumber, getMovieListCommentNumber, addCommentToMovieList, addLikeToMovieList, removeCommentFromList, removeLikeFromList, updateComment, updateListImage, toggleMovieListLike } from "../controllers/movieListController.js";
 import authorize from "../middlewares/auth.middleware.js";
 import multer from 'multer';
 
@@ -17,19 +17,19 @@ const upload = multer({ storage : storage});
 
 const movieListRouter = Router();
 
-movieListRouter.get('/', authorize, getMovieList);
+movieListRouter.get('/',  getMovieList);
 
-movieListRouter.get('/:id', authorize, getMovieListById);
+movieListRouter.get('/:id',  getMovieListById);
 
-movieListRouter.get('/:userId', authorize, getMovieListByUser);
+movieListRouter.get('/:userId',  getMovieListByUser);
 
-movieListRouter.get('/likes/:id', authorize, authorize, getMovieListLikes);
+movieListRouter.get('/likes/:id',  authorize, getMovieListLikes);
 
-movieListRouter.get('/comments/:id', authorize, getMovieListComments);
+movieListRouter.get('/comments/:id',  getMovieListComments);
 
-movieListRouter.get('/likeCount/:id', authorize, getMovieListLikeNumber);
+movieListRouter.get('/likeCount/:id', getMovieListLikeNumber);
 
-movieListRouter.get('/commentCount/:id', authorize, getMovieListCommentNumber);
+movieListRouter.get('/commentCount/:id',  getMovieListCommentNumber);
 
 movieListRouter.post('/:id', upload.single("image"), authorize, createMovieList);
 
@@ -37,7 +37,7 @@ movieListRouter.post('/:listId/addMovie', authorize, addMovieToMovieList);
 
 movieListRouter.post('/:userId/:movieListId/comment', authorize, addCommentToMovieList);
 
-movieListRouter.post('/:userId/:movieListId/likes', authorize, addLikeToMovieList);
+movieListRouter.post('/:userId/:movieListId/likes', authorize, toggleMovieListLike);
 
 movieListRouter.put('/:id', authorize, updateMovieListDetails);
 

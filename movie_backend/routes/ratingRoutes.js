@@ -1,31 +1,31 @@
 import { Router } from "express";
-import { addCommentToRating, addLiketoRating, addRating, deleteRating, getRating, getRatingCommentNumber, getRatingComments, getRatingLikeNumber, getRatingLikes, getRatings, getRatingsByMovie, getRatingsByUser, removeCommentFromRating, removeLikeFromRating, updateComment, updateRating } from "../controllers/ratingController.js";
+import { addCommentToRating, addLiketoRating, addRating, deleteRating, getRating, getRatingCommentNumber, getRatingComments, getRatingLikeNumber, getRatingLikes, getRatings, getRatingsByMovie, getRatingsByUser, removeCommentFromRating, removeLikeFromRating, toggleRatingLike, updateComment, updateRating } from "../controllers/ratingController.js";
 import authorize from "../middlewares/auth.middleware.js";
 
 
 const ratingRouter = Router();
 
-ratingRouter.get('/', authorize, getRatings);
+ratingRouter.get('/',  getRatings);
 
 ratingRouter.get('/:id', authorize, getRating);
 
-ratingRouter.get('/userRatings/:userId', authorize, getRatingsByUser);
+ratingRouter.get('/userRatings/:userId', getRatingsByUser);
 
-ratingRouter.get('/movieRatings/:movieId', authorize, getRatingsByMovie);
+ratingRouter.get('/movieRatings/:movieId', getRatingsByMovie);
 
-ratingRouter.get('/likes/:id', authorize, getRatingLikes);
+ratingRouter.get('/likes/:id',  getRatingLikes);
 
-ratingRouter.get('/comments/:id', authorize, getRatingComments);
+ratingRouter.get('/comments/:id',  getRatingComments);
 
-ratingRouter.get('/likeCount/:id', authorize, getRatingLikeNumber);
+ratingRouter.get('/likeCount/:id',  getRatingLikeNumber);
 
-ratingRouter.get('/commentCount/:id', authorize, getRatingCommentNumber);
+ratingRouter.get('/commentCount/:id',  getRatingCommentNumber);
 
 ratingRouter.post('/', addRating);
 
 ratingRouter.post('/:userId/:ratingId/comment', authorize, addCommentToRating);
 
-ratingRouter.post('/:userId/:ratingId/likes', authorize, addLiketoRating);
+ratingRouter.post('/:userId/:ratingId/like', authorize, toggleRatingLike);
 
 ratingRouter.put('/:id', authorize, updateRating);
 

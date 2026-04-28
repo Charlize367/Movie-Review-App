@@ -10,8 +10,8 @@ const List = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const userId = localStorage.getItem('user_ID');
   const [watchList, setWatchList] = useState([]);
-   const [isLoading, setIsLoading] = useState(false);
-   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem('jwtToken');
 
   const getWatchList = async () => {
@@ -24,12 +24,14 @@ const List = () => {
               });
 
               console.log(response);
-              setWatchList(response.data.watchListMovies);
+              setWatchList(response.data.data);
+              setIsLoading(false);
 
               
               
             } catch (error) {
               console.log(error);
+              setErrorMessage(error);
               
             }
           }
@@ -39,27 +41,32 @@ const List = () => {
       
     }, [userId]);
   return (
-    <div className="container">
+    <div className="w-full">
       <Nav/>
 
-        <h2 className="text-3xl text-white font-bold ml-10 mt-5">Browse WatchList</h2>
-        {watchList.length == 0 && (
-            <p className="text-white text-md m-10"> No movies in WatchList.</p>
-          )}
-      <section className="all-movies">
+        <h2 className="text-3xl text-white font-bold ml-15 mt-5">Browse WatchList</h2>
+
+        
+
+     
+
+        
+      <section className="w-full">
         {isLoading ? (
             <center>
           <img className="spinner" src="/Spinner.svg"/>
           </center>
         ) : errorMessage ? (
         <p>{errorMessage}</p>
+      ) : watchList.length == 0 ? (
+        <p className="text-white text-md m-15"> No movies in WatchList.</p>
       ) : (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5 sm:grid-cols-2
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-6 sm:grid-cols-2
     md:grid-cols-3 lg:gap-8 py-6 px-4 m-10">
   
           {watchList.map((movie) => (
              <div className="aspect-[2/3] rounded-lg overflow-hidden rounded bg-gray-300">
-            <MovieCard movie={movie}/>
+            <MovieCard movie={movie?.movieId[0]}/>
             </div>
           ))}
           

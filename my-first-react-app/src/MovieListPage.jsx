@@ -11,7 +11,7 @@ import CommentsSection from './components/CommentsSection.jsx'
 const MovieListPage = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const apiUrl =  import.meta.env.VITE_TMDB_API_URL;
-const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODI1MGEyNjQ5YTAwYTk2OTdlYjIxMGUzMTExZGE1YyIsIm5iZiI6MTcyMjU4NzAzNS43MTYsInN1YiI6IjY2YWM5NzliNTEyMTNhZjA5MWJkNThhMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zrM-3dtjvwa-al-qRd70tlGRD0VkxCFbHgYmZEzY6gA';
+const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
 const apiOptions = {
   method: 'GET',
@@ -22,7 +22,7 @@ const apiOptions = {
 }
   const userId = localStorage.getItem('user_ID');
   const [movieList, setMovieList] = useState([]);
-   const [isLoading, setIsLoading] = useState(false);
+   const [isLoading, setIsLoading] = useState(true);
    const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem('jwtToken');
   const param = useParams();
@@ -36,7 +36,22 @@ const apiOptions = {
     const [search, setSearch] = useState("");
   const [imageData, setImageData] = useState("");
   const navigate = useNavigate();
+  const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfirm2, setShowConfirm2] = useState(false);
+  const [deleteMovieId, setDeleteMovieId] = useState("");
   
+  
+  const handleDeleteClick = (movieId) => {
+    setShowConfirm(true); 
+    setDeleteMovieId(movieId);
+
+  };
+
+  const handleDeleteClick2 = (movieId) => {
+    setShowConfirm2(true); 
+  };
 
   const getMovieList = async () => {
        try {
@@ -52,6 +67,8 @@ const apiOptions = {
 
               console.log(response);
               setMovieList(response.data.data);
+              setIsLoading(false);
+             
               
               
   
@@ -159,10 +176,15 @@ const openImageForm = () => {
               console.log(response);
 
               
-              setIsActive(isActive);
+              setIsActive(!isActive);
               e.target.reset();
 
               getMovieList();
+              
+              setShowPopup(true);
+              setPopupMessage("Movie list details updated successfully.");
+
+              setTimeout(() => setShowPopup(false), 3000);
 
               } catch (error) {
               console.log(error);
@@ -191,6 +213,10 @@ const openImageForm = () => {
                 e.target.reset();
   
                 getMovieList();
+                setShowPopup(true);
+              setPopupMessage("Cover photo updated successfully.");
+
+              setTimeout(() => setShowPopup(false), 3000);
   
                 } catch (error) {
                 console.log(error);
@@ -358,10 +384,12 @@ const openImageForm = () => {
         setSelectedMovieIds(updatedSelectedMovieIds);
       }
 
-      const removeMovieFromList = async(movieId) => {
+      const removeMovieFromList = async() => {
+
+        setShowConfirm(false);
 
         try {
-          const response = await axios.delete(`${API_URL}/movieList/${movieList._id}/${movieId}/deleteMovie`, {
+          const response = await axios.delete(`${API_URL}/movieList/${movieList._id}/${deleteMovieId}/deleteMovie`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -369,6 +397,12 @@ const openImageForm = () => {
 
           console.log(response);
           getMovieList();
+          setDeleteMovieId("");
+          setShowPopup(true);
+          setPopupMessage("Movie removed from list successfully.");
+          
+
+          setTimeout(() => setShowPopup(false), 3000);
         } catch (error) {
           console.error(error);
         }
@@ -395,6 +429,10 @@ const openImageForm = () => {
             
             setSelectedMovieIds([]);
             setSelectedMovies([]);
+            setShowPopup(true);
+              setPopupMessage("Movie added to list successfully.");
+
+              setTimeout(() => setShowPopup(false), 3000);
         } catch (error) {
             console.error("FULL ERROR:", error);
         }
@@ -416,8 +454,11 @@ const openImageForm = () => {
                     
                   
       
-                    navigate('/movieList');
-      
+                    navigate("/movieList", {
+                      state: {
+                        popup: "🎬 Movie list deleted successfully",
+                      },
+                    });
                     } catch (error) {
                     console.log(error);
                     
@@ -439,7 +480,7 @@ console.log(isActive2);
   <div className="flex flex-wrap gap-3 mt-4">
     <button
       onClick={openForm}
-      className="px-4 py-2 rounded-2xl text-white font-medium
+      className="px-4 py-2 cursor-pointer rounded-2xl text-white font-medium
                  bg-gradient-to-r from-blue-700 to-cyan-600
                  hover:scale-105 transition flex">
       <img className="mr-2 w-5 h-5" src={`/edit-icon.svg`}/>
@@ -448,7 +489,7 @@ console.log(isActive2);
 
     <button
       onClick={openImageForm}
-      className="px-4 py-2 rounded-2xl text-white font-medium
+      className="px-4 py-2 cursor-pointer rounded-2xl text-white font-medium
                  bg-gradient-to-r from-blue-700 to-cyan-600
                  hover:scale-105 transition flex">
       <img className="mr-2 w-5 h-5" src={`/edit-icon.svg`}/>
@@ -457,15 +498,15 @@ console.log(isActive2);
 
     <button
       onClick={openForm2}
-      className="px-4 py-2 rounded-2xl text-white font-medium
+      className="px-4 py-2 cursor-pointer rounded-2xl text-white font-medium
                  bg-gradient-to-r from-blue-700 to-cyan-600
                  hover:scale-105 transition">
       + Add Movie
     </button>
 
     <button
-      onClick={deleteMovieList}
-      className="px-4 py-2 rounded-2xl text-white font-medium
+      onClick={handleDeleteClick2}
+      className="px-4 py-2 cursor-pointer rounded-2xl text-white font-medium
                  bg-red-800 hover:bg-red-700 transition flex">
       <img className="mr-2 w-5 h-5" src={`/delete-icon.svg`}/>
       Delete List
@@ -476,12 +517,65 @@ console.log(isActive2);
         </div>
       
       </div>
+      {showPopup && (
+            <div
+        className={`
+          fixed top-6 right-6 z-50 max-w-xs z-99 w-full p-4 rounded-xl shadow-lg
+          bg-gray-900 text-white text-sm font-medium transition-transform duration-300
+          ${showPopup ? "translate-x-0 opacity-100" : "translate-x-32 opacity-0"}
+        `}
+      >
+        {popupMessage}
+      </div>
+              )}
+
+
+
+      {showConfirm && (
+        <div className="fixed top-6 right-6 z-50 w-80 p-4 rounded-xl shadow-lg bg-gray-900 text-white flex flex-col gap-3">
+    <p className="font-medium">Are you sure you want to delete this movie?</p>
+    <div className="flex justify-end gap-2">
+      <button
+        onClick={removeMovieFromList}
+        className="bg-red-600 px-4 py-2 cursor-pointer rounded-lg hover:bg-red-700 transition"
+      >
+        Confirm
+      </button>
+      <button
+        onClick={() => setShowConfirm(false)}
+        className="bg-gray-700 px-4 py-2 cursor-pointer rounded-lg hover:bg-gray-600 transition"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+      )}
+
+      {showConfirm2 && (
+        <div className="fixed top-6 right-6 z-50 w-80 p-4 rounded-xl shadow-lg bg-gray-900 text-white flex flex-col gap-3">
+    <p className="font-medium">Are you sure you want to delete this movie list?</p>
+    <div className="flex justify-end gap-2">
+      <button
+        onClick={deleteMovieList}
+        className="bg-red-600 px-4 py-2 cursor-pointer rounded-lg hover:bg-red-700 transition"
+      >
+        Confirm
+      </button>
+      <button
+        onClick={() => setShowConfirm2(false)}
+        className="bg-gray-700 px-4 py-2 cursor-pointer rounded-lg hover:bg-gray-600 transition"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+      )}
       
 
       <section className="all-movies">
         {isLoading ? (
             <center>
-          <img className="spinner" src="/Spinner.svg"/>
+          <img className="spinner" src="../Spinner.svg"/>
           </center>
         ) : errorMessage ? (
         <p>{errorMessage}</p>
@@ -496,11 +590,14 @@ console.log(isActive2);
 
             
             </div>
+            
             {movieList.userId == userId && (
-            <button type="button" className="text-white rounded-2xl p-3 mt-3 text-white font-medium
+            <button type="button" className="text-white cursor-pointer rounded-2xl p-3 mt-3 text-white font-medium
                  bg-gradient-to-r from-blue-700 to-cyan-600
-                 hover:scale-105 transition flex" onClick={() => removeMovieFromList(movie._id)}><img className="w-5 h-5" src={`/delete-icon.svg`}/></button>
+                 hover:scale-105 transition flex" onClick={() => handleDeleteClick(movie._id)}><img className="w-5 h-5" src={`/delete-icon.svg`}/></button>
             )}
+
+            
             </div>
             
           ))}
@@ -524,9 +621,9 @@ console.log(isActive2);
            <form onSubmit={editMovieListDetails} className=" md:pt-3" >
             <div className="flex">
         <h3 class="text-xl font-semibold text-white text-heading">
-                     Create a Movie List
+                      Edit Movie List Details
                  </h3>
-                 <button type="button" onClick={openForm} class="text-body text-white bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
+                 <button type="button" onClick={openForm} class="text-body cursor-pointer text-white bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
                      <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
                      <span class="sr-only">Close modal</span>
             </button>
@@ -540,7 +637,7 @@ console.log(isActive2);
      <div className="col-span-2 flex justify-center">
                        
           </div>
-           <button class="block w-full  mt-10 mb-5 rounded-lg border border-blue-600 bg-blue-900 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white" type="submit">Add</button>
+           <button class="block w-full bg-gradient-to-r from-blue-700 to-cyan-600  mt-10 mb-5 rounded-lg px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white" type="submit">Add</button>
          
            </form>
          </div>
@@ -559,7 +656,7 @@ console.log(isActive2);
                <h3 class="text-2xl font-semibold text-white text-heading">
                     Add a movie
                  </h3>
-                 <button type="button" onClick={() => {openForm2(); setSelectedMovieIds([]); setSelectedMovies([]); setSearch("")}} class="text-body text-white bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
+                 <button type="button" onClick={() => {openForm2(); setSelectedMovieIds([]); setSelectedMovies([]); setSearch("")}} class="text-body cursor-pointer text-white bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base  text-sm w-9 h-9 ms-auto inline-flex justify-center items-center" data-modal-hide="authentication-modal">
                      <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
                      <span class="sr-only">Close modal</span>
                  </button>
@@ -574,14 +671,14 @@ console.log(isActive2);
             <svg class="w-4 h-4 text-body" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/></svg>
         </div>
         <input type="search" id="search" value={search} onChange={(event) => setSearch(event.target.value)} class="block w-full rounded-lg p-3 ps-9 dark:text-white dark:placeholder-gray-400 dark:bg-gray-800 mb-1 text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body" placeholder="Search" required />
-        <button type="button" class="absolute end-1.5 bottom-1.5 text-white bg-brand hover:bg-brand-strong box-border border border-transparent focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded text-xs px-3 py-1.5 focus:outline-none">Add</button>
+        <button type="button" class="absolute cursor-pointer end-1.5 bottom-1.5 text-white bg-brand hover:bg-brand-strong box-border border border-transparent focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded text-xs px-3 py-1.5 focus:outline-none">Add</button>
     
     </div>
     {search != "" && (
     <div id="dropdown" class="z-10 h-25 w-full overflow-y-auto dark:placeholder-gray-400 dark:bg-gray-800 text-white mb-2 rounded-base shadow-lg w-44">
             <ul class="p-2 flex flex-col text-sm text-body font-medium" aria-labelledby="dropdown-button">
                 {movieOptions.map(m => 
-                <button type="button" className="hover:bg-gray-400" onClick={() => selectMovieOption(m.id)} disabled={selectedMovieIds.includes(m.id)}>
+                <button type="button" className="hover:bg-gray-400" onClick={() => selectMovieOption(m.id)} disabled={selectedMovies.some(movie => movie.id === m.id)}>
                 <li className="flex items-center mb-3">
                     <img className="w-15 h-15 rounded-lg" src={m.poster_path ? `https://image.tmdb.org/t/p/w500/${m.poster_path}` : null} />
                     <p class="block p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md">{m.title}</p>
@@ -594,6 +691,8 @@ console.log(isActive2);
     )}
     
         </div>
+
+        
     
 
 <div class="relative overflow-x-auto dark:placeholder-gray-400 dark:bg-gray-800 text-white shadow-xs rounded-base mb-2">
@@ -619,7 +718,7 @@ console.log(isActive2);
         )}
     </table>
 </div>
-<button class="block w-full  mt-10 mb-5 rounded-lg border border-blue-600 bg-blue-900 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white" type="submit">Add</button> 
+<button class="block w-full  mt-10 mb-5 rounded-lg cursor-pointer bg-gradient-to-r from-blue-700 to-cyan-600 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 dark:hover:bg-indigo-700 dark:hover:text-white" type="submit">Add</button> 
        </form>
          </div>
          
@@ -640,8 +739,8 @@ console.log(isActive2);
                  focus:ring-2 focus:ring-indigo-500
                  shadow-inner mb-4" />
     
-      <button className="text-gray-400 hover:text-white" onClick={openImageForm}>Cancel</button>
-      <button className="bg-indigo-600 hover:bg-indigo-500 px-4 ml-2 py-2 rounded-lg text-white">
+      <button className="text-gray-400 cursor-pointer hover:text-white" onClick={openImageForm}>Cancel</button>
+      <button className="bg-gradient-to-r cursor-pointer from-blue-700 to-cyan-600 px-4 ml-2 py-2 rounded-lg text-white">
         Save
       </button>
  

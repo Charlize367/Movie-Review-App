@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Form, useParams } from 'react-router-dom';
+import { Form, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react'
 import Nav from './components/Nav.jsx'
 import axios from 'axios';
@@ -11,19 +11,33 @@ import relativeTime from "dayjs/plugin/relativeTime"
 
 const Comments = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('jwtToken');
   const param = useParams();
   const userId = localStorage.getItem('user_ID');
   const [rate, setRate] = useState([]);
-
   const [isActive, setIsActive] = useState(false);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const [updateCommentID, setUpdateCommentID] = useState(0);
-  const [updateComment, setUpdateComment] = useState("");
   const [updateData, setUpdateData] = useState([]);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+ 
  
    dayjs.extend(relativeTime);
+
+   useEffect(() => {
+       if (location.state?.popup) {
+         setPopupMessage(location.state.popup);
+         setShowPopup(true);
+     
+         setTimeout(() => setShowPopup(false), 3000);
+       }
+     }, []);
    
 
   const openUpdateCommentForm = (commentId) => {
@@ -45,8 +59,6 @@ const Comments = () => {
 
 
 
-  const recentRatings = rate.slice(0, 5);
-
   const handleCommentChange = (e) => {
   setComment(e.target.value);
 };
@@ -66,7 +78,8 @@ const Comments = () => {
         
 
       
-        setComments(response.data.comments);
+        setComments(response.data.data.comments);
+        setLoading(false);
       } catch (error) {
         console.log(error);
       }
@@ -107,6 +120,10 @@ const Comments = () => {
         setComment("");
 
         getComment();
+       setShowPopup(true);
+      setPopupMessage("Comment added successfully.");
+
+      setTimeout(() => setShowPopup(false), 3000);
       } catch (error) {
         console.log(error);
       }
@@ -128,10 +145,14 @@ const Comments = () => {
               console.log(response);
 
               
-              setisActive(!isActive);
+              setIsActive(!isActive);
               e.target.reset();
 
               getComment();
+              setShowPopup(true);
+      setPopupMessage("Comment edited successfully.");
+
+      setTimeout(() => setShowPopup(false), 3000);
 
               } catch (error) {
               console.log(error);
@@ -156,11 +177,23 @@ const Comments = () => {
             
 
               getComment();
+              setShowPopup(true);
+      setPopupMessage("Comment deleted successfully.");
+
+      setTimeout(() => setShowPopup(false), 3000);
 
               } catch (error) {
               console.log(error);
               
             }
+  }
+
+  const goToLogin = () => {
+    navigate("/login", {
+      state: {
+        from: location.pathname + location.search
+      }
+    })
   }
    
   return (
@@ -196,6 +229,7 @@ const Comments = () => {
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Discussion</h2>
     </div>
+    {token && (
     <form class="mb-6">
         <div class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <label for="comment" class="sr-only">Your comment</label>
@@ -204,17 +238,59 @@ const Comments = () => {
                 placeholder="Write a comment..." required></textarea>
         </div>
         <button onClick={addComment} type="submit"
-            class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
+            class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-gradient-to-r from-blue-700 to-cyan-600 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
             Post comment
         </button>
     </form>
+    )}
+
+    {loading && (
+      <div className="flex justify-center my-6">
+        <img src="/Spinner.svg" alt="Loading..." className="w-12 h-12" />
+      </div>
+    )}
+
+
+{token && !loading  && comments.length === 0 && (
+  <span className="text-white flex m-10 justify-center">
+    No comments found. 
+  </span>
+)}
+    {!loading && !token && comments.length === 0 && (
+  <span className="text-white">
+    No comments found. Please{" "}
+    <a
+      onClick={goToLogin}
+      className="text-cyan-400 cursor-pointer hover:underline"
+    >
+      sign in
+    </a>{" "}
+    to comment.
+  </span>
+)}
+
+
+
+{showPopup && (
+            <div
+        className={`
+          fixed top-6 right-6 z-50 max-w-xs z-99 w-full p-4 rounded-xl shadow-lg
+          bg-gray-700 text-white text-sm font-medium transition-transform duration-300
+          ${showPopup ? "translate-x-0 opacity-100" : "translate-x-32 opacity-0"}
+        `}
+      >
+        {popupMessage}
+      </div>
+              )}
+
+    
     {comments.map(c => (
-    <article class="p-6 text-base bg-white rounded-lg dark:bg-gray-900">
+    <article class="p-6 text-base bg-white h-auto rounded-lg dark:bg-gray-900">
         <footer class="flex justify-between items-center mb-2">
             <div class="flex items-center">
                 <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold"><img
                         class="mr-2 w-6 h-6 rounded-full"
-                        src={`http://localhost:3000/${c.userId.image}`}
+                        src={`${API_BASE_URL}/${c.userId.image}`}
                         alt="Michael Gough"/>{c.userId.username}</p>
                 <p class="text-sm text-gray-600 dark:text-gray-400"><time pubdate datetime="2022-02-08"
                         title="February 8th, 2022">{dayjs(c.updatedAt).fromNow()}</time></p>

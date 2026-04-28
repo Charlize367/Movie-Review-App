@@ -10,41 +10,49 @@ import Diary from './Diary.jsx'
 import Login from './auth/Login.jsx'
 import SignUp from './auth/SignUp.jsx'
 import MovieDetails from './MovieDetails.jsx'
-import ProtectedRoute from './auth/ProtectedRoute.jsx'
 import { AuthProvider } from './auth/AuthContext.jsx'
+import { NotificationProvider } from './notifications/NotificationContext.jsx'
 import Comments from './Comments.jsx'
 import Account from './Account.jsx'
 import MovieList from './MovieList.jsx'
 import MovieListPage from './MovieListPage.jsx'
+import Members from './Members.jsx'
+import Profile from './Profile.jsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 
-
+const queryClient = new QueryClient();
 const App = ()  => {
   return (
-   
+  <QueryClientProvider client={queryClient} >
       <AuthProvider>
+    <NotificationProvider>
       <BrowserRouter>
     
             <Routes>
                 <Route exact path="/login" element={<Login/>} />
                 <Route exact path="/sign-up" element={<SignUp/>} />
 
-                <Route exact path="/categories/:id/:name" element={<ProtectedRoute allowedRoles={["USER"]}><Categories /></ProtectedRoute>} />
-                <Route exact path="/liked" element={<ProtectedRoute allowedRoles={["USER"]}><Liked /></ProtectedRoute>} />
-                <Route exact path="/all_ratings/:id" element={<ProtectedRoute allowedRoles={["USER"]}><AllRatings /></ProtectedRoute>} />
-                <Route exact path="/list" element={<ProtectedRoute allowedRoles={["USER"]}><List /></ProtectedRoute>} />
-                <Route exact path="/diary" element={<ProtectedRoute allowedRoles={["USER"]}><Diary /></ProtectedRoute>} />
-                <Route exact path="/rated" element={<ProtectedRoute allowedRoles={["USER"]}><Rated /></ProtectedRoute>} />
-                <Route exact path="/home" element={<ProtectedRoute allowedRoles={["USER"]}><Home /></ProtectedRoute>} />
-                <Route exact path="/movieList" element={<ProtectedRoute allowedRoles={["USER"]}><MovieList /></ProtectedRoute>} />
-                <Route exact path="/movieListPage/:id" element={<ProtectedRoute allowedRoles={["USER"]}><MovieListPage /></ProtectedRoute>} />
-                <Route exact path="/movie_details/:id" element={<ProtectedRoute allowedRoles={["USER"]}><MovieDetails /></ProtectedRoute>} />
-                <Route exact path="/comments/:id/:ratingId" element={<ProtectedRoute allowedRoles={["USER"]}><Comments /></ProtectedRoute>} />
-                <Route exact path="/account" element={<ProtectedRoute allowedRoles={["USER"]}><Account /></ProtectedRoute>} />
+                <Route exact path="/categories/:id/:name" element={<Categories />} />
+                <Route exact path="/liked" element={<Liked />} />
+                <Route exact path="/all_ratings/:id" element={<AllRatings />} />
+                <Route exact path="/list" element={<List />}/>
+                <Route exact path="/diary" element={<Diary />} />
+                <Route exact path="/rated" element={<Rated />} />
+                <Route exact path="/home" element={<Home />}/>
+                <Route exact path="/members" element={<Members />}/>
+                <Route exact path="/movieList" element={<MovieList />} />
+                <Route exact path="/movieListPage/:id" element={<MovieListPage />} />
+                <Route exact path="/movie_details/:id" element={<MovieDetails />} />
+                <Route exact path="/comments/:id/:ratingId" element={<Comments />} />
+                <Route exact path="/profile/:id" element={<Profile />} />
+                <Route exact path="/account" element={<Account />} />
 
             </Routes>
             </BrowserRouter>
+        </NotificationProvider>
         </AuthProvider>
+      </QueryClientProvider>
    
 )}
 

@@ -32,20 +32,20 @@ const userSchema = new mongoose.Schema({
         required:true
     },
 
-    likedMovies: [{
+    friends: [{
         type:mongoose.Schema.Types.ObjectId,
-        ref: "Movie"
+        ref: "User"
     }],
 
-    watchListMovies: [{
-       type:mongoose.Schema.Types.ObjectId,
-               ref: "Movie"
+    following: [{
+        type:mongoose.Schema.Types.ObjectId,
+               ref: "User"
     }],
 
-    diary : [{
-       type:mongoose.Schema.Types.ObjectId,
-               ref: "Movie"
-    }],
+    followers: [{
+        type:mongoose.Schema.Types.ObjectId,
+               ref: "User"
+    }]
 
    }, {timestamps: true});
    

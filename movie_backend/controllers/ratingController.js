@@ -1,23 +1,21 @@
 import Ratings from "../models/ratingModel.js";
 import User from '../models/userModel.js'
 import Movie from '../models/movieModel.js'
+import asyncHandler from "../utils/asyncHandler.js";
+import { notificationSender } from "../utils/notificationSender.js";
 
 
-
-export const getRatings = async (req, res) => {
+export const getRatings = asyncHandler(async (req, res) => {
     
-    try {
-        const ratings = await Ratings.find();
+        const ratings = await Ratings.find().lean();
 
         res.status(200).json({ success: true, data: ratings});
-    } catch (error) {
-        next(error);
-    }
-}
+   
+});
 
-export const getRating = async (req, res) => {
-    try {
-        const rating = await Ratings.findById(req.params.id);
+export const getRating = asyncHandler(async (req, res) => {
+   
+        const rating = await Ratings.findById(req.params.id).lean();
 
         if(!rating) {
             const error = new Error('Movie not found');
@@ -25,122 +23,113 @@ export const getRating = async (req, res) => {
             throw error;
         }
         res.status(200).json({ success: true, data: rating});
-    } catch (error) {
-        console.log(error);
-    }
-}
+    
+});
 
-export const getRatingsByUser = async (req, res) => {
-    try {
+export const getRatingsByUser = asyncHandler(async (req, res) => {
+   
+       
         const userId = req.params.userId;
-        const user = await User.findById(userId);
+
+        const user = await User.findById(userId).lean();
 
         if(!user) {
             return res.status(404).json({message : 'User not found'});
         }
 
-        const ratings = await Ratings.find({ userId : userId }).populate('userId').populate('movieId');
-        res.json(ratings);
-    } catch (error) {
-    console.log(error);
-    }
-}
+        const ratings = await Ratings.find({ userId : userId }).populate('userId').populate('movieId').lean();
+
+        res.status(200).json({ success: true, data: ratings});
+   
+});
 
 
-export const getRatingsByMovie = async (req, res) => {
-    try {
+export const getRatingsByMovie = asyncHandler(async (req, res) => {
+   
         const movieId = req.params.movieId;
-        const movie = await Movie.findById(movieId);
+        const movie = await Movie.findById(movieId).lean();
 
         if(!movie) {
             return res.status(404).json({message : 'Movie not found'});
         }
 
-        const ratings = await Ratings.find({ movieId : movieId }).populate('movieId', 'title').populate('userId');
-        res.json(ratings);
-    } catch (error) {
-    console.log(error);
-    }
-}
+        const ratings = await Ratings.find({ movieId : movieId }).populate('movieId', 'title').populate('userId').lean();
+        res.status(200).json({ success: true, data: ratings});
+   
+});
 
-export const getRatingLikes = async (req, res) => {
+export const getRatingLikes = asyncHandler(async (req, res) => {
 
-    try{
+   
 
-        const likedRatings =  await Ratings.findById(req.params.id).select('likes');
+        const likedRatings =  await Ratings.findById(req.params.id).select('likes').lean();
 
-        res.status(200).json(likedRatings);
+        res.status(200).json({ success: true, data: likedRatings});
 
-    } catch (error) {
-        console.error(error);
-    }
-}
+    
+});
 
-export const getRatingComments = async (req, res) => {
+export const getRatingComments = asyncHandler(async (req, res) => {
 
-    try{
+   
 
-        const ratingComments =  await Ratings.findById(req.params.id).select('comments').populate('comments.userId');
+        const ratingComments =  await Ratings.findById(req.params.id).select('comments').populate('comments.userId').lean();
 
-        res.status(200).json(ratingComments);
+        res.status(200).json({ success: true, data: ratingComments});
 
-    } catch (error) {
-        console.error(error);
-    }
-}
+});
 
 
-export const getRatingLikeNumber = async (req, res) => {
-    try{
+export const getRatingLikeNumber = asyncHandler(async (req, res) => {
+    
 
         const rating = await Ratings.findById(req.params.id).lean();
 
         if (!rating) {
-      return res.status(404).json({ message: "Rating not found" });
-    }
+        return res.status(404).json({ message: "Rating not found" });
+        }
 
         const likeCount = rating.likes.length;
 
 
-        res.status(200).json({ likeCount});
-    } catch (error) {
-     console.log(error);
-    }
-}
+        res.status(200).json({ success: true, data: likeCount});
+   
+})
 
-export const getRatingCommentNumber = async (req, res) => {
+export const getRatingCommentNumber = asyncHandler(async (req, res) => {
     try{
 
         const rating = await Ratings.findById(req.params.id).lean();
 
         if (!rating) {
-      return res.status(404).json({ message: "Rating not found" });
-    }
+        return res.status(404).json({ message: "Rating not found" });
+        }
 
         const commentCount = rating.comments.length;
 
 
-        res.status(200).json({ commentCount});
+        res.status(200).json({ success: true, data: commentCount});
     } catch (error) {
      console.log(error);
     }
-}
+})
 
-export const addLiketoRating = async (req, res) => {
+export const addLiketoRating = asyncHandler(async (req, res) => {
 
-    try {
-        const existingLike = await Ratings.findById(req.params.userId).findOne({'likes' : req.params.userId});
+   
+        const existingLike = await Ratings.findOne({
+            _id: req.params.ratingId,
+            likes: req.params.userId
+        });
 
         if (existingLike) {
-            const error = new Error('Rating already liked');
-            error.statusCode = 409;
-            throw error;
+            return res.status(409).json({ message: "Rating already liked" });
         }
 
-        const rating = await Ratings.findById(req.params.ratingId).select('_id');
-        const addLike = await Ratings.findOneAndUpdate(
-            { _id : rating._id },
-            { $push: {likes : [req.params.userId]}},
+       
+        const addLike = await Ratings.findByIdAndUpdate(
+            req.params.ratingId,
+            { $push: {likes : req.params.userId}},
             { new: true}
         )
 
@@ -153,21 +142,76 @@ export const addLiketoRating = async (req, res) => {
             },
             userId: req.params.userId
         })
-    } catch (error) {
-        console.log("Failed to like rating");
-        console.log(error);
-    }
-}
+   
+});
 
-export const addCommentToRating = async (req, res) => {
+
+export const toggleRatingLike = asyncHandler(async (req, res) => {
+        const { userId, ratingId } = req.params;
+
+        const session = await mongoose.startSession();
+        session.startTransaction();
 
     try {
 
+        const unlikeAttempt =   await Ratings.findOneAndUpdate(
+            { _id: ratingId, likes: userId },
+            { $pull : { likes : userId  } },
+            { new: true, session }
+        )
+            
+        let action = "like removed";
+        
+    
+        if (!unlikeAttempt) {
+        const rating = await Ratings.findByIdAndUpdate(
+                ratingId,
+                { $addToSet: { likes : userId } },
+                { new: true, session }
+            );
+            action = "like added";
+
+       
+        const user = await User.findById(userId);
+        const movie = await Movie.findById(rating?.movieId);
+
+       
+        const notification = await Notification.create({
+                    userId: rating?.userId,
+                    from: userId,
+                    type: "LIKED RATING",
+                    message: `${user?.username} liked your rating of ${movie?.title}`
+        }, session)
+        
+        const wss = req.app.get("wss");
+        
+        console.log("Triggering notification");
+        notificationSender(wss, rating?.userId, notification);
+
+        }
+
+        res.status(201).json({
+            success:true,
+            action: action,
+            message: `Rating ${action}`
+        })
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        throw error;
+    }
+
+});
+
+export const addCommentToRating = asyncHandler(async (req, res) => {
+
+   
+
         const {comment} = req.body;
 
-        const rating = await Ratings.findById(req.params.ratingId).select('_id');
-        const addComment = await Ratings.findOneAndUpdate(
-            { _id : rating._id },
+       
+        const addComment = await Ratings.findByIdAndUpdate(
+            req.params.ratingId,
             { $push: {comments : [{userId: req.params.userId, comment: comment, createdAt: new Date(),
         updatedAt: new Date()}]}},
             { new: true}
@@ -181,14 +225,11 @@ export const addCommentToRating = async (req, res) => {
                 liked : addComment
             }
         })
-    } catch (error) {
-        console.log("Failed to add comment to rating");
-        console.log(error);
-    }
-}
+   
+});
 
-export const removeLikeFromRating = async (req, res) => {
-    try {
+export const removeLikeFromRating = asyncHandler(async (req, res) => {
+    
         const deleteLike = await Ratings.findByIdAndUpdate(
             req.params.ratingId,
             { $pull : {likes : req.params.userId  } },
@@ -198,20 +239,15 @@ export const removeLikeFromRating = async (req, res) => {
             return res.status(404).json({message : 'User not found'});
         }
 
-       
-
-
         res.status(200).json({
+            success:true,
             message : 'Like removed successfully'
         });
-    } catch (error) {
-        res.status(500).json({ message : error.message, data :deleteLike });
-        console.log(error);
-    }
-}
+   
+});
 
-export const removeCommentFromRating = async (req, res) => {
-    try {
+export const removeCommentFromRating = asyncHandler(async (req, res) => {
+   
         const deleteComment = await Ratings.findByIdAndUpdate(
             req.params.ratingId,
             { $pull : {comments : { _id: req.params.commentId }   } },
@@ -224,16 +260,14 @@ export const removeCommentFromRating = async (req, res) => {
 
 
         res.status(200).json({
+            success:true,
             message : 'Comment removed successfully'
         });
-    } catch (error) {
-        res.status(500).json({ message : error.message });
-        console.log(error);
-    }
-}
+   
+});
 
-export const updateComment = async (req, res) => {
-    try {
+export const updateComment = asyncHandler(async (req, res) => {
+   
         const { ratingId, commentId } = req.params;
         const { comment } = req.body
 
@@ -253,20 +287,53 @@ export const updateComment = async (req, res) => {
             return res.status(404).json({message : 'Comment not found'})
         }
 
-        res.json(updateComment)
-    } catch (error) {
-        console.log(error.message);
-    }
-}
-
-
-
-export const addRating = async (req, res) => {
+         res.status(200).json({
+            success:true,
+            message : 'Comment updated successfully',
+            comment: updateComment
+        });
     
-    try {
+});
+
+
+
+export const addRating = asyncHandler(async (req, res) => {
+
+        const session = await mongoose.startSession();
+        session.startTransaction();
+   try {
         const {rating, review, userId, movieId} = req.body;
 
-        const newRating = await Ratings.create([{ rating, review, userId, movieId}]);
+         const movie = await Movie.findById(movieId).select('title').session(session);
+         const user = await User.findById(userId).select('username friends').populate('friends', '_id').session(session);
+         const friends = user?.friends;
+
+         if (!movie || !user) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(404).json({ success: false, message: 'Movie or user not found' });
+        }
+
+     
+        const newRating = await Ratings.create([{ rating, review, userId, movieId}], { session });
+
+        //SAVE FOR ACTIVITY FEED
+        // const notifications = await Promise.all(friends.map(friend => 
+        //     Notification.create({
+        //         userId: friend._id,
+        //         from: user.username,
+        //         type: "RATING",
+        //         message: `${user?.username} added a review on ${movie?.title}`
+        //     }, { session })
+        // ));
+
+        // const wss = req.app.get("wss");
+        // notifications.forEach((notification, idx) => {
+        //     notificationSender(wss, friends[idx]._id, notification);
+        // });
+
+        await session.commitTransaction();
+        session.endSession();
 
         res.status(201).json({
             success: true,
@@ -275,18 +342,16 @@ export const addRating = async (req, res) => {
                 rating : newRating,
             }
         })
-    } catch (error) {
-        console.log(error);
-        console.log('Failed to add rating');
-    }
-}
+     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        throw error;
+     }
+    
+});
 
-
+export const updateRating = asyncHandler(async (req, res) => {
    
-
-
-export const updateRating = async (req, res) => {
-    try {
         const { id } = req.params;
         const updatedData = req.body
 
@@ -300,23 +365,24 @@ export const updateRating = async (req, res) => {
             return res.status(404).json({message : 'Rating not found'})
         }
 
-        res.json(updateRating)
-    } catch (error) {
-        console.log(error.message);
-    }
-}
+        
+         res.status(200).json({
+            success:true,
+            message : 'Comment updated successfully',
+            rating: updateRating
+        });
+    
+});
 
 
 
-export const deleteRating = async (req, res) => {
-    try {
+export const deleteRating = asyncHandler(async (req, res) => {
+    
         const ratingDelete = await Ratings.findByIdAndDelete(req.params.id);
         if(!ratingDelete) {
             return res.status(404).json({message : 'Rating not found'});
         }
 
-        res.status(200).json({message : 'Rating deleted successfully'});
-    } catch (error) {
-        res.status(500).json({ message : error.message });
-    }
-}
+        res.status(200).json({success: true, message : 'Rating deleted successfully'});
+   
+});
